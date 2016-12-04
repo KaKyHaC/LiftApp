@@ -1,0 +1,180 @@
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gora"
+    tools:context="com.divan.liftapp.FullscreenActivity">
+
+
+    <!-- The primary full-screen view. This can be replaced with whatever view
+         is needed to present your content, e.g. VideoView, SurfaceView,
+         TextureView, etc. -->
+    <TextView
+        android:id="@+id/fullscreen_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:keepScreenOn="true"
+        android:textSize="50sp"
+        android:textStyle="bold"/>
+        <!--android:text="@string/dummy_content" />-->
+
+    <!-- This FrameLayout insets its children based on system windows using
+         android:fitsSystemWindows. -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+
+        <LinearLayout
+            android:id="@+id/fullscreen_content_controls"
+            style="?metaButtonBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom|center_horizontal"
+            android:background="@color/black_overlay"
+            android:orientation="vertical"
+            tools:ignore="UselessParent">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:layout_margin="2dp"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2dp"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:text="date"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="8"
+                        android:layout_margin="2dp"
+                        android:background="@drawable/roundrect"
+                        android:id="@+id/date"
+                        android:textAlignment="center"
+                        android:textSize="20sp" />
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:srcCompat="@drawable/jagodi"
+
+                        android:layout_weight="1"
+                        android:layout_margin="2dp"
+                        android:id="@+id/imageView2" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_weight="2"
+                    android:layout_margin="2dp"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:text="Information"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/roundrect"
+                        android:layout_weight="3"
+                        android:layout_margin="2dp"
+                        android:id="@+id/information"
+                        android:textAlignment="textStart"
+                        android:textSize="20sp" />
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_weight="2"
+                        android:layout_margin="2dp"
+                        android:background="@drawable/roundrect"
+                        android:layout_height="match_parent">
+
+                        <LinearLayout
+                            android:orientation="vertical"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1">
+
+                            <ImageView
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@android:drawable/arrow_up_float"
+                                android:id="@+id/imageView"
+                                android:layout_weight="1"/>
+
+                            <ImageView
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@android:drawable/arrow_down_float"
+                                android:id="@+id/imageView3"
+                                android:layout_weight="1"/>
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:text="3"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:id="@+id/number"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:textAlignment="viewEnd"
+                            android:textSize="200sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_margin="2dp"
+                        android:background="@drawable/roundrect"
+                        android:layout_height="match_parent"
+                        android:layout_weight="3"
+                        android:id="@+id/iconsLayout" >
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/women"
+                            android:id="@+id/man"
+                            android:layout_weight="1"/>
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+
+                            android:id="@+id/migle"
+                            android:layout_weight="1"/>
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/men"
+                            android:id="@+id/girl"
+                            android:layout_weight="1"/>
+                        </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:text="Берегите лифт - он сохраняет Ваше здоровье"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/roundrect"
+                android:layout_margin="2dp"
+                android:layout_weight="10"
+                android:id="@+id/massage"
+                android:textAlignment="textStart"
+                android:textSize="20sp" />
+        </LinearLayout>
+    </FrameLayout>
+
+</FrameLayout>
