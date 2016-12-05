@@ -21,10 +21,11 @@ import java.util.Vector;
 public class Setting {
     public String MainPath,BackGroundFolder,ImageFolder,SoundFolder,MusicFolder,MassageFolder,InformationFolder,ResourcesFolder;
     public String TextColor,LayOutBackGraundColor;
-    public int TextSize=30;
+    public int TextInfoSize=30,TextDateSize=30,TextMassageSize=30;
     public int NumberSize=130;
     public String typeDate="dd:MM:yyyy EEEE HH:mm";
-    public String pathSerialPort;
+    public String pathSerialPort="";
+    public int baudrate=-1;
 
     String[] AllDevicesPath;
 
@@ -66,22 +67,25 @@ public class Setting {
         try{
             FileWriter fw=new FileWriter(setting);
             BufferedWriter bw=new BufferedWriter(fw);
-            bw.write(folderSetting+"-  mainPath\n");
-            bw.write("BackGround"+"-  BackGround Folder\n");
-            bw.write("Image"+"-  Image Folder\n");
-            bw.write("Sound"+"-  Sound Folder\n");
-            bw.write("Music"+"-  Music Folder\n");
-            bw.write("Massage"+"-  Massage Folder\n");
-            bw.write("Information"+"-  Information Folder\n");
-            bw.write("Resources"+"-  Resources Folder\n");
-            bw.write(TextColor+"-  Text Color\n");
-            bw.write(LayOutBackGraundColor+"-  LayOut BackGraund Color\n");
+            bw.write(folderSetting+"--  mainPath\n");
+            bw.write("BackGround"+"--  BackGround Folder\n");
+            bw.write("Image"+"--  Image Folder\n");
+            bw.write("Sound"+"--  Sound Folder\n");
+            bw.write("Music"+"--  Music Folder\n");
+            bw.write("Massage"+"--  Massage Folder\n");
+            bw.write("Information"+"--  Information Folder\n");
+            bw.write("Resources"+"--  Resources Folder\n");
+            bw.write(TextColor+"--  Text Color\n");
+            bw.write(LayOutBackGraundColor+"--  LayOut BackGraund Color\n");
 
-            bw.write(TextSize+"-  Text Size\n");
-            bw.write(NumberSize+"-  Number Size\n");
-            bw.write(typeDate+"-  type Date\n");
+            bw.write(TextInfoSize+"--  Text Information Size\n");
+            bw.write(TextDateSize+"--  Text Date Size\n");
+            bw.write(TextMassageSize+"--  Text Massage Size\n");
+            bw.write(NumberSize+"--  Number Size\n");
+            bw.write(typeDate+"--  type Date\n");
 
-            bw.write(pathSerialPort+"- path Serial Port");
+            bw.write(pathSerialPort+"-- path Serial Port\n");
+            bw.write(baudrate+"-- baudrate\n");
             bw.close();
         }catch (IOException r){
 
@@ -147,10 +151,15 @@ public class Setting {
             TextColor= getStringBeforCommends(br.readLine());
             LayOutBackGraundColor= getStringBeforCommends(br.readLine());
 
-            TextSize=Integer.parseInt(getStringBeforCommends(br.readLine()));
+            TextInfoSize=Integer.parseInt(getStringBeforCommends(br.readLine()));
+            TextDateSize=Integer.parseInt(getStringBeforCommends(br.readLine()));
+            TextMassageSize=Integer.parseInt(getStringBeforCommends(br.readLine()));
             NumberSize=Integer.parseInt(getStringBeforCommends(br.readLine()));
+
             typeDate= getStringBeforCommends(br.readLine());
             pathSerialPort= getStringBeforCommends(br.readLine());
+
+            baudrate=Integer.parseInt(getStringBeforCommends(br.readLine()));
 
         }catch (IOException r)
         {
@@ -162,7 +171,7 @@ public class Setting {
         StringBuilder sb=new StringBuilder();
         for (int i=0;i<s.length();i++) {
             char cur=s.charAt(i);
-            if(cur!='-')
+            if(!(cur=='-'&&s.charAt(i+1)=='-'))
                 sb.append(cur);
             else
                 break;

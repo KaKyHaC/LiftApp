@@ -27,9 +27,12 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.widget.Toast;
 
 
-public abstract class SerialPortActivity extends Activity {
+public abstract class SerialPortActivity extends AppCompatActivity {
 
 	protected Application mApplication;
 	protected SerialPort mSerialPort;
@@ -74,7 +77,7 @@ public abstract class SerialPortActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mApplication = (Application) getApplication();
+		mApplication = new Application();//(Application) getApplication();
 		try {
 			mSerialPort = mApplication.getSerialPort();
 			mOutputStream = mSerialPort.getOutputStream();
@@ -84,11 +87,11 @@ public abstract class SerialPortActivity extends Activity {
 			mReadThread = new ReadThread();
 			mReadThread.start();
 		} catch (SecurityException e) {
-			//DisplayError(R.string.error_security);
+			DisplayError(R.string.error_security);
 		} catch (IOException e) {
-			//DisplayError(R.string.error_unknown);
+			DisplayError(R.string.error_unknown);
 		} catch (InvalidParameterException e) {
-			//DisplayError(R.string.error_configuration);
+			Toast.makeText(this, R.string.error_configuration, Toast.LENGTH_LONG).show();//DisplayError(R.string.error_configuration);
 		}
 	}
 

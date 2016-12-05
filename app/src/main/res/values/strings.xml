@@ -2,5 +2,8 @@
     <string name="app_name">LiftApp</string>
 
     <string name="dummy_button">Dummy Button</string>
+    <string name="error_security">error_security</string>
+    <string name="error_unknown">error_unknown</string>
+    <string name="error_configuration">error_configuration</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>
