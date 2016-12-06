@@ -3,6 +3,7 @@ package com.divan.liftapp;
 import android.annotation.SuppressLint;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -15,6 +16,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.support.annotation.UiThread;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -36,6 +38,7 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -59,6 +62,7 @@ public class FullscreenActivity extends SerialPortActivity {
     AudioManager am;
     String SettingFolder="LiftApp",settingFile="setting.txt";
     String pathSDcard= Environment.getExternalStorageDirectory().getAbsolutePath();
+    Context context=this;
 
 
     @Override
@@ -85,21 +89,21 @@ public class FullscreenActivity extends SerialPortActivity {
 
         mTimer.schedule(mMyTimerTask, 1000, 1000);
 
-        //con=new Controller(savedInstanceState);
+        new CatTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
-        new CatTask().execute();
+        new Demo().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
-        SetBackGraund("1.bmp");
-        SetTextViewMassage(info,setting.MassageFolder,"1.txt");
-
+        mediaPlayer=MediaPlayer.create(this,R.raw.nature);
+        mediaPlayer.setLooping(true);
+        mediaPlayer.start();
 
     }
-
 
     @Override
     protected void onResume() {
         super.onResume();
         getWindow().getDecorView().setSystemUiVisibility(UiSetting);
+        mediaPlayer.start();
     }
 
 
@@ -207,6 +211,12 @@ public class FullscreenActivity extends SerialPortActivity {
         ed.commit();
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mediaPlayer.pause();
+    }
+
     class MyTimerTask extends TimerTask {
 
         @Override
@@ -245,6 +255,96 @@ public class FullscreenActivity extends SerialPortActivity {
             getWindow().getDecorView().setSystemUiVisibility(UiSetting);
         }
 
-           }
+    }
+
+    class Demo extends  AsyncTask<Void,Integer,Void>{
+        private int index=1;
+        @Override
+        protected Void doInBackground(Void... params) {
+            int maxLvl=6;
+            int i=-1;
+            publishProgress(1,1);
+            try {
+                while (true) {
+                    for (i+=2 ; i <= maxLvl; i++) {
+                        if(i==maxLvl)
+                            publishProgress(i,-1);
+                        else if(i==2) {
+                            publishProgress(i, 0);
+                            TimeUnit.SECONDS.sleep(2);
+                            publishProgress(i,1);
+                        }
+                        else
+                             publishProgress(i,1);
+                        TimeUnit.SECONDS.sleep(3);
+                    }
+
+                    for (i-=2; i >= 1; i--) {
+                        if(i==1)
+                            publishProgress(i,1);
+                        else
+                            publishProgress(i,-1);
+                        TimeUnit.SECONDS.sleep(3);
+                    }
+
+                }
+            }catch (InterruptedException r){
+
+            }
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+
+            int val=values[0];
+            boolean isUp=(values[1]==1);
+
+            if(values[1]==1){
+                up.setVisibility(View.VISIBLE);
+                down.setVisibility(View.INVISIBLE);
+            }
+            else if(values[1]==-1)
+            {
+                down.setVisibility(View.VISIBLE);
+                up.setVisibility(View.INVISIBLE);
+            }
+            else if(values[1]==0){
+                down.setVisibility(View.INVISIBLE);
+                up.setVisibility(View.INVISIBLE);
+            }
+            number.setText(String.valueOf(val));
+            Bitmap bm=BitmapFactory.decodeResource(getResources(),R.drawable.cat1);
+            Drawable bc=getResources().getDrawable(R.drawable.im1);
+            if(values[1]==0){
+                switch (index){
+                    case 0:bc=getResources().getDrawable(R.drawable.im1);index++;break;
+                    case 1:bc=getResources().getDrawable(R.drawable.im2);index++;break;
+                    case 2:bc=getResources().getDrawable(R.drawable.im3);index=0;break;
+                }
+            }
+            /*switch (val%3){
+
+            }*/
+            switch (val%2)
+            {
+                case 0:bm=BitmapFactory.decodeResource(getResources(),R.drawable.cat1);break;
+                case 1:bm=BitmapFactory.decodeResource(getResources(),R.drawable.cat2);break;
+            }
+            frameLayout.setBackground(bc);
+            image.setImageBitmap(bm);
+
+
+            if(val==2&&values[1]==0) {
+                MediaPlayer mp = MediaPlayer.create(context, R.raw.et2);
+                //Звук будет проигрываться только 1 раз:
+                mp.setLooping(false);
+                mp.start();
+            }
+
+            //getWindow().getDecorView().setSystemUiVisibility(UiSetting);
+        }
+    }
 
 }

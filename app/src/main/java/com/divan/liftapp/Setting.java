@@ -2,6 +2,7 @@ package com.divan.liftapp;
 
 import android.os.Environment;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -19,6 +20,7 @@ import java.util.Vector;
  */
 
 public class Setting {
+    private final String LOG_TAG="LiftApp";
     public String MainPath,BackGroundFolder,ImageFolder,SoundFolder,MusicFolder,MassageFolder,InformationFolder,ResourcesFolder;
     public String TextColor,LayOutBackGraundColor;
     public int TextInfoSize=30,TextDateSize=30,TextMassageSize=30;
@@ -42,7 +44,7 @@ public class Setting {
 
         if (!Environment.getExternalStorageState().equals(
                 Environment.MEDIA_MOUNTED)) {
-            //Log.d(LOG_TAG, "SD-карта не доступна: " + Environment.getExternalStorageState());
+            Log.d(LOG_TAG, "SD-карта не доступна: " + Environment.getExternalStorageState());
             return;
         }
         // получаем путь к SD
@@ -94,13 +96,16 @@ public class Setting {
 
     public void StartRead(String folderSetting,String settingFile)
     {
+        File sdPath;
         if (!Environment.getExternalStorageState().equals(
                 Environment.MEDIA_MOUNTED)) {
-            //Log.d(LOG_TAG, "SD-карта не доступна: " + Environment.getExternalStorageState());
-            return;
+            Log.d(LOG_TAG, "SD-карта не доступна: " + Environment.getExternalStorageState());
+            sdPath=Environment.getDataDirectory();
+            //return;
         }
-        // получаем путь к SD
-        File sdPath = Environment.getExternalStorageDirectory();
+        else {// получаем путь к SD
+            sdPath = Environment.getExternalStorageDirectory();
+        }
         // добавляем свой каталог к пути
         sdPath = new File(sdPath.getAbsolutePath() + "/" + folderSetting);
         // создаем каталог
