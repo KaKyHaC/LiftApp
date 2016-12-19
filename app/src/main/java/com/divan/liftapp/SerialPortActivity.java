@@ -39,6 +39,7 @@ public abstract class SerialPortActivity extends AppCompatActivity {
 	protected OutputStream mOutputStream;
 	private InputStream mInputStream;
 	private ReadThread mReadThread;
+	private final int SIZEOFBUFFER=5;
 
 	private class ReadThread extends Thread {
 
@@ -48,7 +49,7 @@ public abstract class SerialPortActivity extends AppCompatActivity {
 			while(!isInterrupted()) {
 				int size;
 				try {
-					byte[] buffer = new byte[64];
+					byte[] buffer = new byte[SIZEOFBUFFER];
 					if (mInputStream == null) return;
 					size = mInputStream.read(buffer);
 					if (size > 0) {

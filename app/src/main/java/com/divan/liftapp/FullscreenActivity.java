@@ -3,6 +3,9 @@ package com.divan.liftapp;
 import android.annotation.SuppressLint;
 
 import android.app.Dialog;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -21,13 +24,20 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -35,6 +45,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -51,23 +62,89 @@ public class FullscreenActivity extends SerialPortActivity {
     private View mContentView;
     private View mControlsView;
     private TextView date,info,massage,number;
-    private ImageView up,down,man,women,image;
+    private ImageView imageArrow,fire,ring;
+    //ImageView image;
     private FrameLayout frameLayout;
-    private boolean mVisible;
+    private boolean mVisible,voiceSupport=false;
     private Timer mTimer;
     private MyTimerTask mMyTimerTask;
     private Setting setting;
+    //private VideoView videoView;
     //Controller con;
     MediaPlayer mediaPlayer;
     AudioManager am;
-    String SettingFolder="LiftApp",settingFile="setting.txt";
-    String pathSDcard= Environment.getExternalStorageDirectory().getAbsolutePath();
-    Context context=this;
+    FragmentVideo fragVideo;
+    FragmentText fragText;
+    FragmentImage fragImage;
+
+    final String SettingFolder="LiftApp",settingFile="setting.txt",GONG="gong.wav";
+    final String pathSDcard= Environment.getExternalStorageDirectory().getAbsolutePath();
+    final Context context=this;
+
 
 
     @Override
-    protected void onDataReceived(byte[] buffer, int size) {
-        Toast.makeText(this, "Data Received", Toast.LENGTH_LONG).show();
+    protected void onDataReceived(final byte[] buffer,final int size) {
+        runOnUiThread(new Runnable() {
+            public void run() {
+            //TODO your logic
+                Toast.makeText(context, "Data Received", Toast.LENGTH_LONG).show();
+                if(size>=4) {
+                    Evidence(buffer[3]);
+                    if (voiceSupport) Orders(buffer[2]);
+                    Floors(buffer[1]);
+                    SpecialSignal(buffer[0]);
+                }
+
+            }
+        });
+
+    }
+    //TODO режим
+    private void Evidence(final byte b){
+        runOnUiThread(new Runnable() {
+            public void run() {
+                   /* up.setVisibility(isChecked(b,0)?View.VISIBLE:View.INVISIBLE);
+                    down.setVisibility(isChecked(b,1)?View.VISIBLE:View.INVISIBLE);*/
+                if(isChecked(b,2))
+                    PlaySound(GONG);
+                voiceSupport=isChecked(b,3);
+            }
+        });
+
+    }
+    private void Orders(byte b){
+        int myInt = b & 0xff;
+        final String soundFile=String.valueOf(myInt);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                PlaySound(soundFile);
+            }
+        });
+    }
+    private void Floors(byte b){
+        final int myInt = b & 0xff;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                number.setText(String.valueOf(myInt));
+            }
+        });
+    }
+    private void SpecialSignal(byte b){
+        int myInt = b & 0xff;
+        final String soundFile=String.valueOf(myInt);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                PlaySpecialSound(soundFile);
+            }
+        });
+    }
+    private boolean isChecked(byte b,int pos){
+        assert (pos<8);
+        return (b&(byte)Math.pow(2,pos))!=0;
     }
 
     @Override
@@ -75,7 +152,7 @@ public class FullscreenActivity extends SerialPortActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_fullscreen);
-        setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         Initialaze();
         getWindow().getDecorView().setSystemUiVisibility(UiSetting);
 
@@ -83,6 +160,8 @@ public class FullscreenActivity extends SerialPortActivity {
         if (actionBar != null) {
             actionBar.hide();
         }
+
+
 
         setting=new Setting(SettingFolder,settingFile);
         SetSetting();
@@ -93,9 +172,9 @@ public class FullscreenActivity extends SerialPortActivity {
 
         new Demo().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
-        mediaPlayer=MediaPlayer.create(this,R.raw.nature);
+       /* mediaPlayer=MediaPlayer.create(this,R.raw.nature);
         mediaPlayer.setLooping(true);
-        mediaPlayer.start();
+        mediaPlayer.start();*/
 
     }
 
@@ -116,6 +195,42 @@ public class FullscreenActivity extends SerialPortActivity {
                 mediaPlayer.setDataSource(f.getAbsolutePath());
                 mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
                 mediaPlayer.prepareAsync();
+                mediaPlayer.start();
+            }else{
+                Toast.makeText(this,"Cann't read music file",Toast.LENGTH_LONG);
+            }
+        }catch (IOException e){
+
+        }
+    }
+    private void PlaySound(String fileName){
+        try {
+            MediaPlayer mediaPlayer = new MediaPlayer();
+            //mediaPlayer.setDataSource(filePath);
+            File f=new File(pathSDcard+'/'+SettingFolder+'/'+setting.SoundFolder+'/'+fileName);
+            if(f.canRead()) {
+                mediaPlayer.setDataSource(f.getAbsolutePath());
+                mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                mediaPlayer.setLooping(false);
+                mediaPlayer.prepare();
+                mediaPlayer.start();
+            }else{
+                Toast.makeText(this,"Cann't read music file",Toast.LENGTH_LONG);
+            }
+        }catch (IOException e){
+
+        }
+    }
+    private void PlaySpecialSound(String fileName){
+        try {
+             MediaPlayer mediaPlayer = new MediaPlayer();
+            //mediaPlayer.setDataSource(filePath);
+            File f=new File(pathSDcard+'/'+SettingFolder+'/'+setting.SpecialSoundFolder+'/'+fileName);
+            if(f.canRead()) {
+                mediaPlayer.setDataSource(f.getAbsolutePath());
+                mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                mediaPlayer.setLooping(false);
+                mediaPlayer.prepare();
                 mediaPlayer.start();
             }else{
                 Toast.makeText(this,"Cann't read music file",Toast.LENGTH_LONG);
@@ -177,11 +292,12 @@ public class FullscreenActivity extends SerialPortActivity {
         number=(TextView)findViewById(R.id.number);
         mTimer = new Timer();
         mMyTimerTask = new MyTimerTask();
-        up=(ImageView)findViewById(R.id.imageUp);
-        down=(ImageView)findViewById(R.id.imageDown);
-        man=(ImageView)findViewById(R.id.man);
-        women=(ImageView)findViewById(R.id.women);
-        image=(ImageView)findViewById(R.id.imageMain);
+        imageArrow=(ImageView)findViewById(R.id.imageArrow);
+        fire=(ImageView)findViewById(R.id.fire);
+        ring=(ImageView)findViewById(R.id.ring);
+        /*image=(ImageView)findViewById(R.id.imageMain);
+        videoView=(VideoView)findViewById(R.id.video);*/
+
 
         frameLayout=(FrameLayout)findViewById(R.id.mainLayout);
         //con=new Controller();
@@ -192,6 +308,35 @@ public class FullscreenActivity extends SerialPortActivity {
                 "№0000000001 2016г \n" +
                 "Сделано в России";
         info.setText(infoSt);
+
+
+        StringBuilder sb=new StringBuilder(massage.getText());
+        for(int i=0;i<100;i++)
+            sb.append("  ");
+        sb.append(massage.getText());
+        for(int i=0;i<100;i++)
+            sb.append("  ");
+        //massage.setText(sb.toString());
+
+        massage.setSelected(true);
+
+        mediaPlayer = new MediaPlayer();
+
+        fragVideo= new FragmentVideo();
+        fragText=new FragmentText();
+        fragImage=new FragmentImage();
+
+
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager
+                .beginTransaction();
+
+
+        fragmentTransaction.add(R.id.fragment, fragImage);
+        fragmentTransaction.commit();
+
+        //videoView=((VideoView) fragVideo.getView().findViewById(R.id.videoFragment));
+
 
 
 
@@ -205,12 +350,22 @@ public class FullscreenActivity extends SerialPortActivity {
         massage.setTextSize(setting.TextMassageSize);
         info.setTextSize(setting.TextInfoSize);
         number.setTextSize(setting.NumberSize);
+        SetTextViewMassage(info,setting.InformationFolder,"information.txt");
+
+        int color=(int)Long.parseLong(setting.textColorHex,16);
+        date.setTextColor(color);
+        massage.setTextColor(color);
+        info.setTextColor(color);
+
         SharedPreferences sPref = getPreferences(MODE_PRIVATE);
         SharedPreferences.Editor ed = sPref.edit();
         ed.putString("DEVICE", setting.pathSerialPort);
         ed.commit();
     }
 
+    private void GravityNumber(){
+
+    }
     @Override
     protected void onPause() {
         super.onPause();
@@ -242,6 +397,7 @@ public class FullscreenActivity extends SerialPortActivity {
                 while(true) {
                     TimeUnit.SECONDS.sleep(2);
                     publishProgress(1);
+                    //onDataReceived(new byte[5],5);
                                     }
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -259,33 +415,74 @@ public class FullscreenActivity extends SerialPortActivity {
 
     class Demo extends  AsyncTask<Void,Integer,Void>{
         private int index=1;
+        String PathToLiftApp=pathSDcard + '/' + setting.MainPath +'/' ;
+        List<String> images,backGrounds,musics,videos;
+        int nImage=1,nBack=1,nMusic=0,nVideo=0;
+        int maxLvl=9;
+        boolean isFire=false;
+        MyFragment myFrag;
+
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            massage.setText(FileManager.getAllTextFromDirectory(PathToLiftApp + setting.MassageFolder));
+            /*------------------------*/
+            images= FileManager.getAllFilesPath(PathToLiftApp+setting.ImageFolder,"BMP","bmp","jpg","JPG");
+            backGrounds=FileManager.getAllFilesPath(PathToLiftApp+setting.BackGroundFolder,"BMP","bmp","jpg","JPG");
+            musics=FileManager.getAllFilesPath(PathToLiftApp+setting.MusicFolder,"mp3","wav");
+            videos=FileManager.getAllFilesPath(PathToLiftApp+setting.ResourcesFolder,"mp4","3gp");
+
+           /* if(videos.size()!=0) {
+                videoView.setVideoPath(videos.get(nVideo++ % videos.size()));
+                videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        videoView.setVideoPath(videos.get(nVideo++ % videos.size()));
+                        videoView.start();
+                    }
+                });
+                videoView.start();
+            }*/
+            fragVideo.setVideos(videos);
+            fragImage.setLists(images,musics);
+
+        }
+
+        @Override
+
         protected Void doInBackground(Void... params) {
-            int maxLvl=6;
+
             int i=-1;
             publishProgress(1,1);
             try {
                 while (true) {
+
                     for (i+=2 ; i <= maxLvl; i++) {
-                        if(i==maxLvl)
-                            publishProgress(i,-1);
-                        else if(i==2) {
+                        if (i == 9) {
                             publishProgress(i, 0);
-                            TimeUnit.SECONDS.sleep(2);
-                            publishProgress(i,1);
+                            TimeUnit.SECONDS.sleep(6);
                         }
+                        if (i == maxLvl)
+                            publishProgress(i, -1);
                         else
-                             publishProgress(i,1);
+                            publishProgress(i, 1);
                         TimeUnit.SECONDS.sleep(3);
                     }
 
                     for (i-=2; i >= 1; i--) {
+                        if (i == 3) {
+                            publishProgress(i, 0);
+                            TimeUnit.SECONDS.sleep(6);
+                        }
                         if(i==1)
                             publishProgress(i,1);
                         else
                             publishProgress(i,-1);
                         TimeUnit.SECONDS.sleep(3);
                     }
+
+                    publishProgress(2, 2);//fire
+                    TimeUnit.SECONDS.sleep(5);
 
                 }
             }catch (InterruptedException r){
@@ -294,56 +491,117 @@ public class FullscreenActivity extends SerialPortActivity {
             return null;
         }
 
+        protected void directionOfMovement(int value1 ){
+            FragmentManager fragmentManager = getFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager
+                    .beginTransaction();
+
+
+            if(value1==1){
+                imageArrow.setImageResource(R.drawable.up);
+                
+                fragmentTransaction.replace(R.id.fragment,fragImage);
+                myFrag=fragImage;
+            }
+            else if(value1==-1)
+            {
+                imageArrow.setImageResource(R.drawable.down);
+                if(videos.size()>0) {
+                    fragmentTransaction.replace(R.id.fragment, fragVideo);
+                    myFrag = fragVideo;
+                }
+            }
+
+            fragmentTransaction.commit();
+        }
+        protected void isStopOnFloor(int value1,int val){
+            if(value1==0){
+                final Animation animationFlipOut,animationFlipIn;
+                animationFlipIn = AnimationUtils.loadAnimation(context,
+                        android.R.anim.slide_in_left);
+                animationFlipOut = AnimationUtils.loadAnimation(context,
+                        android.R.anim.slide_out_right);
+                animationFlipOut.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        if(backGrounds.size()!=0) {
+                            Drawable drawable = BitmapDrawable.createFromPath(backGrounds.get((nBack++ % backGrounds.size())));
+                            frameLayout.setBackground(drawable);
+                            frameLayout.startAnimation(animationFlipIn);
+                        }
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+
+                    }
+                });
+
+                imageArrow.setImageBitmap(null);
+
+                if(backGrounds.size()>0) {
+                    //frameLayout.startAnimation(animationFlipOut);
+                    Drawable drawable = BitmapDrawable.createFromPath(backGrounds.get((nBack++ % backGrounds.size())));
+                    frameLayout.setBackground(drawable);
+                }
+                PlaySound(String.valueOf(val)+".mp3");
+                ring.setImageResource(R.drawable.ring);
+               // mediaPlayer.pause();
+            }
+            else{
+                ring.setImageBitmap(null);
+                //mediaPlayer.start();
+            }
+        }
+        protected void isFireAlert(int value1){
+            FragmentManager fragmentManager = getFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager
+                    .beginTransaction();
+            if(value1==2)
+            {
+                imageArrow.setImageBitmap(null);
+                fire.setImageResource(R.drawable.fire1);
+                //fire.setVisibility(View.VISIBLE);
+                isFire=true;
+                fragmentTransaction.replace(R.id.fragment,fragText);
+
+                PlaySpecialSound("fire.mp3");
+
+            }
+            else if(isFire==true)
+            {
+               // fire.setVisibility(View.INVISIBLE);
+                fire.setImageBitmap(null);
+                isFire=false;
+                fragmentTransaction.replace(R.id.fragment,myFrag);
+            }
+            fragmentTransaction.commit();
+        }
+
+
         @Override
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
 
             int val=values[0];
-            boolean isUp=(values[1]==1);
+            directionOfMovement(values[1]);
+            isStopOnFloor(values[1],val);
+            isFireAlert(values[1]);
 
-            if(values[1]==1){
-                up.setVisibility(View.VISIBLE);
-                down.setVisibility(View.INVISIBLE);
-            }
-            else if(values[1]==-1)
-            {
-                down.setVisibility(View.VISIBLE);
-                up.setVisibility(View.INVISIBLE);
-            }
-            else if(values[1]==0){
-                down.setVisibility(View.INVISIBLE);
-                up.setVisibility(View.INVISIBLE);
-            }
+
             number.setText(String.valueOf(val));
-            Bitmap bm=BitmapFactory.decodeResource(getResources(),R.drawable.cat1);
-            Drawable bc=getResources().getDrawable(R.drawable.im1);
-            if(values[1]==0){
-                switch (index){
-                    case 0:bc=getResources().getDrawable(R.drawable.im1);index++;break;
-                    case 1:bc=getResources().getDrawable(R.drawable.im2);index++;break;
-                    case 2:bc=getResources().getDrawable(R.drawable.im3);index=0;break;
-                }
-            }
-            /*switch (val%3){
+            myFrag.onApdate(val,values[1]);
 
+          /*  if(images.size()!=0&&val%2==0) {
+                Bitmap bm = BitmapFactory.decodeFile(images.get(nImage++ % images.size()));
+                fragImage.setImage(bm);
             }*/
-            switch (val%2)
-            {
-                case 0:bm=BitmapFactory.decodeResource(getResources(),R.drawable.cat1);break;
-                case 1:bm=BitmapFactory.decodeResource(getResources(),R.drawable.cat2);break;
-            }
-            frameLayout.setBackground(bc);
-            image.setImageBitmap(bm);
 
-
-            if(val==2&&values[1]==0) {
-                MediaPlayer mp = MediaPlayer.create(context, R.raw.et2);
-                //Звук будет проигрываться только 1 раз:
-                mp.setLooping(false);
-                mp.start();
-            }
-
-            //getWindow().getDecorView().setSystemUiVisibility(UiSetting);
         }
     }
 

@@ -1,5 +1,6 @@
 package com.divan.liftapp;
 
+import android.graphics.Color;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
@@ -21,13 +22,14 @@ import java.util.Vector;
 
 public class Setting {
     private final String LOG_TAG="LiftApp";
-    public String MainPath,BackGroundFolder,ImageFolder,SoundFolder,MusicFolder,MassageFolder,InformationFolder,ResourcesFolder;
-    public String TextColor,LayOutBackGraundColor;
+    public String MainPath,BackGroundFolder,ImageFolder,SoundFolder,MusicFolder,MassageFolder,InformationFolder,ResourcesFolder,SpecialSoundFolder;
+    public String LayOutBackGraundColor;
     public int TextInfoSize=30,TextDateSize=30,TextMassageSize=30;
-    public int NumberSize=130;
+    public int NumberSize=230;
     public String typeDate="dd:MM:yyyy EEEE HH:mm";
     public String pathSerialPort="";
     public int baudrate=-1;
+    public String textColorHex=Integer.toHexString(Color.WHITE);
 
     String[] AllDevicesPath;
 
@@ -77,10 +79,12 @@ public class Setting {
             bw.write("Massage"+"--  Massage Folder\n");
             bw.write("Information"+"--  Information Folder\n");
             bw.write("Resources"+"--  Resources Folder\n");
-            bw.write(TextColor+"--  Text Color\n");
+            bw.write("SpecialSound"+"--  Special Sound Folder\n");
+           // bw.write(TextColor+"--  Text Color\n");
             bw.write(LayOutBackGraundColor+"--  LayOut BackGraund Color\n");
+            bw.write(textColorHex+"-- цвет текста (Text Color)\n");
 
-            bw.write(TextInfoSize+"--  Text Information Size\n");
+            bw.write(TextInfoSize+"--  Текст Information Size\n");
             bw.write(TextDateSize+"--  Text Date Size\n");
             bw.write(TextMassageSize+"--  Text Massage Size\n");
             bw.write(NumberSize+"--  Number Size\n");
@@ -88,6 +92,7 @@ public class Setting {
 
             bw.write(pathSerialPort+"-- path Serial Port\n");
             bw.write(baudrate+"-- baudrate\n");
+
             bw.close();
         }catch (IOException r){
 
@@ -96,8 +101,8 @@ public class Setting {
 
     public void StartRead(String folderSetting,String settingFile)
     {
-        File sdPath;
-        if (!Environment.getExternalStorageState().equals(
+        File sdPath= Environment.getExternalStorageDirectory();;
+      /*  if (!Environment.getExternalStorageState().equals(
                 Environment.MEDIA_MOUNTED)) {
             Log.d(LOG_TAG, "SD-карта не доступна: " + Environment.getExternalStorageState());
             sdPath=Environment.getDataDirectory();
@@ -105,7 +110,7 @@ public class Setting {
         }
         else {// получаем путь к SD
             sdPath = Environment.getExternalStorageDirectory();
-        }
+        }*/
         // добавляем свой каталог к пути
         sdPath = new File(sdPath.getAbsolutePath() + "/" + folderSetting);
         // создаем каталог
@@ -142,6 +147,7 @@ public class Setting {
         new File(sdPath.getAbsolutePath()+'/'+MassageFolder).mkdir();
         new File(sdPath.getAbsolutePath()+'/'+InformationFolder).mkdir();
         new File(sdPath.getAbsolutePath()+'/'+ResourcesFolder).mkdir();
+        new File(sdPath.getAbsolutePath()+'/'+SpecialSoundFolder).mkdir();
     }
     private void ReadSettings(BufferedReader br){
         try {
@@ -153,8 +159,10 @@ public class Setting {
             MassageFolder= getStringBeforCommends(br.readLine());
             InformationFolder= getStringBeforCommends(br.readLine());
             ResourcesFolder= getStringBeforCommends(br.readLine());
-            TextColor= getStringBeforCommends(br.readLine());
+            SpecialSoundFolder= getStringBeforCommends(br.readLine());
+            //TextColor= getStringBeforCommends(br.readLine());
             LayOutBackGraundColor= getStringBeforCommends(br.readLine());
+            textColorHex=getStringBeforCommends(br.readLine());
 
             TextInfoSize=Integer.parseInt(getStringBeforCommends(br.readLine()));
             TextDateSize=Integer.parseInt(getStringBeforCommends(br.readLine()));
@@ -165,6 +173,7 @@ public class Setting {
             pathSerialPort= getStringBeforCommends(br.readLine());
 
             baudrate=Integer.parseInt(getStringBeforCommends(br.readLine()));
+
 
         }catch (IOException r)
         {
