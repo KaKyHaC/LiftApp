@@ -36,37 +36,9 @@ public class Setting {
     public Setting(String folderSetting,String settingFile)
     {
         StartRead(folderSetting,settingFile);
-        FindAllDevices(folderSetting,"devices.txt");
         MainPath=folderSetting;
     }
-    private void FindAllDevices(String folder,String devicesFile)
-    {
-        SerialPortFinder spf=new SerialPortFinder();
-        AllDevicesPath=spf.getAllDevicesPath();
 
-        if (!Environment.getExternalStorageState().equals(
-                Environment.MEDIA_MOUNTED)) {
-            Log.d(LOG_TAG, "SD-карта не доступна: " + Environment.getExternalStorageState());
-            return;
-        }
-        // получаем путь к SD
-        File sdPath = Environment.getExternalStorageDirectory();
-        // добавляем свой каталог к пути
-        sdPath = new File(sdPath.getAbsolutePath() + "/" + folder);
-        // создаем каталог
-        sdPath.mkdirs();
-        // формируем объект File, который содержит путь к файлу
-        File sdFile = new File(sdPath, devicesFile);
-        try{
-            BufferedWriter bw=new BufferedWriter(new FileWriter(sdFile));
-            for (String a:AllDevicesPath) {
-                bw.write(a+'\n');
-            }
-            bw.close();
-        }catch (IOException e){
-
-        }
-    }
     public void CreateDefaultSetting(File setting ,String folderSetting){
         try{
             FileWriter fw=new FileWriter(setting);

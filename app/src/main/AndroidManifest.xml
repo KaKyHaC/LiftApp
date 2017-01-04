@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.divan.liftapp">
-
-<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"></uses-permission>
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
-
+    <permission android:name="android.hardware.usb.host" >
+    </permission>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.BIND_SCREENING_SERVICE" />
+    <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-feature android:name="android.hardware.usb.host" android:required="true" />
     <application
-
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="AppLift"
@@ -16,16 +19,30 @@
         <activity
             android:name=".FullscreenActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-
             android:theme="@style/FullscreenTheme">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+            </intent-filter>
+            <meta-data android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+                android:resource="@xml/device_filter" />
         </activity>
-    </application
-        >
+        <activity
+            android:name=".AlertActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_alert"
+            android:theme="@style/FullscreenTheme">
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+            </intent-filter>
+            <meta-data android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+                android:resource="@xml/device_filter" />
+        </activity>
+
+    </application>
 
 </manifest>
