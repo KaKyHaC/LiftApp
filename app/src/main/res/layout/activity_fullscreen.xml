@@ -97,7 +97,6 @@
 
 
                         <TextView
-                            android:text="3"
                             android:layout_margin="2dp"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
@@ -108,7 +107,7 @@
                             android:textSize="220sp"
                             android:layout_gravity="center"
                             android:background="@drawable/roundrect"
-                             />
+                            android:text="a" />
 
 
 
@@ -131,7 +130,6 @@
                             <ImageView
                                 android:layout_width="wrap_content"
                                 android:layout_height="match_parent"
-                                app:srcCompat="@drawable/up"
                                 android:layout_margin="0dp"
                                 android:id="@+id/imageArrow"
                                 android:layout_weight="1"/>

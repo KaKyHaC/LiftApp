@@ -56,6 +56,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Vector;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
@@ -89,6 +90,10 @@ public class FullscreenActivity extends AppCompatActivity {
     final String pathSDcard= Environment.getExternalStorageDirectory().getAbsolutePath();
     final Context context=this;
 
+    CatTask catTask;
+    Main main;
+    boolean isAsyn=false;
+
 
     private boolean isChecked(byte b,int pos){
         assert (pos<8);
@@ -113,17 +118,43 @@ public class FullscreenActivity extends AppCompatActivity {
 
         mTimer.schedule(mMyTimerTask, 1000, 1000);
 
-        new CatTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        new Main().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        if(!isAsyn) {
+            catTask = new CatTask();
+            main = new Main();
+
+            if (!isAsyn && catTask != null && main != null) {
+                catTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                main.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                isAsyn = true;
+            }
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         getWindow().getDecorView().setSystemUiVisibility(UiSetting);
-      //  mediaPlayer.start();
+       // musicPlayer.start();
+        if(!isAsyn) {
+            catTask = new CatTask();
+            main = new Main();
+
+            if (!isAsyn && catTask != null && main != null) {
+                catTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                main.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                isAsyn = true;
+            }
+        }
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        musicPlayer.pause();
+        main.cancel(false);
+        catTask.cancel(false);
+        isAsyn=false;
+    }
 
     private void PlayMusic(String fileName){
         try {
@@ -309,11 +340,7 @@ public class FullscreenActivity extends AppCompatActivity {
         ed.commit();*/
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-       // mediaPlayer.pause();
-    }
+
 
     class MyTimerTask extends TimerTask {
 
@@ -338,6 +365,7 @@ public class FullscreenActivity extends AppCompatActivity {
         protected Void doInBackground(Void... params) {
             try {
                 while(true) {
+                    if (isCancelled()) return null;
                     TimeUnit.SECONDS.sleep(2);
                     publishProgress(1);
                     //onDataReceived(new byte[5],5);
@@ -370,6 +398,8 @@ public class FullscreenActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+
+            number.setText("b");
 
             ftDriver=new FTDriver((UsbManager)getSystemService(Context.USB_SERVICE));
             isOpen=ftDriver.begin(FTDriver.BAUD9600);
@@ -406,38 +436,51 @@ public class FullscreenActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... params) {
 
-            byte[] signal=new byte[64];
-           /* byte[][] test=new byte[][]{
+         /*   byte[] signal=new byte[64];
+            isOpen=true;
+           byte[][] test=new byte[][]{
                     {0,1,1,1,1,0,1,0,0,3},
+                    {0,0,0,0,0,0,0,0,0,0},
                     {0,2,2,6,1,1,0,1,1,4},
                     {0,3,3,2,3,2,2,1,0,2},
+                   {0,0,0,0,0,0,0,0,0,0},
                     {0,4,4,5,1,3,1,2,0,4},
                     {0,5,5,3,1,4,3,2,1,6},
+                   {0,0,0,0,0,0,0,0,0,0},
                     {0,6,6,3,6,5,2,1,0,4},
                     {0,7,7,4,1,6,1,0,0,3},
                     {0,8,0,5,0,7,0,3,1,0}};
-            int index=0;*/
+            int index=0;
             while(true){
-          /*      publishProgress(test[index++%test.length]);
+                if (isCancelled()) return null;
+                publishProgress(test[index++%test.length]);
                 try{
-                TimeUnit.SECONDS.sleep(5);
-                 }catch(InterruptedException e){}*/
+                TimeUnit.SECONDS.sleep(2);
+                 }catch(InterruptedException e){}
+                 }*/
+
+            while(true){
+             if (isCancelled()) return null;
                 byte[] buf = new byte[SIZEOFMASSAGE];
+                //isOpen=ftDriver.isConnection();
                 //isOpen=ftDriver.begin(FTDriver.BAUD9600);
                 if(isOpen) {
                     ftDriver.read(buf);
-                    isOpen=ftDriver.isConnection();
+                    //isOpen=ftDriver.isConnection();
                 }
-                else {
+                else
+                {
                     isOpen=ftDriver.begin(FTDriver.BAUD9600);
                 }
-                publishProgress(buf,signal);
+                publishProgress(buf);
                 try{
                     Thread.sleep(BAUDRATE);
                 }catch (InterruptedException e){}
-
             }
+
+
         }
+
 
         @Override
         protected void onProgressUpdate(byte[]... values) {
@@ -448,6 +491,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 Flours(b[1]);
                 Images(b[2]);
                 Media(b[3]);
+                //viewMassage(b);
                 NamedSound(b[4]);
                 Sounds(b[5]);
                 SpecialSound(b[6]);
@@ -467,7 +511,8 @@ public class FullscreenActivity extends AppCompatActivity {
 
         void Flours(byte b){
             int myInt = b & 0xff;
-            number.setText(String.valueOf(myInt));
+            if(myInt!=0)
+                number.setText(String.valueOf(myInt));
         }
         void Images(byte b){
             switch (b)
@@ -603,7 +648,27 @@ public class FullscreenActivity extends AppCompatActivity {
 
             fragmentTransaction.commit();
         }
+        Vector<String> sBuf=new Vector<>();
+        void viewMassage(byte[] b){
+            boolean isMassage=false;
+            StringBuilder s=new StringBuilder();
+            for(int i=0;i<9;i++){
+                if(b[i]!=0)
+                    isMassage=true;
 
+                s.append(String.valueOf(b[i]));
+                if(i<14)s.append(",");
+            }
+            if(isMassage)
+                sBuf.add(s.toString());
+           SetFragment(Fragment.Text);
+            StringBuilder vS=new StringBuilder();
+            for(int i=sBuf.size()-1;i>=0&&i>sBuf.size()-10;i--)
+            {
+                vS.append(sBuf.elementAt(i)+'\n');
+            }
+            fragText.SetText(vS.toString());
+        }
     }
 
     class Demo extends  AsyncTask<Void,Integer,Void>{

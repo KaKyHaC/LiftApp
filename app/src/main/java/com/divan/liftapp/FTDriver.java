@@ -98,12 +98,9 @@ public class FTDriver {
     	byte[] rbuf = new byte[64];
 		if(mDeviceConnection==null||mFTDIEndpointIN==null||mDevice==null)
 			return -1;
-    	/*if(buf.length > 64) {
-			history.append("buf.length > 64\n");
-    		return -1;
-    	}*/
-    	
-		len = mDeviceConnection.bulkTransfer(mFTDIEndpointIN, rbuf, 64, 0); // RX
+
+		//len = mDeviceConnection.bulkTransfer(mFTDIEndpointIN, buf, buf.length, 0);
+		len = mDeviceConnection.bulkTransfer(mFTDIEndpointIN, rbuf, buf.length, 0); // RX
 		history.append("after bulkTransfer\n");
 
 		len=((len-2)<buf.length)?(len-2):buf.length;
