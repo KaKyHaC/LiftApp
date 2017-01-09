@@ -9,7 +9,6 @@
         android:color="@color/colorText"></solid>
 
 
-
     <padding
         android:bottom="15dp"
         android:left="15dp"

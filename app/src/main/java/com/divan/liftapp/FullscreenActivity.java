@@ -11,11 +11,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.hardware.usb.UsbManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -27,6 +31,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
+import android.util.Xml;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -44,6 +50,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
+
+import com.divan.liftapp.Fragments.FragmentImage;
+import com.divan.liftapp.Fragments.FragmentText;
+import com.divan.liftapp.Fragments.FragmentVideo;
+import com.divan.liftapp.Fragments.MyFragment;
+import com.divan.liftapp.ActivitySetting;
+
+import org.xmlpull.v1.XmlPullParser;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -68,7 +82,8 @@ public class FullscreenActivity extends AppCompatActivity {
     public static final int UiSetting=View.SYSTEM_UI_FLAG_FULLSCREEN|View.SYSTEM_UI_FLAG_HIDE_NAVIGATION| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
     public static final int SIZEOFMASSAGE=64;
     public static final int BAUDRATE=500,PosSpecialThings=9,ValAlert=2,ValNormal=1;
-
+    public static final  String SettingFolder="LiftApp",settingFile="setting.txt",GONG="gong.wav";
+    public static final String pathSDcard= Environment.getExternalStorageDirectory().getAbsolutePath();
 
 
     private View mContentView;
@@ -86,8 +101,7 @@ public class FullscreenActivity extends AppCompatActivity {
     FragmentText fragText;
     FragmentImage fragImage;
 
-    final String SettingFolder="LiftApp",settingFile="setting.txt",GONG="gong.wav";
-    final String pathSDcard= Environment.getExternalStorageDirectory().getAbsolutePath();
+
     final Context context=this;
 
     CatTask catTask;
@@ -108,16 +122,31 @@ public class FullscreenActivity extends AppCompatActivity {
         Initialaze();
         getWindow().getDecorView().setSystemUiVisibility(UiSetting);
 
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.hide();
-        }
+        ActionBar supportActionBar = getSupportActionBar();
+        if (supportActionBar != null)supportActionBar.hide();
+
+        android.app.ActionBar actionBar=getActionBar();
+        if(actionBar!=null)actionBar.hide();
+
 
         setting=new Setting(SettingFolder,settingFile);
         SetSetting();
 
         mTimer.schedule(mMyTimerTask, 1000, 1000);
 
+        ((FrameLayout)findViewById(R.id.fragment)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context,ActivitySetting.class);
+                startActivity(intent);
+            }
+        });
+
+        StartAsync();
+
+    }
+
+    private void StartAsync(){
         if(!isAsyn) {
             catTask = new CatTask();
             main = new Main();
@@ -129,30 +158,25 @@ public class FullscreenActivity extends AppCompatActivity {
             }
         }
     }
-
     @Override
     protected void onResume() {
         super.onResume();
         getWindow().getDecorView().setSystemUiVisibility(UiSetting);
        // musicPlayer.start();
-        if(!isAsyn) {
-            catTask = new CatTask();
-            main = new Main();
-
-            if (!isAsyn && catTask != null && main != null) {
-                catTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                main.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                isAsyn = true;
-            }
-        }
+       StartAsync();
+        setting.StartRead();
+        SetSetting();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        musicPlayer.pause();
-        main.cancel(false);
-        catTask.cancel(false);
+        if(musicPlayer!=null)
+            musicPlayer.pause();
+        if(main!=null)
+            main.cancel(false);
+        if(catTask!=null)
+            catTask.cancel(false);
         isAsyn=false;
     }
 
@@ -323,21 +347,45 @@ public class FullscreenActivity extends AppCompatActivity {
     }
 
     private void SetSetting() {
-        date.setTextSize(setting.TextDateSize);
-        massage.setTextSize(setting.TextMassageSize);
-        info.setTextSize(setting.TextInfoSize);
-        number.setTextSize(setting.NumberSize);
+        date.setTextSize(setting.TextDateSize.value);
+        massage.setTextSize(setting.TextMassageSize.value);
+        info.setTextSize(setting.TextInfoSize.value);
+        number.setTextSize(setting.NumberSize.value);
         SetTextViewMassage(info,setting.InformationFolder,"information.txt");
 
-        int color=(int)Long.parseLong(setting.textColorHex,16);
+        int color=(int)Long.parseLong(setting.textColorHex.toString(),16);
         date.setTextColor(color);
         massage.setTextColor(color);
         info.setTextColor(color);
+        number.setTextColor(color);
 
-       /* SharedPreferences sPref = getPreferences(MODE_PRIVATE);
-        SharedPreferences.Editor ed = sPref.edit();
-        ed.putString("DEVICE", setting.pathSerialPort);
-        ed.commit();*/
+
+
+
+        int colorBack=(int )Long.parseLong(setting.LayOutBackGraundColor.toString(),16);
+        SetBackGraunds(colorBack);
+
+    }
+    private void SetBackGraunds(int color){
+        Drawable drawable=date.getBackground();
+        drawable.setColorFilter(color, PorterDuff.Mode.SRC);
+        date.setBackground(drawable);
+
+        drawable=info.getBackground();
+        drawable.setColorFilter(color, PorterDuff.Mode.SRC);
+        info.setBackground(drawable);
+
+        drawable=number.getBackground();
+        drawable.setColorFilter(color, PorterDuff.Mode.SRC);
+        number.setBackground(drawable);
+
+        drawable=massage.getBackground();
+        drawable.setColorFilter(color, PorterDuff.Mode.SRC);
+        massage.setBackground(drawable);
+
+        drawable=((LinearLayout)findViewById(R.id.iconsLayout)).getBackground();
+        drawable.setColorFilter(color, PorterDuff.Mode.SRC);
+        ((LinearLayout)findViewById(R.id.iconsLayout)).setBackground(drawable);
     }
 
 
@@ -393,6 +441,7 @@ public class FullscreenActivity extends AppCompatActivity {
         int nBack=0,nMusic=0;
         int musicSeek=0;
         boolean isOpen=false;
+        boolean isMusicPlayed=false;
 
 
         @Override
@@ -423,12 +472,14 @@ public class FullscreenActivity extends AppCompatActivity {
                             musicPlayer.reset();
                             musicPlayer.setDataSource(musics.get(nMusic++ % musics.size()));
                             musicPlayer.prepare();
-                            musicPlayer.start();
+                            if(isMusicPlayed)
+                                musicPlayer.start();
                         } catch (IOException e) {
                         }
                     }
                 });
-                musicPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+               // musicPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                musicPlayer.pause();
                // musicPlayer.start();
 
             }
@@ -460,7 +511,9 @@ public class FullscreenActivity extends AppCompatActivity {
                  }*/
 
             while(true){
-             if (isCancelled()) return null;
+             if (isCancelled()) {
+                 return null;
+             }
                 byte[] buf = new byte[SIZEOFMASSAGE];
                 //isOpen=ftDriver.isConnection();
                 //isOpen=ftDriver.begin(FTDriver.BAUD9600);
@@ -488,6 +541,7 @@ public class FullscreenActivity extends AppCompatActivity {
             byte [] b=values[0];
             if(isOpen) {
                 SpecialThings(b[PosSpecialThings]);
+                Status(b[0]);
                 Flours(b[1]);
                 Images(b[2]);
                 Media(b[3]);
@@ -501,14 +555,21 @@ public class FullscreenActivity extends AppCompatActivity {
             else
             {
                 number.setText("-");
-                Media((byte)7);
-                //fragText.SetText(ftDriver.getHistory());
                 Images((byte)7);
+                Media((byte)8);
             }
+
 
 
         }
 
+        void Status(byte b){
+            if(b==1)
+            {
+                Intent intent = new Intent(context,ActivitySetting.class);
+                startActivity(intent);
+            }
+        }
         void Flours(byte b){
             int myInt = b & 0xff;
             if(myInt!=0)
@@ -534,7 +595,8 @@ public class FullscreenActivity extends AppCompatActivity {
                 case 4:SetFragment(Fragment.Video);myFrag.onUpdate(0,2);break;//next
                 case 5:SetFragment(Fragment.Text);myFrag.onUpdate(0,1);break;//fire
                 case 6:SetFragment(Fragment.Text);myFrag.onUpdate(0,2);break;//overload
-                case 7:SetFragment(Fragment.Text);myFrag.onUpdate(0,3);break;//no connection
+                case 7:SetFragment(Fragment.Text);myFrag.onUpdate(0,3);break;//No communication with the station
+                case 8:SetFragment(Fragment.Text);myFrag.onUpdate(0,4);break;//No communication with the controller
 
             }
         }
@@ -555,11 +617,13 @@ public class FullscreenActivity extends AppCompatActivity {
             if(musics.size()!=0) {
                 if (b == 1) {
                     musicPlayer.start();
+                    isMusicPlayed=true;
                 }
-                if (b == 2) {
+                else if (b == 2) {
                     musicPlayer.pause();
+                    isMusicPlayed=false;
                 }
-                if (b == 3) {
+                else if (b == 3) {
                     try {
                         musicPlayer.stop();
                         musicPlayer.reset();
@@ -568,6 +632,9 @@ public class FullscreenActivity extends AppCompatActivity {
                         musicPlayer.start();
                     } catch (IOException e) {
                     }
+                }
+                else{
+                    if(!isMusicPlayed)musicPlayer.pause();
                 }
             }
         }
