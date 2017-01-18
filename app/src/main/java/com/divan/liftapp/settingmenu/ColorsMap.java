@@ -22,6 +22,7 @@ public class ColorsMap {
         colors.add(new ColorPair("Blue",Color.BLUE));
         colors.add(new ColorPair("Black",Color.BLACK));
         colors.add(new ColorPair("White",Color.WHITE));
+        colors.add(new ColorPair("Yellow",Color.YELLOW));
     }
     public static Vector<ColorPair> getColors(){
          return  getInstance().colors;

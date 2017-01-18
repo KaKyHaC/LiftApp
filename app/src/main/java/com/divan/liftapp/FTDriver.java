@@ -47,6 +47,8 @@ public class FTDriver {
 
 	private StringBuilder history=new StringBuilder();
 
+	private int sizeOfReadBuffer=0;
+
 	public boolean isConnection(){
 		if(mDeviceConnection==null||mFTDIEndpointIN==null||mDevice==null)
 			return false;
@@ -61,8 +63,8 @@ public class FTDriver {
     }
     
     // Open an FTDI USB Device
-    public boolean begin(int baudrate) {
-
+    public boolean begin(int baudrate,int sizeOfBuffer) {
+	sizeOfReadBuffer=sizeOfBuffer;
         for (UsbDevice device :  mManager.getDeviceList().values()) {
 			history.append("Device:"+device.toString()+"\n");
         	  Log.i(TAG,"Devices : "+device.toString());
@@ -95,12 +97,12 @@ public class FTDriver {
     // Read Binary Data
     public int read(byte[] buf) {
     	int i,len;
-    	byte[] rbuf = new byte[64];
+    	byte[] rbuf = new byte[sizeOfReadBuffer];
 		if(mDeviceConnection==null||mFTDIEndpointIN==null||mDevice==null)
 			return -1;
 
 		//len = mDeviceConnection.bulkTransfer(mFTDIEndpointIN, buf, buf.length, 0);
-		len = mDeviceConnection.bulkTransfer(mFTDIEndpointIN, rbuf, buf.length, 0); // RX
+		len = mDeviceConnection.bulkTransfer(mFTDIEndpointIN, rbuf, rbuf.length, 0); // RX
 		history.append("after bulkTransfer\n");
 
 		len=((len-2)<buf.length)?(len-2):buf.length;

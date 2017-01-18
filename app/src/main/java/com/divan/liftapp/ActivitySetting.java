@@ -32,6 +32,8 @@ import com.divan.liftapp.Fragments.MyFragment;
 import com.divan.liftapp.R;
 import com.divan.liftapp.Setting;
 import com.divan.liftapp.settingmenu.SettingItem;
+import com.divan.liftapp.settingmenu.SpecialItem;
+
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -41,23 +43,28 @@ import java.util.concurrent.TimeUnit;
 import java.util.jar.Attributes;
 
 import static com.divan.liftapp.FullscreenActivity.BAUDRATE;
+import static com.divan.liftapp.FullscreenActivity.PosSetStation;
 import static com.divan.liftapp.FullscreenActivity.SIZEOFMASSAGE;
 
 public class ActivitySetting extends AppCompatActivity {
     public static final int UiSetting= View.SYSTEM_UI_FLAG_FULLSCREEN|View.SYSTEM_UI_FLAG_HIDE_NAVIGATION| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
-    final String SettingFolder="LiftApp",settingFile="setting.txt",GONG="gong.wav";
+    final String SettingFolder="LiftApp",settingFile="setting.txt",GONG="gong.wav",EXIT="Выход",DEFAULT="По умолчанию",STATION="Станции";
     Vector<SettingItem> settingItems;
-    Setting setting=new Setting(SettingFolder,settingFile);
+    public Setting setting=new Setting(SettingFolder,settingFile);
 
     ListView listView;
     TextView name,value;
-    int indexSelected=-1;
-    boolean isSelect=false;
-    View selected;
+    //int indexSelected=-1;
+   // boolean isSelect=false;
+    View selectedView;
+    SettingItem curItem;
+    CharSequence curText=null;
+    byte byteToSend=0;
 
     Context context;
     boolean isAsync=false;
     Main main;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,11 +90,45 @@ public class ActivitySetting extends AppCompatActivity {
         FillList();
         setListener();
 
+        onListItemClick(0);
         context=this;
         StartAsync();
 
     }
+    private void InitSettingItems(){
+        settingItems=new Vector<>();
+        settingItems.add(setting.LayOutBackGraundColor);
+        settingItems.add(setting.textColorHex);
+        settingItems.add(setting.textFragmentColor);
+        settingItems.add(setting.iconColor);
+        settingItems.add(setting.NumberSize);
+        settingItems.add(setting.TextDateSize);
+        settingItems.add(setting.TextInfoSize);
+        settingItems.add(setting.TextMassageSize);
+        settingItems.add(setting.textFragmenSize);
+        settingItems.add(setting.sizeOfBuffer);
+        settingItems.add(setting.volumeDay);
+        settingItems.add(setting.volumeNight);
+        settingItems.add(new SpecialItem(SpecialItem.TypeSpecialItem.STATION,this,STATION));
+        settingItems.add(new SpecialItem(SpecialItem.TypeSpecialItem.DEFAULT,this,DEFAULT));
+        settingItems.add(new SpecialItem(SpecialItem.TypeSpecialItem.EXIT,this,EXIT));
 
+
+        ;
+    }
+    private void FillList(){
+// определяем массив типа String
+        String[] catNames = new String[settingItems.size()];
+        for(int i=0;i<settingItems.size();i++){
+            catNames[i]=settingItems.elementAt(i).getName();
+        }
+
+// используем адаптер данных
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_list_item_1, catNames);
+
+        listView.setAdapter(adapter);
+    }
     private void StartAsync(){
         if(!isAsync){
             main=new Main();
@@ -102,16 +143,17 @@ public class ActivitySetting extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View itemClicked, int position,
                                     long id) {
 
+                if(curItem!=null)curItem.setFocus(false);
 
-                if(position==settingItems.size()) {
-                    isSelect=false;
-                }
-                else {
-                    indexSelected = position;
-                    isSelect = true;
+
+                    //indexSelected = position;
+                    curItem= settingItems.elementAt(position);
+                    curItem.setFocus(true);
+
                     updateView();
-                }
-                selected=itemClicked;
+
+                curText=((TextView)itemClicked).getText();
+                selectedView=itemClicked;
                 focusItem(itemClicked);
                 //itemClicked.setBackgroundColor(Color.BLUE);
 
@@ -121,40 +163,43 @@ public class ActivitySetting extends AppCompatActivity {
         name.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(isSelect) {
-                    settingItems.elementAt(indexSelected).onClick(SettingItem.Key.up);
+
+                    curItem.onClick(SettingItem.Key.up);
                     updateView();
-                }
-                else{
-                    setting.InitDefault();
-                    InitSettingItems();
-                    Toast.makeText(context,"make default",Toast.LENGTH_LONG);
-                }
+
+                    if(curText.toString()==DEFAULT) {
+                       MakeDefaultSetting();
+                    }
+                    else if(curText.toString()==EXIT)
+                        Exit();
+
             }
         });
         value.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(isSelect) {
-                    settingItems.elementAt(indexSelected).onClick(SettingItem.Key.down);
-                    updateView();
-                }
-                else{
-                    setting.InitDefault();
-                    InitSettingItems();
-                    Toast.makeText(context,"make default",Toast.LENGTH_LONG);
-                }
+
+                   curItem.onClick(SettingItem.Key.down);
+                   updateView();
+
+
+                    if(curText.toString()==DEFAULT) {
+                       MakeDefaultSetting();
+                    }
+                    else if(curText.toString()==EXIT)
+                        Exit();
+
             }
         });
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
-
+                //focusItem(selected);
             }
 
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                focusItem(selected);
+                focusItem(selectedView);
             }
         });
     }
@@ -164,54 +209,28 @@ public class ActivitySetting extends AppCompatActivity {
             View a= listView.getChildAt(i);
             if(a!=null) {
                 a.setBackgroundColor(Color.WHITE);
-                if(((TextView)a).getText()==((TextView)view).getText())
+                if(((TextView)a).getText()==curText)
                     a.setBackgroundColor(Color.YELLOW);
             }
         }
 
     }
     private void updateView(){
-        name.setText(settingItems.elementAt(indexSelected).getName());
-        value.setText(settingItems.elementAt(indexSelected).getValue());
-        String color=settingItems.elementAt(indexSelected).getColor();
-        if(color!=null){
-            value.setBackgroundColor((int) Long.parseLong(color,16));
-        }
-        else {
-            value.setBackgroundColor(Color.WHITE);
+        if(curItem!=null) {
+            name.setText(curItem.getName());
+            value.setText(curItem.getValue());
+            String color = curItem.getColor();
+            if (color != null) {
+                value.setBackgroundColor((int) Long.parseLong(color, 16));
+            } else {
+                value.setBackgroundColor(Color.WHITE);
+            }
         }
     }
-    private void InitSettingItems(){
-        settingItems=new Vector<>();
-        settingItems.add(setting.LayOutBackGraundColor);
-        settingItems.add(setting.textColorHex);
-        settingItems.add(setting.textFragmentColor);
-        settingItems.add(setting.NumberSize);
-        settingItems.add(setting.TextDateSize);
-        settingItems.add(setting.TextInfoSize);
-        settingItems.add(setting.TextMassageSize);
-        settingItems.add(setting.textFragmenSize);
-        ;
-    }
-    private void FillList(){
 
-
-// определяем массив типа String
-        String[] catNames = new String[settingItems.size()+1];
-        for(int i=0;i<settingItems.size();i++){
-            catNames[i]=settingItems.elementAt(i).getName();
-        }
-        catNames[catNames.length-1]="default";
-
-
-// используем адаптер данных
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1, catNames);
-
-        listView.setAdapter(adapter);
-    }
 
     public void onListItemClick(int pos) {
+
         int activePosition = pos; // первый элемент списка
         listView.performItemClick(listView.getAdapter().
                 getView(activePosition, null, null), activePosition, listView.getAdapter().
@@ -223,13 +242,23 @@ public class ActivitySetting extends AppCompatActivity {
         setting.StartRead();
         StartAsync();
     }
-
     @Override
     protected void onPause() {
         super.onPause();
         setting.WriteSetting();
         if(isAsync)
             main.cancel(false);
+    }
+
+    public void Exit(){finish();}
+    public void MakeDefaultSetting(){
+        setting.InitDefault();
+        InitSettingItems();
+        value.setText("Установлены значения по умолчанию");
+        Toast.makeText(context, "make default", Toast.LENGTH_LONG);
+    }
+    public void SendByte(Byte val){
+        byteToSend=val;
     }
 
     class Main extends AsyncTask<Void,byte[],Void> {
@@ -240,7 +269,7 @@ public class ActivitySetting extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             ftDriver=new FTDriver((UsbManager)getSystemService(Context.USB_SERVICE));
-            isOpen=ftDriver.begin(FTDriver.BAUD9600);
+            isOpen=ftDriver.begin(FTDriver.BAUD9600,setting.sizeOfBuffer.value);
             onListItemClick(index);
         }
         @Override
@@ -271,7 +300,15 @@ public class ActivitySetting extends AppCompatActivity {
 
             while(true){
                 if (isCancelled()) {
+                    ftDriver.end();
                     return null;
+                }
+
+                if(byteToSend!=0&&isOpen){
+                    byte[] buf=new byte[SIZEOFMASSAGE];
+                    buf[PosSetStation]=byteToSend;
+                    ftDriver.write(buf,SIZEOFMASSAGE);
+                    byteToSend=0;
                 }
                 byte[] buf = new byte[SIZEOFMASSAGE];
                 //isOpen=ftDriver.isConnection();
@@ -282,7 +319,7 @@ public class ActivitySetting extends AppCompatActivity {
                 }
                 else
                 {
-                    isOpen=ftDriver.begin(FTDriver.BAUD9600);
+                    isOpen=ftDriver.begin(FTDriver.BAUD9600,setting.sizeOfBuffer.value);
                 }
                 publishProgress(buf);
                 try{
@@ -299,13 +336,15 @@ public class ActivitySetting extends AppCompatActivity {
             super.onProgressUpdate(values);
             byte [] b=values[0];
             if(isOpen) {
+                if(b[0]==FullscreenActivity.ValNormal)
+                    Exit();
                 Handler(b[11]);
             }
             else
             {
-                name.setText("No connection");
+                name.setText("Нет сигнала");
                 value.setText("-");
-                Toast.makeText(context,"No connection",Toast.LENGTH_SHORT);
+                Toast.makeText(context,"Нет сигнала",Toast.LENGTH_SHORT);
             }
 
         }
@@ -314,10 +353,11 @@ public class ActivitySetting extends AppCompatActivity {
             switch (b){
                 case 1:onListItemClick(++index%listView.getCount());break;
                 case 2:onListItemClick(--index%listView.getCount());break;
-                case 3:name.callOnClick();break;
-                case 4:value.callOnClick();break;
-                case 5:finish();
+                case 3:curItem.onClick(SettingItem.Key.right);break;
+                case 4:curItem.onClick(SettingItem.Key.left);break;
+                case 5:curItem.onClick(SettingItem.Key.ok);break;
             }
+            updateView();
         }
 
     }

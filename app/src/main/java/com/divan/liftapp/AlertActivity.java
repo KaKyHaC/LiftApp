@@ -31,8 +31,8 @@ import static com.divan.liftapp.FullscreenActivity.ValNormal;
  * status bar and navigation/system bar) with user interaction.
  */
 public class AlertActivity extends AppCompatActivity {
-
-
+    CatTask catTask;
+    Setting setting=new Setting(FullscreenActivity.SettingFolder,FullscreenActivity.settingFile);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,10 +47,11 @@ public class AlertActivity extends AppCompatActivity {
         Timer   mTimer = new Timer();
         MyTimerTask mMyTimerTask = new MyTimerTask();
         mTimer.schedule(mMyTimerTask, 1000, 1000);
-        new CatTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        catTask=new CatTask();
+        catTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
     }
-    void FinishIt(){finish();}
+    void FinishIt(){ catTask.cancel(false);finish();}
 
     public class MyTimerTask extends TimerTask {
 
@@ -78,13 +79,17 @@ public class AlertActivity extends AppCompatActivity {
             super.onPreExecute();
 
             ftDriver=new FTDriver((UsbManager)getSystemService(Context.USB_SERVICE));
-            ftDriver.begin(FTDriver.BAUD9600);
+            ftDriver.begin(FTDriver.BAUD9600,setting.sizeOfBuffer.value);
         }
 
         @Override
         protected Void doInBackground(Void... params) {
             try {
                 while(true) {
+                    if (isCancelled()) {
+                        ftDriver.end();
+                        return null;
+                    }
                     Thread.sleep(BAUDRATE);
                     byte[] buf=new byte[SIZEOFMASSAGE];
                     ftDriver.read(buf);
@@ -101,7 +106,7 @@ public class AlertActivity extends AppCompatActivity {
         protected void onProgressUpdate(byte[]... values) {
             super.onProgressUpdate(values);
             getWindow().getDecorView().setSystemUiVisibility(UiSetting);
-            if(values[0][FullscreenActivity.PosSpecialThings]==ValNormal){
+            if(values[0][0]==ValNormal){
                 FinishIt();
             }
         }

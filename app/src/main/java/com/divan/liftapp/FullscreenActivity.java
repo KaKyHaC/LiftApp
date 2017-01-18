@@ -24,6 +24,7 @@ import android.hardware.usb.UsbManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
 import android.os.PowerManager;
 import android.support.annotation.UiThread;
@@ -79,9 +80,14 @@ import java.util.concurrent.TimeUnit;
  * status bar and navigation/system bar) with user interaction.
  */
 public class FullscreenActivity extends AppCompatActivity {
-    public static final int UiSetting=View.SYSTEM_UI_FLAG_FULLSCREEN|View.SYSTEM_UI_FLAG_HIDE_NAVIGATION| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+    public static final int UiSetting=View.SYSTEM_UI_FLAG_FULLSCREEN
+            |View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+            |View.SYSTEM_UI_FLAG_LOW_PROFILE
+            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
     public static final int SIZEOFMASSAGE=64;
-    public static final int BAUDRATE=500,PosSpecialThings=9,ValAlert=2,ValNormal=1;
+    public static final int BAUDRATE=500,PosSpecialThings=9,ValAlert=2,ValNormal=2,PosSetStation=12;
     public static final  String SettingFolder="LiftApp",settingFile="setting.txt",GONG="gong.wav";
     public static final String pathSDcard= Environment.getExternalStorageDirectory().getAbsolutePath();
 
@@ -108,11 +114,10 @@ public class FullscreenActivity extends AppCompatActivity {
     Main main;
     boolean isAsyn=false;
 
+    enum PathOfDay{DAY,NIGHT};
+    PathOfDay pathOfDay=null;
 
-    private boolean isChecked(byte b,int pos){
-        assert (pos<8);
-        return (b&(byte)Math.pow(2,pos))!=0;
-    }
+    Drawable drawableUp,drawableDown,drawableRing;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,7 +172,6 @@ public class FullscreenActivity extends AppCompatActivity {
         setting.StartRead();
         SetSetting();
     }
-
     @Override
     protected void onPause() {
         super.onPause();
@@ -278,7 +282,18 @@ public class FullscreenActivity extends AppCompatActivity {
         }
     }
 
-
+    public void FullScreencall() {
+        View decorView=null;
+        if(Build.VERSION.SDK_INT < 19) {//19 or above api
+            decorView = this.getWindow().getDecorView();
+        decorView.setSystemUiVisibility(View.GONE|UiSetting);
+    } else {
+        //for lower api versions.
+         decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY  |  UiSetting;
+        decorView.setSystemUiVisibility(uiOptions);
+    }
+}
     private void Initialaze() {
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
@@ -293,8 +308,10 @@ public class FullscreenActivity extends AppCompatActivity {
         imageArrow=(ImageView)findViewById(R.id.imageArrow);
         fire=(ImageView)findViewById(R.id.fire);
         ring=(ImageView)findViewById(R.id.ring);
-        /*image=(ImageView)findViewById(R.id.imageMain);
-        videoView=(VideoView)findViewById(R.id.video);*/
+
+        drawableUp=getResources().getDrawable(R.drawable.up);
+        drawableDown=getResources().getDrawable(R.drawable.down);
+        drawableRing=getResources().getDrawable(R.drawable.ring);
 
 
         frameLayout=(FrameLayout)findViewById(R.id.mainLayout);
@@ -365,6 +382,14 @@ public class FullscreenActivity extends AppCompatActivity {
         int colorBack=(int )Long.parseLong(setting.LayOutBackGraundColor.toString(),16);
         SetBackGraunds(colorBack);
 
+        int iconColor=(int )Long.parseLong(setting.iconColor.getColor(),16);
+        drawableUp.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN);
+        drawableDown.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN);
+        drawableRing.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN);
+
+        pathOfDay=null;
+        SetVolume();
+
     }
     private void SetBackGraunds(int color){
         Drawable drawable=date.getBackground();
@@ -387,6 +412,21 @@ public class FullscreenActivity extends AppCompatActivity {
         drawable.setColorFilter(color, PorterDuff.Mode.SRC);
         ((LinearLayout)findViewById(R.id.iconsLayout)).setBackground(drawable);
     }
+    private void SetVolume(){
+        Calendar c = Calendar.getInstance();
+        int hour = c.get(Calendar.HOUR_OF_DAY);
+        PathOfDay now=((hour>=7&&hour<=22)?PathOfDay.DAY:PathOfDay.NIGHT);
+
+        if(now!=pathOfDay||pathOfDay==null) {
+            AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            int max = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+            int value = ((hour >= 7 && hour <= 22) ? setting.volumeDay.value : setting.volumeNight.value);
+            int res = value * max / 100;
+            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, res, 0);
+            pathOfDay=now;
+        }
+    }
+
 
 
 
@@ -403,6 +443,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     date.setText(strDate);
+                    SetVolume();
                     //((TextView)findViewById(R.id.specialText)).setText(strDate);//TODO check it
                 }
             });
@@ -427,7 +468,8 @@ public class FullscreenActivity extends AppCompatActivity {
         @Override
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
-            getWindow().getDecorView().setSystemUiVisibility(UiSetting);
+            //getWindow().getDecorView().setSystemUiVisibility(UiSetting);
+            FullScreencall();
         }
 
     }
@@ -451,7 +493,7 @@ public class FullscreenActivity extends AppCompatActivity {
             number.setText("b");
 
             ftDriver=new FTDriver((UsbManager)getSystemService(Context.USB_SERVICE));
-            isOpen=ftDriver.begin(FTDriver.BAUD9600);
+            isOpen=ftDriver.begin(FTDriver.BAUD9600,setting.sizeOfBuffer.value);
 
             massage.setText(FileManager.getAllTextFromDirectory(PathToLiftApp + setting.MassageFolder));
             images= FileManager.getAllFilesPath(PathToLiftApp+setting.ImageFolder,"BMP","bmp","jpg","JPG");
@@ -487,19 +529,19 @@ public class FullscreenActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... params) {
 
-         /*   byte[] signal=new byte[64];
+          /*  byte[] signal=new byte[64];
             isOpen=true;
            byte[][] test=new byte[][]{
-                    {0,1,1,1,1,0,1,0,0,3},
-                    {0,0,0,0,0,0,0,0,0,0},
-                    {0,2,2,6,1,1,0,1,1,4},
-                    {0,3,3,2,3,2,2,1,0,2},
+                    {0,1,1,1,1,0,1,0,0,0},
+                    {0,(byte)221,0,0,0,0,0,0,0,0},
+                    {0,(byte)201,2,6,1,1,0,1,1,0},
+                    {0,3,3,2,3,2,2,1,0,0},
+                   {0,(byte)220,0,0,0,0,0,0,0,0},
+                    {0,4,4,5,1,3,1,2,0,0},
+                    {0,(byte)225,5,3,1,4,3,2,1,0},
                    {0,0,0,0,0,0,0,0,0,0},
-                    {0,4,4,5,1,3,1,2,0,4},
-                    {0,5,5,3,1,4,3,2,1,6},
-                   {0,0,0,0,0,0,0,0,0,0},
-                    {0,6,6,3,6,5,2,1,0,4},
-                    {0,7,7,4,1,6,1,0,0,3},
+                    {0,(byte)240,6,3,6,5,2,1,0,0},
+                    {0,(byte)231,7,4,1,6,1,0,0,0},
                     {0,8,0,5,0,7,0,3,1,0}};
             int index=0;
             while(true){
@@ -512,25 +554,25 @@ public class FullscreenActivity extends AppCompatActivity {
 
             while(true){
              if (isCancelled()) {
+                 ftDriver.end();
                  return null;
              }
                 byte[] buf = new byte[SIZEOFMASSAGE];
                 //isOpen=ftDriver.isConnection();
-                //isOpen=ftDriver.begin(FTDriver.BAUD9600);
+                //isOpen=ftDriver.begin(FTDriver.BAUD9600);// work while it commented (2d branch)
                 if(isOpen) {
                     ftDriver.read(buf);
                     //isOpen=ftDriver.isConnection();
                 }
-                else
+                else//comment it (2d branch)
                 {
-                    isOpen=ftDriver.begin(FTDriver.BAUD9600);
+                    isOpen=ftDriver.begin(FTDriver.BAUD9600,setting.sizeOfBuffer.value);
                 }
                 publishProgress(buf);
                 try{
                     Thread.sleep(BAUDRATE);
                 }catch (InterruptedException e){}
             }
-
 
         }
 
@@ -572,16 +614,45 @@ public class FullscreenActivity extends AppCompatActivity {
         }
         void Flours(byte b){
             int myInt = b & 0xff;
-            if(myInt!=0)
-                number.setText(String.valueOf(myInt));
+            if(myInt!=0) {
+                if (myInt > 0 && myInt <= 199)
+                    number.setText(String.valueOf(myInt));
+                else if(myInt==200)
+                    number.setText("0");
+                else if(myInt>200&&myInt<=220)
+                {
+                    myInt-=200;
+                    myInt*=(-1);
+                    number.setText(String.valueOf(myInt));
+                }
+                else if(myInt>220&&myInt<=233){
+                    String sym="я";
+                    switch (myInt){
+                        case 221:sym="П";break;
+                        case 222:sym="п";break;
+                        case 223:sym="C";break;
+                        case 224:sym="L";break;
+                        case 225:sym="H";break;
+                        case 226:sym="P";break;
+                        case 227:sym="U";break;
+                        case 228:sym="b";break;
+                        case 229:sym="F";break;
+                        case 230:sym="A";break;
+                        case 231:sym="E";break;
+                        case 232:sym="-";break;
+                        case 233:sym="--";break;
+                    }
+                    number.setText(sym);
+                }
+            }
         }
         void Images(byte b){
             switch (b)
             {
-                case 1:imageArrow.setImageResource(R.drawable.up);break;
-                case 2:imageArrow.setImageResource(R.drawable.down);break;
+                case 1:imageArrow.setImageDrawable(drawableUp);break;
+                case 2:imageArrow.setImageDrawable(drawableDown);break;
                 case 3:imageArrow.setImageResource(R.drawable.fire1);break;
-                case 4:imageArrow.setImageResource(R.drawable.ring);break;
+                case 4:imageArrow.setImageDrawable(drawableRing);break;
                 case 5:SetImageViewIcon(imageArrow,setting.ImageFolder,"overload.png");break;
                 case 6:SetImageViewIcon(imageArrow,setting.ImageFolder,"photoreverse.png");break;
                 case 7:imageArrow.setImageBitmap(null);
@@ -645,11 +716,8 @@ public class FullscreenActivity extends AppCompatActivity {
                 frameLayout.setBackground(drawable);
             }}
         void SpecialThings(byte b){
-            if(b==ValNormal)
-            {
-              //  setContentView(R.layout.activity_fullscreen);
-            }
-            if(b==ValAlert){
+
+            if(b==ValAlert){//2
               //  setContentView(R.layout.white);
                 Intent intent = new Intent(context,AlertActivity.class);
                 startActivity(intent);

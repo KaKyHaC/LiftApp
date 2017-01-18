@@ -4,7 +4,7 @@ import android.graphics.Color;
 import android.os.Environment;
 
 import com.divan.liftapp.settingmenu.ColorSetting;
-import com.divan.liftapp.settingmenu.SizeSetting;
+import com.divan.liftapp.settingmenu.NumberedSetting;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -25,28 +25,45 @@ public class Setting {
 
     public ColorSetting textColorHex;//Integer.toHexString(Color.WHITE);
     public ColorSetting LayOutBackGraundColor;
-    public SizeSetting TextInfoSize,TextDateSize,TextMassageSize;//30
-    public SizeSetting NumberSize;//230
+    public NumberedSetting TextInfoSize,TextDateSize,TextMassageSize;//30
+    public NumberedSetting NumberSize;//230
 
     public ColorSetting textFragmentColor;
-    public SizeSetting textFragmenSize;
+    public NumberedSetting textFragmenSize;
+
+    public NumberedSetting volumeDay;
+    public NumberedSetting volumeNight;
+
+    public ColorSetting iconColor;
+
+    public int indexCurStation;
+
+    public NumberedSetting sizeOfBuffer;
 
 
 
     public void InitDefault(){
-            textColorHex = new ColorSetting("Цвет текста", Color.WHITE);
-            LayOutBackGraundColor = new ColorSetting("Цвет подложки", Integer.parseInt("534056ff",16));
-            TextInfoSize = new SizeSetting(30, "Размер шрифта информации");
-            TextDateSize = new SizeSetting(30, "Размер шрифта времени");
-            TextMassageSize = new SizeSetting(30, "Размер шрифта сообщеня");
-            NumberSize = new SizeSetting(230, "Размер шрифта этажа");
+            textColorHex = new ColorSetting("Цвет текста", Color.RED);
+            LayOutBackGraundColor = new ColorSetting("Цвет подложки", Integer.parseInt("5300ff00",16));// Integer.parseInt("534056ff",16)
+            TextInfoSize = new NumberedSetting(30, "Размер шрифта информации");
+            TextDateSize = new NumberedSetting(30, "Размер шрифта времени");
+            TextMassageSize = new NumberedSetting(30, "Размер шрифта сообщеня");
+            NumberSize = new NumberedSetting(230, "Размер шрифта этажа");
 
         textFragmentColor = new ColorSetting("Цвет текста фрагмента",Color.RED);
-        textFragmenSize=new SizeSetting(100,"Размер шрифта фрагмента");
+        textFragmenSize=new NumberedSetting(100,"Размер шрифта фрагмента");
+
+        volumeDay=new NumberedSetting(100,"Громкость днем", NumberedSetting.NumberedType.Volume);
+        volumeNight=new NumberedSetting(50,"Громкость ночью", NumberedSetting.NumberedType.Volume);
+
+        iconColor=new ColorSetting("Цвет иконок",Color.YELLOW);
+
+        sizeOfBuffer=new NumberedSetting(64,"Размер буффера", NumberedSetting.NumberedType.Buffer);
+
+        indexCurStation=0;
 
     }
-    public Setting(String folderSetting, String settingFile)
-    {
+    public Setting(String folderSetting, String settingFile) {
         this.folderSetting=folderSetting;
         this.settingFile=settingFile;
         if(NumberSize==null)
@@ -57,7 +74,12 @@ public class Setting {
 
     public void WriteSetting(){
         try{
-            File sdPath= Environment.getExternalStorageDirectory();;
+            File sdPath= Environment.getExternalStorageDirectory();
+            for(File f:sdPath.getParentFile().listFiles()){
+                String n=f.getName();
+                if(n.equals("extsd"))
+                    sdPath=f;
+            }
             // добавляем свой каталог к пути
             sdPath = new File(sdPath.getAbsolutePath() + "/" + folderSetting);
             // создаем каталог
@@ -90,15 +112,67 @@ public class Setting {
             bw.write(textFragmentColor+"--  text Fragment Color\n");
             bw.write(textFragmenSize+"--  text Fragment Color\n");
 
+            bw.write(volumeDay+"--  volume Day\n");
+            bw.write(volumeNight+"--  volume Night\n");
+
+            bw.write(iconColor+"--  icon Color\n");
+            bw.write(indexCurStation+"--  indexCurStation\n");
+
+            bw.write(sizeOfBuffer+"--  size Of Buffer\n");
+
             bw.close();
         }catch (IOException r){
 
         }
     }
+    private void ReadSettings(BufferedReader br){
+        try {
+            MainPath = getStringBeforCommends(br.readLine());
+            BackGroundFolder= getStringBeforCommends(br.readLine());
+            ImageFolder= getStringBeforCommends(br.readLine());
+            SoundFolder= getStringBeforCommends(br.readLine());
+            MusicFolder= getStringBeforCommends(br.readLine());
+            MassageFolder= getStringBeforCommends(br.readLine());
+            InformationFolder= getStringBeforCommends(br.readLine());
+            ResourcesFolder= getStringBeforCommends(br.readLine());
+            SpecialSoundFolder= getStringBeforCommends(br.readLine());
+            //TextColor= getStringBeforCommends(br.readLine());
+            LayOutBackGraundColor.setColor(getStringBeforCommends(br.readLine()));
+            textColorHex.setColor(getStringBeforCommends(br.readLine()));
 
+            TextInfoSize.value=Integer.parseInt(getStringBeforCommends(br.readLine()));
+            TextDateSize.value=Integer.parseInt(getStringBeforCommends(br.readLine()));
+            TextMassageSize.value=Integer.parseInt(getStringBeforCommends(br.readLine()));
+            NumberSize.value=Integer.parseInt(getStringBeforCommends(br.readLine()));
+
+            typeDate= getStringBeforCommends(br.readLine());
+
+            textFragmentColor.setColor(getStringBeforCommends(br.readLine()));
+            textFragmenSize.value=Integer.parseInt(getStringBeforCommends(br.readLine()));
+
+            volumeDay.value=Integer.parseInt(getStringBeforCommends(br.readLine()));
+            volumeNight.value=Integer.parseInt(getStringBeforCommends(br.readLine()));
+
+            iconColor.setColor(getStringBeforCommends(br.readLine()));
+
+            indexCurStation=Integer.parseInt(getStringBeforCommends(br.readLine()));
+
+            sizeOfBuffer.value=Integer.parseInt(getStringBeforCommends(br.readLine()));
+
+
+        }catch (IOException r)
+        {
+
+        }
+    }
     public void StartRead()
     {
-        File sdPath= Environment.getExternalStorageDirectory();;
+        File sdPath= Environment.getExternalStorageDirectory();
+        for(File f:sdPath.getParentFile().listFiles()){
+            String n=f.getName();
+            if(n.equals("extsd"))
+                sdPath=f;
+        }
         // добавляем свой каталог к пути
         sdPath = new File(sdPath.getAbsolutePath() + "/" + folderSetting);
         // создаем каталог
@@ -137,39 +211,8 @@ public class Setting {
         new File(sdPath.getAbsolutePath()+'/'+ResourcesFolder).mkdir();
         new File(sdPath.getAbsolutePath()+'/'+SpecialSoundFolder).mkdir();
     }
-    private void ReadSettings(BufferedReader br){
-        try {
-            MainPath = getStringBeforCommends(br.readLine());
-            BackGroundFolder= getStringBeforCommends(br.readLine());
-            ImageFolder= getStringBeforCommends(br.readLine());
-            SoundFolder= getStringBeforCommends(br.readLine());
-            MusicFolder= getStringBeforCommends(br.readLine());
-            MassageFolder= getStringBeforCommends(br.readLine());
-            InformationFolder= getStringBeforCommends(br.readLine());
-            ResourcesFolder= getStringBeforCommends(br.readLine());
-            SpecialSoundFolder= getStringBeforCommends(br.readLine());
-            //TextColor= getStringBeforCommends(br.readLine());
-            LayOutBackGraundColor.setColor(getStringBeforCommends(br.readLine()));
-            textColorHex.setColor(getStringBeforCommends(br.readLine()));
 
-            TextInfoSize.value=Integer.parseInt(getStringBeforCommends(br.readLine()));
-            TextDateSize.value=Integer.parseInt(getStringBeforCommends(br.readLine()));
-            TextMassageSize.value=Integer.parseInt(getStringBeforCommends(br.readLine()));
-            NumberSize.value=Integer.parseInt(getStringBeforCommends(br.readLine()));
-
-            typeDate= getStringBeforCommends(br.readLine());
-
-            textFragmentColor.setColor(getStringBeforCommends(br.readLine()));
-            textFragmenSize.value=Integer.parseInt(getStringBeforCommends(br.readLine()));
-
-
-        }catch (IOException r)
-        {
-
-        }
-    }
-    private String getStringBeforCommends(String s)
-    {
+    private String getStringBeforCommends(String s) {
         StringBuilder sb=new StringBuilder();
         for (int i=0;i<s.length();i++) {
             char cur=s.charAt(i);

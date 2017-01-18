@@ -5,9 +5,11 @@ package com.divan.liftapp.settingmenu;
  */
 
 public abstract class SettingItem {
+    protected boolean hasFocus=false;
     public enum Key{up,down,left,right,ok};
     public abstract void onClick(Key key);
     public abstract String getName();
     public abstract String getValue();
     public abstract String getColor();
+    public abstract void setFocus(boolean isFocus);
 }

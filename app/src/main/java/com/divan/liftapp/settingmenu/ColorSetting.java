@@ -10,8 +10,8 @@ import java.util.Vector;
 public class ColorSetting extends SettingItem {
     String Name;
     int color;
-    int curIndex;
-    int alpha;
+    private int curIndex,bufIndex;
+    private int alpha;
 
     public ColorSetting(String name, int color) {
         Name = name;
@@ -63,18 +63,29 @@ public class ColorSetting extends SettingItem {
     @Override
     public void onClick(Key key) {
         Vector<ColorPair> v=ColorsMap.getColors();
-        switch (key) {
-            case up:setColor(v.elementAt(++curIndex%v.size()));
-                break;
-            case down:while (curIndex<=0){curIndex+=v.size();}setColor(v.elementAt(--curIndex%v.size()));
-                break;
-            case left:
-                break;
-            case right:
-                break;
-            case ok:
-                break;
+        if(hasFocus) {
+            switch (key) {
+                case up:
+                    curIndex++;bufIndex=curIndex;
+                    break;
+                case down:
+                    curIndex--;bufIndex=curIndex;
+                    break;
+                case left:bufIndex--;
+                    break;
+                case right:bufIndex++;
+                    break;
+                case ok:curIndex=bufIndex;
+                    break;
+            }
         }
+        while (curIndex<=0) {
+            curIndex += v.size();
+        }
+        while (bufIndex<=0) {
+            bufIndex += v.size();
+        }
+        setColor(v.elementAt(bufIndex%v.size()));
     }
 
     @Override
@@ -85,13 +96,24 @@ public class ColorSetting extends SettingItem {
     @Override
     public String getValue() {
         Vector<ColorPair> v=ColorsMap.getColors();
-        while (curIndex<0)curIndex+=v.size();
-        return v.elementAt(curIndex%v.size()).Name;
+        while (bufIndex<0)curIndex+=v.size();
+        return v.elementAt(bufIndex%v.size()).Name;
     }
 
     @Override
     public String getColor() {
         return  Integer.toHexString(Color.argb(alpha,Color.red(color),Color.green(color),Color.blue(color)));
+    }
+
+    @Override
+    public void setFocus(boolean isFocus) {
+        hasFocus=isFocus;
+        bufIndex=curIndex;
+        if(!isFocus)
+        {
+            onClick(Key.ok);
+        }
+
     }
 }
 

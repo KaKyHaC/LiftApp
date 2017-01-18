@@ -57,16 +57,16 @@ public class FragmentText extends MyFragment {
         lastSignal=signal;
         if (tv != null) {
             if (signal == 1) {
-                tv.setText("FIRE");
+                tv.setText("Пожар");
             }
             else if (signal == 2) {
-                tv.setText("Overload");
+                tv.setText("Перегруз");
             }
             else if(signal==3){
-                tv.setText("No communication with the station");
+                tv.setText("Нет связи со станцией");
             }
             else if(signal==4){
-                tv.setText("No communication with the controller");
+                tv.setText("Нет связи с контроллером");
             }
         }
     }
