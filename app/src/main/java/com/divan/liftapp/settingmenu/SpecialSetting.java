@@ -6,9 +6,9 @@ import com.divan.liftapp.ActivitySetting;
  * Created by Димка on 11.01.2017.
  */
 
-public class SpecialItem extends SettingItem {
-    public enum TypeSpecialItem{EXIT,DEFAULT,STATION}
-    private String[] stationNames={"ШУЛМ","ШК6000","УЭЛ","УЛ"};
+public class SpecialSetting extends SettingItem {
+    public enum TypeSpecialItem{EXIT,DEFAULT,STATION,INSTRUCTION};
+    public static final String[] stationNames={"ШУЛМ","ШК6000","УЭЛ","УЛ"};
     public int indexCurStation=0;
     private int indexBufStation=indexCurStation;
 
@@ -16,7 +16,7 @@ public class SpecialItem extends SettingItem {
     ActivitySetting activitySetting;//TODO bad idea
     String Name;
 
-    public SpecialItem(TypeSpecialItem typeSpecialItem, ActivitySetting activitySetting, String name) {
+    public SpecialSetting(TypeSpecialItem typeSpecialItem, ActivitySetting activitySetting, String name) {
         this.typeSpecialItem = typeSpecialItem;
         this.activitySetting = activitySetting;
         Name = name;
@@ -44,20 +44,29 @@ public class SpecialItem extends SettingItem {
                     case right:indexCurStation++;
                         break;
                 }
-                
+
 
             }
             switch (key)
             {
                 case ok:
+                case up:
+                case down:
                     switch (typeSpecialItem){
-                        case EXIT:activitySetting.Exit();
+                        case EXIT:activitySetting.SendByte();
+                            activitySetting.Exit();
                             break;
                         case DEFAULT:activitySetting.MakeDefaultSetting();
                             break;
-                        case STATION:activitySetting.SendByte((byte)(indexCurStation%stationNames.length+1));indexCurStation=indexBufStation;
+                        case STATION:
+                            indexCurStation=indexBufStation;
+//                            activitySetting.SendByte((byte)(indexCurStation%stationNames.length+1));
+                            break;
+                        case INSTRUCTION:activitySetting.OpenInstruction();
+                            break;
                     }
                     break;
+
             }
         }
     }

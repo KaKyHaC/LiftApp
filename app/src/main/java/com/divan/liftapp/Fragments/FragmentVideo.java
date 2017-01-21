@@ -38,11 +38,6 @@ public class FragmentVideo extends MyFragment {
             video = (VideoView) v.findViewById(R.id.videoFragment);
 
             if (videos.size() != 0) {
-               /* if(isFirst) {
-                video.setVideoPath(videos.get(nVideo % videos.size()));
-                isFirst = false;
-            }*/
-                //video.setVideoPath(videos.get(nVideo % videos.size()));
                 video.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
                     public void onCompletion(MediaPlayer mp) {

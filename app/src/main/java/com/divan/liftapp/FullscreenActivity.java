@@ -87,9 +87,9 @@ public class FullscreenActivity extends AppCompatActivity {
             | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
             | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
     public static final int SIZEOFMASSAGE=64;
-    public static final int BAUDRATE=500,PosSpecialThings=9,ValAlert=2,ValNormal=2,PosSetStation=12;
+    public static final int BAUDRATE=100,PosSpecialThings=9,ValAlert=2,ValNormal=2,PosSetStation=12;
     public static final  String SettingFolder="LiftApp",settingFile="setting.txt",GONG="gong.wav";
-    public static final String pathSDcard= Environment.getExternalStorageDirectory().getAbsolutePath();
+    public static String pathSDcard= Environment.getExternalStorageDirectory().getAbsolutePath();
 
 
     private View mContentView;
@@ -101,7 +101,8 @@ public class FullscreenActivity extends AppCompatActivity {
     private Timer mTimer;
     private MyTimerTask mMyTimerTask;
     private Setting setting;
-    MediaPlayer musicPlayer,soundPlayer,specialSoundPlayer;
+    MediaPlayer musicPlayer;
+    QueuePlayer soundPlayer,specialSoundPlayer;
     AudioManager am;
     FragmentVideo fragVideo;
     FragmentText fragText;
@@ -110,7 +111,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
     final Context context=this;
 
-    CatTask catTask;
+   // CatTask catTask;
     Main main;
     boolean isAsyn=false;
 
@@ -146,18 +147,17 @@ public class FullscreenActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
         StartAsync();
 
     }
 
     private void StartAsync(){
         if(!isAsyn) {
-            catTask = new CatTask();
+           // catTask = new CatTask();
             main = new Main();
 
-            if (!isAsyn && catTask != null && main != null) {
-                catTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            if (!isAsyn &&  main != null) {
+             //   catTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 main.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 isAsyn = true;
             }
@@ -179,8 +179,8 @@ public class FullscreenActivity extends AppCompatActivity {
             musicPlayer.pause();
         if(main!=null)
             main.cancel(false);
-        if(catTask!=null)
-            catTask.cancel(false);
+        /*if(catTask!=null)
+            catTask.cancel(false);*/
         isAsyn=false;
     }
 
@@ -203,44 +203,12 @@ public class FullscreenActivity extends AppCompatActivity {
         }
     }
     private void PlaySound(String fileName){
-        if(!soundPlayer.isPlaying())
-        try {
-          // MediaPlayer mediaPlayer = new MediaPlayer();
-            //mediaPlayer.setDataSource(filePath);
             File f=new File(pathSDcard+'/'+SettingFolder+'/'+setting.SoundFolder+'/'+fileName);
-            if(f.canRead()) {
-                soundPlayer.reset();
-                soundPlayer.setDataSource(f.getAbsolutePath());
-                soundPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                soundPlayer.setLooping(false);
-                soundPlayer.prepare();
-                soundPlayer.start();
-            }else{
-                Toast.makeText(this,"Cann't read music file",Toast.LENGTH_LONG);
-            }
-        }catch (IOException e){
-
-        }
+            soundPlayer.add(f.getAbsolutePath());
     }
     private void PlaySpecialSound(String fileName){
-        if(!specialSoundPlayer.isPlaying())
-        try {//  MediaPlayer mediaPlayer = new MediaPlayer();
-            //mediaPlayer.setDataSource(filePath);
-
             File f=new File(pathSDcard+'/'+SettingFolder+'/'+setting.SpecialSoundFolder+'/'+fileName);
-            if(f.canRead()) {
-                specialSoundPlayer.reset();
-                specialSoundPlayer.setDataSource(f.getAbsolutePath());
-                specialSoundPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                specialSoundPlayer.setLooping(false);
-                specialSoundPlayer.prepare();
-                specialSoundPlayer.start();
-            }else{
-                Toast.makeText(this,"Cann't read music file",Toast.LENGTH_LONG);
-            }
-        }catch (IOException e){
-
-        }
+            specialSoundPlayer.add(f.getAbsolutePath());
     }
     private void SetBackGraund(String fileName){
         File f=new File(pathSDcard+'/'+SettingFolder+'/'+setting.BackGroundFolder+'/'+fileName);
@@ -336,8 +304,8 @@ public class FullscreenActivity extends AppCompatActivity {
         massage.setSelected(true);
 
         musicPlayer = new MediaPlayer();
-        soundPlayer  = new MediaPlayer();
-        specialSoundPlayer = new MediaPlayer();
+        soundPlayer  = new QueuePlayer(new MediaPlayer());
+        specialSoundPlayer = new QueuePlayer(new MediaPlayer());
 
         fragVideo= new FragmentVideo();
         fragText=new FragmentText();
@@ -364,6 +332,7 @@ public class FullscreenActivity extends AppCompatActivity {
     }
 
     private void SetSetting() {
+        pathSDcard=setting.pathSDcard;
         date.setTextSize(setting.TextDateSize.value);
         massage.setTextSize(setting.TextMassageSize.value);
         info.setTextSize(setting.TextInfoSize.value);
@@ -523,26 +492,26 @@ public class FullscreenActivity extends AppCompatActivity {
                // musicPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
                 musicPlayer.pause();
                // musicPlayer.start();
-
             }
         }
         @Override
         protected Void doInBackground(Void... params) {
+            byte[] buf = new byte[setting.sizeOfBuffer.value];//work while size=64
 
-          /*  byte[] signal=new byte[64];
-            isOpen=true;
-           byte[][] test=new byte[][]{
-                    {0,1,1,1,1,0,1,0,0,0},
-                    {0,(byte)221,0,0,0,0,0,0,0,0},
-                    {0,(byte)201,2,6,1,1,0,1,1,0},
-                    {0,3,3,2,3,2,2,1,0,0},
-                   {0,(byte)220,0,0,0,0,0,0,0,0},
-                    {0,4,4,5,1,3,1,2,0,0},
-                    {0,(byte)225,5,3,1,4,3,2,1,0},
-                   {0,0,0,0,0,0,0,0,0,0},
-                    {0,(byte)240,6,3,6,5,2,1,0,0},
-                    {0,(byte)231,7,4,1,6,1,0,0,0},
-                    {0,8,0,5,0,7,0,3,1,0}};
+          /*  isOpen=true;
+          byte[][] test=new byte[][]{
+          //          0 1 2 3 4 5 6 7 8 9
+                    {50,1,1,0,0,0,0,0,0,0},
+                    {50,2,2,0,0,0,0,0,0,0},
+                    {50,3,2,0,0,1,0,1,1,0},
+                    {50,4,0,0,0,0,0,1,0,0},
+                    {50,5,0,0,0,9,0,0,0,0},
+                    {50,6,4,1,0,0,0,2,0,0},
+                    {50,7,5,0,0,4,0,2,1,0},
+                    {50,8,0,0,0,9,0,0,0,0},
+                    {50,9,6,0,0,9,0,1,0,0},
+                    {50,(byte)231,0,4,0,0,0,0,0,0},
+                    {50,8,0,5,0,0,0,3,1,0}};
             int index=0;
             while(true){
                 if (isCancelled()) return null;
@@ -557,11 +526,11 @@ public class FullscreenActivity extends AppCompatActivity {
                  ftDriver.end();
                  return null;
              }
-                byte[] buf = new byte[SIZEOFMASSAGE];
+                System.gc();
                 //isOpen=ftDriver.isConnection();
                 //isOpen=ftDriver.begin(FTDriver.BAUD9600);// work while it commented (2d branch)
                 if(isOpen) {
-                    ftDriver.read(buf);
+                    ftDriver.readInMy(buf);// work while read(buf)
                     //isOpen=ftDriver.isConnection();
                 }
                 else//comment it (2d branch)
@@ -573,7 +542,6 @@ public class FullscreenActivity extends AppCompatActivity {
                     Thread.sleep(BAUDRATE);
                 }catch (InterruptedException e){}
             }
-
         }
 
 
@@ -582,17 +550,19 @@ public class FullscreenActivity extends AppCompatActivity {
             super.onProgressUpdate(values);
             byte [] b=values[0];
             if(isOpen) {
-                SpecialThings(b[PosSpecialThings]);
-                Status(b[0]);
-                Flours(b[1]);
-                Images(b[2]);
-                Media(b[3]);
-                //viewMassage(b);
-                NamedSound(b[4]);
-                Sounds(b[5]);
-                SpecialSound(b[6]);
-                MucisPalyer(b[7]);
-                NextBackGraund(b[8]);
+                if(b[0]==50) {
+                    SpecialThings(b[PosSpecialThings]);
+                    // Status(b[0]);
+                    Flours(b[1]);
+                    Images(b[2]);
+                    //viewMassage(b);
+                    NamedSound(b[4]);
+                    Sounds(b[5]);
+                    SpecialSound(b[6]);
+                    Media(b[3]);
+                    MucisPalyer(b[7]);
+                    NextBackGraund(b[8]);
+                }
             }
             else
             {
@@ -600,9 +570,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 Images((byte)7);
                 Media((byte)8);
             }
-
-
-
+            FullScreencall();
         }
 
         void Status(byte b){
@@ -661,14 +629,19 @@ public class FullscreenActivity extends AppCompatActivity {
         void Media(byte b){
             switch(b){
                 case 1:SetFragment(Fragment.Image);myFrag.onUpdate(0,1);break;
-                case 2:SetFragment(Fragment.Video);myFrag.onUpdate(0,1);break;//start
-                case 3:SetFragment(Fragment.Video);myFrag.onUpdate(0,0);break;//stop
-                case 4:SetFragment(Fragment.Video);myFrag.onUpdate(0,2);break;//next
+
                 case 5:SetFragment(Fragment.Text);myFrag.onUpdate(0,1);break;//fire
                 case 6:SetFragment(Fragment.Text);myFrag.onUpdate(0,2);break;//overload
                 case 7:SetFragment(Fragment.Text);myFrag.onUpdate(0,3);break;//No communication with the station
                 case 8:SetFragment(Fragment.Text);myFrag.onUpdate(0,4);break;//No communication with the controller
 
+            }
+            if(setting.accessVideo.Access&&!QueuePlayer.isPlaying()){
+                switch (b){
+                    case 2:SetFragment(Fragment.Video);myFrag.onUpdate(0,1);break;//start
+                    case 3:SetFragment(Fragment.Video);myFrag.onUpdate(0,0);break;//stop
+                    case 4:SetFragment(Fragment.Video);myFrag.onUpdate(0,2);break;//next
+                }
             }
         }
         void NamedSound(byte b){
@@ -682,30 +655,38 @@ public class FullscreenActivity extends AppCompatActivity {
                 case 7:PlaySpecialSound("out.mp3");break;
             }
         }
-        void Sounds(byte b){PlaySound(String.valueOf(b)+"mp3");}
-        void SpecialSound(byte b){PlaySpecialSound(String.valueOf(b)+"mp3");}
+        void Sounds(byte b){
+            if(b!=0) {
+                soundPlayer.add(PathToLiftApp + setting.SoundFolder + '/' + String.valueOf(b) + ".mp3");
+                priorityPause();
+            }
+        }
+        void SpecialSound(byte b){
+            if(b!=0) {
+                specialSoundPlayer.add(PathToLiftApp + setting.SpecialSoundFolder + '/' + String.valueOf(b) + ".mp3");
+                priorityPause();
+            }
+        }
         void MucisPalyer(byte b){
-            if(musics.size()!=0) {
-                if (b == 1) {
-                    musicPlayer.start();
-                    isMusicPlayed=true;
-                }
-                else if (b == 2) {
-                    musicPlayer.pause();
-                    isMusicPlayed=false;
-                }
-                else if (b == 3) {
-                    try {
-                        musicPlayer.stop();
-                        musicPlayer.reset();
-                        musicPlayer.setDataSource(musics.get(nMusic++ % musics.size()));
-                        musicPlayer.prepare();
+
+            if(setting.accessMusic.Access&&!QueuePlayer.isPlaying()) {
+                if (musics.size() != 0) {
+                    if (b == 1) {
                         musicPlayer.start();
-                    } catch (IOException e) {
+                        isMusicPlayed = true;
+                    } else if (b == 2) {
+                        musicPlayer.pause();
+                        isMusicPlayed = false;
+                    } else if (b == 3) {
+                        try {
+                            musicPlayer.stop();
+                            musicPlayer.reset();
+                            musicPlayer.setDataSource(musics.get(nMusic++ % musics.size()));
+                            musicPlayer.prepare();
+                            musicPlayer.start();
+                        } catch (IOException e) {
+                        }
                     }
-                }
-                else{
-                    if(!isMusicPlayed)musicPlayer.pause();
                 }
             }
         }
@@ -716,6 +697,11 @@ public class FullscreenActivity extends AppCompatActivity {
                 frameLayout.setBackground(drawable);
             }}
         void SpecialThings(byte b){
+            if(b==1)
+            {
+                Intent intent = new Intent(context,ActivitySetting.class);
+                startActivity(intent);
+            }
 
             if(b==ValAlert){//2
               //  setContentView(R.layout.white);
@@ -787,7 +773,7 @@ public class FullscreenActivity extends AppCompatActivity {
         void viewMassage(byte[] b){
             boolean isMassage=false;
             StringBuilder s=new StringBuilder();
-            for(int i=0;i<9;i++){
+            for(int i=0;i<15;i++){
                 if(b[i]!=0)
                     isMassage=true;
 
@@ -803,6 +789,15 @@ public class FullscreenActivity extends AppCompatActivity {
                 vS.append(sBuf.elementAt(i)+'\n');
             }
             fragText.SetText(vS.toString());
+        }
+        void priorityPause(){
+            if(QueuePlayer.isPlaying()) {
+                if(musicPlayer.isPlaying())
+                    musicPlayer.pause();
+                if(myFrag!=null)
+                    if (myFrag.equals(fragVideo))
+                        myFrag.onUpdate(0, 0);
+            }
         }
     }
 

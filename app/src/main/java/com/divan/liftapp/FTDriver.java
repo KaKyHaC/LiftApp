@@ -64,7 +64,10 @@ public class FTDriver {
     
     // Open an FTDI USB Device
     public boolean begin(int baudrate,int sizeOfBuffer) {
-	sizeOfReadBuffer=sizeOfBuffer;
+		/* my shit*/
+		baudrate=2400;
+		sizeOfReadBuffer=sizeOfBuffer;
+
         for (UsbDevice device :  mManager.getDeviceList().values()) {
 			history.append("Device:"+device.toString()+"\n");
         	  Log.i(TAG,"Devices : "+device.toString());
@@ -97,13 +100,13 @@ public class FTDriver {
     // Read Binary Data
     public int read(byte[] buf) {
     	int i,len;
-    	byte[] rbuf = new byte[sizeOfReadBuffer];
+    	byte[] rbuf = new byte[64];//work while =64
 		if(mDeviceConnection==null||mFTDIEndpointIN==null||mDevice==null)
 			return -1;
 
 		//len = mDeviceConnection.bulkTransfer(mFTDIEndpointIN, buf, buf.length, 0);
-		len = mDeviceConnection.bulkTransfer(mFTDIEndpointIN, rbuf, rbuf.length, 0); // RX
-		history.append("after bulkTransfer\n");
+		len = mDeviceConnection.bulkTransfer(mFTDIEndpointIN, rbuf, rbuf.length, 0); // RX; buf.length;
+		//history.append("after bulkTransfer\n");
 
 		len=((len-2)<buf.length)?(len-2):buf.length;
 		// FIXME shift rbuf's pointer 2 to 0. (I don't know how to do.) 
@@ -112,6 +115,18 @@ public class FTDriver {
 		}
 		return (len);
     }
+	public boolean readInMy(byte[] buf){
+		if(mDeviceConnection==null||mFTDIEndpointIN==null||mDevice==null)
+			return false;
+		byte[] rbuf = new byte[buf.length];
+		int len = mDeviceConnection.bulkTransfer(mFTDIEndpointIN, rbuf, rbuf.length, 0);
+		len=((len-2)<buf.length)?(len-2):buf.length;
+		// FIXME shift rbuf's pointer 2 to 0. (I don't know how to do.)
+		for(int i=0;i<len;++i) {
+			buf[i] = rbuf[i+2];
+		}
+		return true;
+	}
 
     // Write 1byte Binary Data
     public int write(byte[] buf) {

@@ -3,6 +3,7 @@ package com.divan.liftapp;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.admin.DevicePolicyManager;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -12,7 +13,9 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.hardware.usb.UsbManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.os.PowerManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -32,10 +35,11 @@ import com.divan.liftapp.Fragments.MyFragment;
 import com.divan.liftapp.R;
 import com.divan.liftapp.Setting;
 import com.divan.liftapp.settingmenu.SettingItem;
-import com.divan.liftapp.settingmenu.SpecialItem;
+import com.divan.liftapp.settingmenu.SpecialSetting;
 
 
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
@@ -45,6 +49,7 @@ import java.util.jar.Attributes;
 import static com.divan.liftapp.FullscreenActivity.BAUDRATE;
 import static com.divan.liftapp.FullscreenActivity.PosSetStation;
 import static com.divan.liftapp.FullscreenActivity.SIZEOFMASSAGE;
+import static com.divan.liftapp.settingmenu.SpecialSetting.stationNames;
 
 public class ActivitySetting extends AppCompatActivity {
     public static final int UiSetting= View.SYSTEM_UI_FLAG_FULLSCREEN|View.SYSTEM_UI_FLAG_HIDE_NAVIGATION| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
@@ -106,12 +111,16 @@ public class ActivitySetting extends AppCompatActivity {
         settingItems.add(setting.TextInfoSize);
         settingItems.add(setting.TextMassageSize);
         settingItems.add(setting.textFragmenSize);
+        settingItems.add(setting.sizeTextSetting);
         settingItems.add(setting.sizeOfBuffer);
         settingItems.add(setting.volumeDay);
         settingItems.add(setting.volumeNight);
-        settingItems.add(new SpecialItem(SpecialItem.TypeSpecialItem.STATION,this,STATION));
-        settingItems.add(new SpecialItem(SpecialItem.TypeSpecialItem.DEFAULT,this,DEFAULT));
-        settingItems.add(new SpecialItem(SpecialItem.TypeSpecialItem.EXIT,this,EXIT));
+        settingItems.add(setting.accessMusic);
+        settingItems.add(setting.accessVideo);
+        settingItems.add(new SpecialSetting(SpecialSetting.TypeSpecialItem.STATION,this,STATION));
+        settingItems.add(new SpecialSetting(SpecialSetting.TypeSpecialItem.DEFAULT,this,DEFAULT));
+        settingItems.add(new SpecialSetting(SpecialSetting.TypeSpecialItem.INSTRUCTION,this,"Инструкция"));
+        settingItems.add(new SpecialSetting(SpecialSetting.TypeSpecialItem.EXIT,this,EXIT));
 
 
         ;
@@ -142,10 +151,11 @@ public class ActivitySetting extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View itemClicked, int position,
                                     long id) {
+                listView.smoothScrollToPosition(position);
 
-                if(curItem!=null)curItem.setFocus(false);
-
-
+                if(curItem!=null) {
+                    curItem.setFocus(false);
+                }
                     //indexSelected = position;
                     curItem= settingItems.elementAt(position);
                     curItem.setFocus(true);
@@ -225,9 +235,17 @@ public class ActivitySetting extends AppCompatActivity {
             } else {
                 value.setBackgroundColor(Color.WHITE);
             }
+
+            setSizeSetting();//bad idea
         }
     }
-
+    private void setSizeSetting(){
+        for(View e:listView.getTouchables()){
+            ((TextView)e).setTextSize(setting.sizeTextSetting.value);
+        }
+        name.setTextSize(setting.sizeTextSetting.value);
+        value.setTextSize(setting.sizeTextSetting.value);
+    }
 
     public void onListItemClick(int pos) {
 
@@ -241,6 +259,7 @@ public class ActivitySetting extends AppCompatActivity {
         super.onResume();
         setting.StartRead();
         StartAsync();
+        setSizeSetting();
     }
     @Override
     protected void onPause() {
@@ -257,8 +276,24 @@ public class ActivitySetting extends AppCompatActivity {
         value.setText("Установлены значения по умолчанию");
         Toast.makeText(context, "make default", Toast.LENGTH_LONG);
     }
-    public void SendByte(Byte val){
-        byteToSend=val;
+    public void SendByte(){
+        byteToSend=(byte)(setting.indexCurStation%stationNames.length+1);
+    }
+    public void SendByte(byte b){
+        byteToSend=b;
+    }
+    public void OpenInstruction(){
+        File file = new File(FullscreenActivity.pathSDcard+'/'+FullscreenActivity.SettingFolder +"/"+ "instruction.pdf");
+        Intent target = new Intent(Intent.ACTION_VIEW);
+        target.setDataAndType(Uri.fromFile(file),"application/pdf");
+        target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+        Intent intent = Intent.createChooser(target, "Open File");
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            // Instruct the user to install a PDF reader here, or something
+        }
     }
 
     class Main extends AsyncTask<Void,byte[],Void> {
@@ -274,21 +309,22 @@ public class ActivitySetting extends AppCompatActivity {
         }
         @Override
         protected Void doInBackground(Void... params) {
+          
 
-       /*     byte[] signal=new byte[64];
+           /* byte[] signal=new byte[64];
             isOpen=true;
            byte[][] test=new byte[][]{
-                    {0,0,1,1,1,0,1,0,0,3},
-                    {0,2,0,0,0,0,0,0,0,0},
-                    {0,3,2,6,1,1,0,1,1,4},
-                    {0,1,3,2,3,2,2,1,0,2},
-                   {0,1,0,0,0,0,0,0,0,0},
-                    {0,3,4,5,1,3,1,2,0,4},
-                    {0,3,5,3,1,4,3,2,1,6},
-                   {0,1,0,0,0,0,0,0,0,0},
-                    {0,4,6,3,6,5,2,1,0,4},
-                    {0,4,7,4,1,6,1,0,0,3},
-                    {0,5,0,5,0,7,0,3,1,0}};
+                    {50,0,1,1,1,0,1,0,0,3,21,4,1,1,1},
+                    {50,2,0,0,0,0,0,0,0,0,21,4,1,1,1},
+                    {50,3,2,6,1,1,0,1,1,4,21,4,1,1,1},
+                    {50,1,3,2,3,2,2,1,0,2,21,5,1,1,1},
+                   {50,1,0,0,0,0,0,0,0,0,21,1,1,1,1},
+                    {50,3,4,5,1,3,1,2,0,4,21,1,1,1,1},
+                    {50,3,5,3,1,4,3,2,1,6,21,1,1,1,1},
+                   {50,1,0,0,0,0,0,0,0,0,21,1,1,1,1},
+                    {50,4,6,3,6,5,2,1,0,4,21,1,1,1,1},
+                    {50,4,7,4,1,6,1,0,0,3,21,1,1,1,1},
+                    {50,5,0,5,0,7,0,3,1,0,21,1,1,1,1}};
             int index=0;
             while(true){
                 if (isCancelled()) return null;
@@ -299,34 +335,37 @@ public class ActivitySetting extends AppCompatActivity {
                  }*/
 
             while(true){
+                System.gc();
                 if (isCancelled()) {
                     ftDriver.end();
                     return null;
                 }
-
+                
+                byte[] buf = new byte[setting.sizeOfBuffer.value];
+                
                 if(byteToSend!=0&&isOpen){
-                    byte[] buf=new byte[SIZEOFMASSAGE];
-                    buf[PosSetStation]=byteToSend;
-                    ftDriver.write(buf,SIZEOFMASSAGE);
+                    byte[] bufS=new byte[setting.sizeOfBuffer.value];
+                    bufS[PosSetStation]=byteToSend;
+                    ftDriver.write(bufS,setting.sizeOfBuffer.value);
                     byteToSend=0;
                 }
-                byte[] buf = new byte[SIZEOFMASSAGE];
-                //isOpen=ftDriver.isConnection();
-                //isOpen=ftDriver.begin(FTDriver.BAUD9600);
+                
                 if(isOpen) {
-                    ftDriver.read(buf);
+                    ftDriver.readInMy(buf);
                     //isOpen=ftDriver.isConnection();
                 }
                 else
                 {
                     isOpen=ftDriver.begin(FTDriver.BAUD9600,setting.sizeOfBuffer.value);
                 }
+                
                 publishProgress(buf);
+                
                 try{
-                    Thread.sleep(BAUDRATE/2);
+                    Thread.sleep(BAUDRATE);
                 }catch (InterruptedException e){}
+                
             }
-
 
         }
 
@@ -338,7 +377,12 @@ public class ActivitySetting extends AppCompatActivity {
             if(isOpen) {
                 if(b[0]==FullscreenActivity.ValNormal)
                     Exit();
-                Handler(b[11]);
+                if(b[0]==50)
+                    Handler(b[11]);
+
+                updateView();
+                //viewMassage(b);
+
             }
             else
             {
@@ -357,8 +401,30 @@ public class ActivitySetting extends AppCompatActivity {
                 case 4:curItem.onClick(SettingItem.Key.left);break;
                 case 5:curItem.onClick(SettingItem.Key.ok);break;
             }
-            updateView();
+
+
         }
 
+        Vector<String> sBuf=new Vector<>();
+        void viewMassage(byte[] b){
+            boolean isMassage=false;
+            StringBuilder s=new StringBuilder();
+            for(int i=0;i<15;i++){
+                if(b[i]!=0)
+                    isMassage=true;
+                if(i==0||i==11)
+                    s.append(String.valueOf(b[i]));
+                if(i<14)s.append(",");
+            }
+            if(isMassage)
+                sBuf.add(s.toString());
+
+            StringBuilder vS=new StringBuilder();
+            for(int i=sBuf.size()-1;i>=0&&i>sBuf.size()-10;i--)
+            {
+                vS.append(sBuf.elementAt(i)+'\n');
+            }
+            name.setText(vS.toString());
+        }
     }
 }

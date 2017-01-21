@@ -85,13 +85,15 @@ public class AlertActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... params) {
             try {
+                byte[] buf=new byte[SIZEOFMASSAGE];
                 while(true) {
+                    System.gc();
                     if (isCancelled()) {
                         ftDriver.end();
                         return null;
                     }
                     Thread.sleep(BAUDRATE);
-                    byte[] buf=new byte[SIZEOFMASSAGE];
+
                     ftDriver.read(buf);
                     publishProgress(buf);
 
