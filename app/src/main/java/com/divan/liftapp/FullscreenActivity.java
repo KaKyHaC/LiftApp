@@ -57,6 +57,8 @@ import com.divan.liftapp.Fragments.FragmentText;
 import com.divan.liftapp.Fragments.FragmentVideo;
 import com.divan.liftapp.Fragments.MyFragment;
 import com.divan.liftapp.ActivitySetting;
+import com.divan.liftapp.settingmenu.DateSetting;
+import com.divan.liftapp.settingmenu.NumberedSetting;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -67,8 +69,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -404,8 +408,11 @@ public class FullscreenActivity extends AppCompatActivity {
         @Override
         public void run() {
             Calendar calendar = Calendar.getInstance();
+            Date curDate =calendar.getTime();
+//            Long deltaTime=setting.year.deltaTime+setting.month.deltaTime+setting.day.deltaTime+setting.hour.deltaTime+setting.min.deltaTime;
+            curDate.setTime(curDate.getTime()+ DateSetting.deltaTime);
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat(setting.typeDate, Locale.getDefault()); //"dd:MM:yyyy EEEE HH:mm"
-            final String strDate = simpleDateFormat.format(calendar.getTime());
+            final String strDate = simpleDateFormat.format(curDate);
 
             runOnUiThread(new Runnable() {
 
@@ -462,7 +469,7 @@ public class FullscreenActivity extends AppCompatActivity {
             number.setText("b");
 
             ftDriver=new FTDriver((UsbManager)getSystemService(Context.USB_SERVICE));
-            isOpen=ftDriver.begin(FTDriver.BAUD9600,setting.sizeOfBuffer.value);
+            isOpen=ftDriver.begin(NumberedSetting.BAUDRATE[setting.indexBAUDRATE.value%NumberedSetting.BAUDRATE.length],setting.sizeOfBuffer.value);
 
             massage.setText(FileManager.getAllTextFromDirectory(PathToLiftApp + setting.MassageFolder));
             images= FileManager.getAllFilesPath(PathToLiftApp+setting.ImageFolder,"BMP","bmp","jpg","JPG");
@@ -535,7 +542,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 }
                 else//comment it (2d branch)
                 {
-                    isOpen=ftDriver.begin(FTDriver.BAUD9600,setting.sizeOfBuffer.value);
+                    isOpen=ftDriver.begin(NumberedSetting.BAUDRATE[setting.indexBAUDRATE.value%NumberedSetting.BAUDRATE.length],setting.sizeOfBuffer.value);
                 }
                 publishProgress(buf);
                 try{

@@ -34,6 +34,8 @@ import android.widget.Toast;
 import com.divan.liftapp.Fragments.MyFragment;
 import com.divan.liftapp.R;
 import com.divan.liftapp.Setting;
+import com.divan.liftapp.settingmenu.DateSetting;
+import com.divan.liftapp.settingmenu.NumberedSetting;
 import com.divan.liftapp.settingmenu.SettingItem;
 import com.divan.liftapp.settingmenu.SpecialSetting;
 
@@ -46,6 +48,7 @@ import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 import java.util.jar.Attributes;
 
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 import static com.divan.liftapp.FullscreenActivity.BAUDRATE;
 import static com.divan.liftapp.FullscreenActivity.PosSetStation;
 import static com.divan.liftapp.FullscreenActivity.SIZEOFMASSAGE;
@@ -113,10 +116,17 @@ public class ActivitySetting extends AppCompatActivity {
         settingItems.add(setting.textFragmenSize);
         settingItems.add(setting.sizeTextSetting);
         settingItems.add(setting.sizeOfBuffer);
+        settingItems.add(setting.indexBAUDRATE);
         settingItems.add(setting.volumeDay);
         settingItems.add(setting.volumeNight);
         settingItems.add(setting.accessMusic);
         settingItems.add(setting.accessVideo);
+        settingItems.add(setting.year);
+        settingItems.add(setting.month);
+        settingItems.add(setting.day);
+        settingItems.add(setting.hour);
+        settingItems.add(setting.min);
+
         settingItems.add(new SpecialSetting(SpecialSetting.TypeSpecialItem.STATION,this,STATION));
         settingItems.add(new SpecialSetting(SpecialSetting.TypeSpecialItem.DEFAULT,this,DEFAULT));
         settingItems.add(new SpecialSetting(SpecialSetting.TypeSpecialItem.INSTRUCTION,this,"Инструкция"));
@@ -257,6 +267,7 @@ public class ActivitySetting extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        DateSetting.StopTime();
         setting.StartRead();
         StartAsync();
         setSizeSetting();
@@ -304,7 +315,7 @@ public class ActivitySetting extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             ftDriver=new FTDriver((UsbManager)getSystemService(Context.USB_SERVICE));
-            isOpen=ftDriver.begin(FTDriver.BAUD9600,setting.sizeOfBuffer.value);
+            isOpen=ftDriver.begin(NumberedSetting.BAUDRATE[setting.indexBAUDRATE.value%NumberedSetting.BAUDRATE.length],setting.sizeOfBuffer.value);
             onListItemClick(index);
         }
         @Override
@@ -356,7 +367,7 @@ public class ActivitySetting extends AppCompatActivity {
                 }
                 else
                 {
-                    isOpen=ftDriver.begin(FTDriver.BAUD9600,setting.sizeOfBuffer.value);
+                    isOpen=ftDriver.begin(NumberedSetting.BAUDRATE[setting.indexBAUDRATE.value%NumberedSetting.BAUDRATE.length],setting.sizeOfBuffer.value);
                 }
                 
                 publishProgress(buf);
@@ -366,7 +377,6 @@ public class ActivitySetting extends AppCompatActivity {
                 }catch (InterruptedException e){}
                 
             }
-
         }
 
 
@@ -387,8 +397,8 @@ public class ActivitySetting extends AppCompatActivity {
             else
             {
                 name.setText("Нет сигнала");
-                value.setText("-");
-                Toast.makeText(context,"Нет сигнала",Toast.LENGTH_SHORT);
+                //value.setText("-");
+                Toast.makeText(context,"Нет сигнала",Toast.LENGTH_SHORT).show();
             }
 
         }
@@ -399,7 +409,7 @@ public class ActivitySetting extends AppCompatActivity {
                 case 2:onListItemClick(--index%listView.getCount());break;
                 case 3:curItem.onClick(SettingItem.Key.right);break;
                 case 4:curItem.onClick(SettingItem.Key.left);break;
-                case 5:curItem.onClick(SettingItem.Key.ok);break;
+                case 5:curItem.onClick(SettingItem.Key.ok);Toast.makeText(context, "Подтверждено", Toast.LENGTH_SHORT).show();break;
             }
 
 

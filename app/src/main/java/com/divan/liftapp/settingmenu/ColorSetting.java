@@ -108,11 +108,8 @@ public class ColorSetting extends SettingItem {
     @Override
     public void setFocus(boolean isFocus) {
         hasFocus=isFocus;
-        bufIndex=curIndex;
-        if(!isFocus)
-        {
-            onClick(Key.ok);
-        }
+        if(isFocus)
+            bufIndex=curIndex;
 
     }
 }

@@ -5,11 +5,12 @@ package com.divan.liftapp.settingmenu;
  */
 
 public class NumberedSetting extends SettingItem {
-    public enum NumberedType{Text,Volume,Buffer};
+    public enum NumberedType{Text,Volume,Buffer,BaudRate};
+    public static int [] BAUDRATE={2400,9600,14400,19200,38400,57600,115200,230400};
     public int value;
     private int bufValue;
     private String Name;
-    //private boolean isVolume=false;
+
     private NumberedType type=NumberedType.Text;
 
     public NumberedSetting(int value, String name) {
@@ -67,6 +68,8 @@ public class NumberedSetting extends SettingItem {
 
     @Override
     public String getValue() {
+        if(type==NumberedType.BaudRate)
+            return String.valueOf(BAUDRATE[bufValue%BAUDRATE.length]);
         return String.valueOf(bufValue)+((type==NumberedType.Volume)?"%":"");
     }
 

@@ -5,6 +5,7 @@ import android.os.Environment;
 
 import com.divan.liftapp.settingmenu.AccessSetting;
 import com.divan.liftapp.settingmenu.ColorSetting;
+import com.divan.liftapp.settingmenu.DateSetting;
 import com.divan.liftapp.settingmenu.NumberedSetting;
 
 import java.io.BufferedReader;
@@ -23,7 +24,7 @@ public class Setting {
     private String folderSetting,settingFile;
     public String pathSDcard=null;
     public String MainPath,BackGroundFolder,ImageFolder,SoundFolder,MusicFolder,MassageFolder,InformationFolder,ResourcesFolder,SpecialSoundFolder;
-    public String typeDate="dd:MM:yyyy EEEE HH:mm";
+    public String typeDate="dd/MM/yyyy EEEE HH:mm";
 
     public ColorSetting textColorHex;//Integer.toHexString(Color.WHITE);
     public ColorSetting LayOutBackGraundColor;
@@ -41,13 +42,17 @@ public class Setting {
 
     public NumberedSetting sizeTextSetting;
 
+    public NumberedSetting indexBAUDRATE;
+
+    public DateSetting year,month,day,hour,min;
+
 
 
     public void InitDefault(){
             textColorHex = new ColorSetting("Цвет текста", Color.RED);
             LayOutBackGraundColor = new ColorSetting("Цвет подложки", Integer.parseInt("5300ff00",16));// Integer.parseInt("534056ff",16)
             TextInfoSize = new NumberedSetting(30, "Размер шрифта информации");
-            TextDateSize = new NumberedSetting(30, "Размер шрифта времени");
+            TextDateSize = new NumberedSetting(15, "Размер шрифта времени");
             TextMassageSize = new NumberedSetting(30, "Размер шрифта сообщеня");
             NumberSize = new NumberedSetting(230, "Размер шрифта этажа");
 
@@ -66,7 +71,18 @@ public class Setting {
         accessVideo=new AccessSetting("Воспроизведение видео",AccessSetting.typeAccess[0]);
         accessMusic=new AccessSetting("Воспроизведение музыки",AccessSetting.typeAccess[0]);
 
-        sizeTextSetting=new NumberedSetting(30,"Размер шрифта настроек", NumberedSetting.NumberedType.Text);
+        sizeTextSetting=new NumberedSetting(15,"Размер шрифта настроек", NumberedSetting.NumberedType.Text);
+
+        indexBAUDRATE=new NumberedSetting(0,"Частота", NumberedSetting.NumberedType.BaudRate);
+
+        year=new DateSetting("Год", DateSetting.TypeDate.year);
+        month=new DateSetting("Месяц", DateSetting.TypeDate.month);
+        day=new DateSetting("День", DateSetting.TypeDate.day);
+        hour=new DateSetting("Час", DateSetting.TypeDate.hour);
+        min=new DateSetting("Минуты", DateSetting.TypeDate.min);
+
+        DateSetting.deltaTime=new Long(0);
+
 
     }
     public Setting(String folderSetting, String settingFile) {
@@ -124,6 +140,10 @@ public class Setting {
             bw.write(accessMusic+"--  accessMusic\n");
 
             bw.write(sizeTextSetting+"--  sizeTextSetting\n");
+            bw.write(indexBAUDRATE+"--  indexBAUDRATE\n");
+
+            bw.write(DateSetting.deltaTime+"--  deltaTime\n");
+
 
             bw.close();
         }catch (IOException r){
@@ -159,6 +179,13 @@ public class Setting {
             accessMusic.Access=Boolean.parseBoolean(getStringBeforCommends(br.readLine()));
 
             sizeTextSetting.value=Integer.parseInt(getStringBeforCommends(br.readLine()));
+            indexBAUDRATE.value=Integer.parseInt(getStringBeforCommends(br.readLine()));
+
+            DateSetting.deltaTime=Long.parseLong(getStringBeforCommends(br.readLine()));
+            /*month.deltaTime=Long.parseLong(getStringBeforCommends(br.readLine()));
+            day.deltaTime=Long.parseLong(getStringBeforCommends(br.readLine()));
+            hour.deltaTime=Long.parseLong(getStringBeforCommends(br.readLine()));
+            min.deltaTime=Long.parseLong(getStringBeforCommends(br.readLine()));*/
 
 
         }catch (IOException r)

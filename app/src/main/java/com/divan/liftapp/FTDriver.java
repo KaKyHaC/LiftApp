@@ -65,7 +65,7 @@ public class FTDriver {
     // Open an FTDI USB Device
     public boolean begin(int baudrate,int sizeOfBuffer) {
 		/* my shit*/
-		baudrate=2400;
+		//baudrate=2400;
 		sizeOfReadBuffer=sizeOfBuffer;
 
         for (UsbDevice device :  mManager.getDeviceList().values()) {

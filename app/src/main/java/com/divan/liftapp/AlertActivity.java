@@ -13,6 +13,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
+import com.divan.liftapp.settingmenu.NumberedSetting;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -79,7 +81,7 @@ public class AlertActivity extends AppCompatActivity {
             super.onPreExecute();
 
             ftDriver=new FTDriver((UsbManager)getSystemService(Context.USB_SERVICE));
-            ftDriver.begin(FTDriver.BAUD9600,setting.sizeOfBuffer.value);
+            ftDriver.begin(NumberedSetting.BAUDRATE[setting.indexBAUDRATE.value%NumberedSetting.BAUDRATE.length],setting.sizeOfBuffer.value);
         }
 
         @Override
