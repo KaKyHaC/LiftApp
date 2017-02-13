@@ -1,0 +1,17 @@
+﻿LiftApp--  mainPath
+BackGround--  BackGround Folder
+Image--  Image Folder
+Sound--  Sound Folder
+Music--  Music Folder
+Massage--  Massage Folder
+Information--  Information Folder
+Resources--  Resources Folder
+SpecialSound--  Special Sound Folder
+null--  LayOut BackGraund Color
+ffffffff-- цвет текста (Text Color)
+30--  Текст Information Size
+30--  Text Date Size
+30--  Text Massage Size
+330--  Number Size
+dd:MM:yyyy EEEE HH:mm--  type Date
+-

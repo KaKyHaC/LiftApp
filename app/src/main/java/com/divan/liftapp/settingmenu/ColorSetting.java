@@ -9,60 +9,43 @@ import java.util.Vector;
 
 public class ColorSetting extends SettingItem {
     String Name;
-    int color;
+    private int color;
     private int curIndex,bufIndex;
     private int alpha;
 
     public ColorSetting(String name, int color) {
         Name = name;
         this.color = color;
-        AddMyColorToMap();
+        alpha=Color.alpha(color);
+        bufIndex=curIndex=ColorsMap.getColorIndex(name,color);
     }
     public ColorSetting(String name,String hexColor){
         Name = name;
         this.color =(int) Long.parseLong(hexColor,16);
-        AddMyColorToMap();
+        alpha=Color.alpha(color);
+        bufIndex=curIndex=ColorsMap.getColorIndex(name,color);
     }
 
-    private void AddMyColorToMap(){
-        alpha=Color.alpha(color);
-        int maxAlpha=Color.alpha(Color.RED);
-        color=Color.argb(maxAlpha,Color.red(color),Color.green(color),Color.blue(color));
-       Vector<ColorPair> map=ColorsMap.getInstance().colors;
-        boolean hasColor=false,hasName=false;
-        for(int i=0;i<map.size();i++){
-            if(map.elementAt(i).value==color)
-                hasColor=true;
-            if(map.elementAt(i).Name==this.Name)
-                hasName=true;
-        }
-        if(!hasColor&&!hasName){
-            map.add(new ColorPair(Name,color));
-        }
-        curIndex=getMyIndex();
+    public void setColor(String hexColor){
+        color=(int)Long.parseLong(hexColor,16);
+        curIndex=bufIndex=ColorsMap.getColorIndex(Name,color);
     }
-    private int getMyIndex(){
-        Vector<ColorPair> v=ColorsMap.getColors();
-        for(int i=0;i<v.size();i++){
-            ColorPair buf=v.elementAt(i);
-            if(buf.value==this.color)
-                return i;
-        }
-        return -1;
-    }
+
+
+
     @Override
     public String toString() {
-        return Integer.toHexString(Color.argb(alpha,Color.red(color),Color.green(color),Color.blue(color)));
+        return Integer.toHexString(color);
     }
-    private void setColor(ColorPair p){
+   /* private void setColor(ColorPair p){
         this.color=p.value;
-    }
-    public void setColor(String hexColor){
+    }*/
+    /*public void setColor(String hexColor){
         this.color =(int) Long.parseLong(hexColor,16);
-    }
+    }*/
     @Override
     public void onClick(Key key) {
-        Vector<ColorPair> v=ColorsMap.getColors();
+      //  Vector<ColorPair> v=ColorsMap.getColors();
         if(hasFocus) {
             switch (key) {
                 case up:
@@ -80,12 +63,12 @@ public class ColorSetting extends SettingItem {
             }
         }
         while (curIndex<=0) {
-            curIndex += v.size();
+            curIndex += ColorsMap.size();
         }
         while (bufIndex<=0) {
-            bufIndex += v.size();
+            bufIndex += ColorsMap.size();
         }
-        setColor(v.elementAt(bufIndex%v.size()));
+        color=ColorsMap.makeARGB(alpha,ColorsMap.colorAt(curIndex));
     }
 
     @Override
@@ -95,14 +78,14 @@ public class ColorSetting extends SettingItem {
 
     @Override
     public String getValue() {
-        Vector<ColorPair> v=ColorsMap.getColors();
-        while (bufIndex<0)bufIndex+=v.size();
-        return v.elementAt(bufIndex%v.size()).Name;
+
+        return ColorsMap.nameAt(bufIndex);
     }
 
     @Override
     public String getColor() {
-        return  Integer.toHexString(Color.argb(alpha,Color.red(color),Color.green(color),Color.blue(color)));
+//        return ColorsMap.getArgbHexColor(alpha,bufIndex);
+        return Integer.toHexString(Color.argb(alpha,Color.red(color),Color.green(color),Color.blue(color)));
     }
 
     @Override
