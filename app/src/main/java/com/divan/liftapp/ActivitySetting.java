@@ -398,7 +398,7 @@ public class ActivitySetting extends AppCompatActivity {
             {
                 name.setText("Нет сигнала");
                 //value.setText("-");
-              //  Toast.makeText(context,"Нет сигнала",Toast.LENGTH_SHORT).show();
+                Toast.makeText(context,"Нет сигнала",Toast.LENGTH_SHORT).show();
             }
 
         }

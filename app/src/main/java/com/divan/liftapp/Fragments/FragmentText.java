@@ -40,19 +40,16 @@ public class FragmentText extends MyFragment {
     public void SetText(String text){
         if(tv!=null){
             tv.setText(text);
-           // tv.setTextSize(20);
+            tv.setTextSize(20);
         }
-    }
-    public void setSetting(){
-        Setting setting=new Setting(SettingFolder,settingFile);
-        tv.setTextColor((int)Long.parseLong(setting.textFragmentColor.toString(),16));
-        tv.setTextSize(setting.textFragmenSize.value);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-       setSetting();
+        Setting setting=new Setting(SettingFolder,settingFile);
+        tv.setTextColor((int)Long.parseLong(setting.textFragmentColor.toString(),16));
+        tv.setTextSize(setting.textFragmenSize.value);
     }
 
     @Override
@@ -71,7 +68,6 @@ public class FragmentText extends MyFragment {
             else if(signal==4){
                 tv.setText("Нет связи с контроллером");
             }
-            setSetting();
         }
     }
 }
