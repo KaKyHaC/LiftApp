@@ -57,6 +57,7 @@ import com.divan.liftapp.Fragments.FragmentText;
 import com.divan.liftapp.Fragments.FragmentVideo;
 import com.divan.liftapp.Fragments.MyFragment;
 import com.divan.liftapp.ActivitySetting;
+import com.divan.liftapp.Wifi.WiFiDirectActivity;
 import com.divan.liftapp.settingmenu.DateSetting;
 import com.divan.liftapp.settingmenu.NumberedSetting;
 
@@ -124,6 +125,8 @@ public class FullscreenActivity extends AppCompatActivity {
 
     Drawable drawableUp,drawableDown,drawableRing;
 
+    WiFiDirectActivity wiFiDirectActivity;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -161,9 +164,11 @@ public class FullscreenActivity extends AppCompatActivity {
             main = new Main();
 
             if (!isAsyn &&  main != null) {
-             //   catTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                RunWiFiTusk();
+                //   catTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 main.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 isAsyn = true;
+
             }
         }
     }
@@ -183,6 +188,8 @@ public class FullscreenActivity extends AppCompatActivity {
             musicPlayer.pause();
         if(main!=null)
             main.cancel(false);
+        if(wiFiDirectActivity!=null)
+            wiFiDirectActivity.cancel(false);
         /*if(catTask!=null)
             catTask.cancel(false);*/
         isAsyn=false;
@@ -329,10 +336,7 @@ public class FullscreenActivity extends AppCompatActivity {
         //videoView=((VideoView) fragVideo.getView().findViewById(R.id.videoFragment));
 
 
-
-
-
-
+        wiFiDirectActivity=new WiFiDirectActivity(this);
     }
 
     private void SetSetting() {
@@ -362,6 +366,12 @@ public class FullscreenActivity extends AppCompatActivity {
 
         pathOfDay=null;
         SetVolume();
+
+        MyFragment curFrag=((MyFragment)this.getFragmentManager().findFragmentById(R.id.fragment));
+        if(curFrag!=null)
+            curFrag.onUpdate(0,0);
+
+
 
     }
     private void SetBackGraunds(int color){
@@ -400,7 +410,16 @@ public class FullscreenActivity extends AppCompatActivity {
         }
     }
 
+    public void SetSettingFromWiFi(){
+        setting.StartRead();
+        this.SetSetting();
 
+    }
+    public void RunWiFiTusk(){
+
+            wiFiDirectActivity=new WiFiDirectActivity(this);
+            wiFiDirectActivity.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
 
 
     class MyTimerTask extends TimerTask {
@@ -645,9 +664,9 @@ public class FullscreenActivity extends AppCompatActivity {
             }
             if(setting.accessVideo.Access&&!QueuePlayer.isPlaying()){
                 switch (b){
-                    case 2:SetFragment(Fragment.Video);myFrag.onUpdate(0,1);break;//start
-                    case 3:SetFragment(Fragment.Video);myFrag.onUpdate(0,0);break;//stop
-                    case 4:SetFragment(Fragment.Video);myFrag.onUpdate(0,2);break;//next
+                    case 2:SetFragment(Fragment.Video);myFrag.onUpdate(0,2);break;//start
+                    case 3:SetFragment(Fragment.Video);myFrag.onUpdate(0,1);break;//stop
+                    case 4:SetFragment(Fragment.Video);myFrag.onUpdate(0,3);break;//next
                 }
             }
         }

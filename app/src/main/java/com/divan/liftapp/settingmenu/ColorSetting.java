@@ -96,7 +96,7 @@ public class ColorSetting extends SettingItem {
     @Override
     public String getValue() {
         Vector<ColorPair> v=ColorsMap.getColors();
-        while (bufIndex<0)curIndex+=v.size();
+        while (bufIndex<0)bufIndex+=v.size();
         return v.elementAt(bufIndex%v.size()).Name;
     }
 

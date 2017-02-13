@@ -1,6 +1,7 @@
 package com.divan.liftapp;
 
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Environment;
 
 import com.divan.liftapp.settingmenu.AccessSetting;
@@ -14,6 +15,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by Димка on 03.12.2016.
@@ -23,6 +25,7 @@ public class Setting {
     private final String LOG_TAG="LiftApp";
     private String folderSetting,settingFile;
     public String pathSDcard=null;
+    private File StoragePath;
     public String MainPath,BackGroundFolder,ImageFolder,SoundFolder,MusicFolder,MassageFolder,InformationFolder,ResourcesFolder,SpecialSoundFolder;
     public String typeDate="dd/MM/yyyy EEEE HH:mm";
 
@@ -88,6 +91,7 @@ public class Setting {
     public Setting(String folderSetting, String settingFile) {
         this.folderSetting=folderSetting;
         this.settingFile=settingFile;
+        setStoragePath();
         if(NumberSize==null)
             InitDefault();
         StartRead();
@@ -96,13 +100,7 @@ public class Setting {
 
     public void WriteSetting(){
         try{
-            File sdPath= Environment.getExternalStorageDirectory();
-            for(File f:sdPath.getParentFile().listFiles()){
-                String n=f.getName();
-                if(n.equals("extsd"))
-                    sdPath=f;
-            }
-            pathSDcard=sdPath.getAbsolutePath();
+           File sdPath=StoragePath;
             // добавляем свой каталог к пути
             sdPath = new File(sdPath.getAbsolutePath() + "/" + folderSetting);
             // создаем каталог
@@ -193,15 +191,8 @@ public class Setting {
 
         }
     }
-    public void StartRead()
-    {
-        File sdPath= Environment.getExternalStorageDirectory();
-        for(File f:sdPath.getParentFile().listFiles()){
-            String n=f.getName();
-            if(n.equals("extsd"))
-                sdPath=f;
-        }
-        pathSDcard=sdPath.getAbsolutePath();
+    public void StartRead() {
+       File sdPath=StoragePath;
         // добавляем свой каталог к пути
         sdPath = new File(sdPath.getAbsolutePath() + "/" + folderSetting);
         // создаем каталог
@@ -209,7 +200,7 @@ public class Setting {
         // формируем объект File, который содержит путь к файлу
         File sdFile = new File(sdPath, settingFile);
         try{
-            if(!sdFile.canRead())
+            if(!sdFile.canRead()||sdFile.getUsableSpace()<100)
             {
                 WriteSetting();
             }
@@ -253,5 +244,30 @@ public class Setting {
         return sb.toString();
     }
 
-
+    public Uri getUri(){
+        File sdPath= StoragePath;
+        // добавляем свой каталог к пути
+        sdPath = new File(sdPath.getAbsolutePath() + "/" + folderSetting);
+        // создаем каталог
+        sdPath.mkdirs();
+        // формируем объект File, который содержит путь к файлу
+        File sdFile = new File(sdPath, settingFile);
+        return Uri.fromFile(sdFile);
+    }
+    private void setStoragePath(){
+        File sdPath= Environment.getExternalStorageDirectory();
+        File parent=sdPath.getParentFile();
+        if(parent!=null) {
+            File[] files = parent.listFiles();
+            if(files!=null) {
+                for (File f : sdPath.getParentFile().listFiles()) {
+                    String n = f.getName();
+                    if (n.equals("extsd"))
+                        sdPath = f;
+                }
+            }
+        }
+        pathSDcard=sdPath.getAbsolutePath();
+        StoragePath=sdPath;
+    }
 }
