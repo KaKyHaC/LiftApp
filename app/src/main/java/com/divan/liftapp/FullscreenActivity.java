@@ -6,7 +6,6 @@ import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.app.Instrumentation;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.content.Intent;
@@ -117,7 +116,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
     final Context context=this;
 
-   // CatTask catTask;
+    // CatTask catTask;
     Main main;
     boolean isAsyn=false;
 
@@ -155,13 +154,13 @@ public class FullscreenActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-//        StartAsync();
+        StartAsync();
 
     }
 
     private void StartAsync(){
         if(!isAsyn) {
-           // catTask = new CatTask();
+            // catTask = new CatTask();
             main = new Main();
 
             if (!isAsyn &&  main != null) {
@@ -177,8 +176,8 @@ public class FullscreenActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         getWindow().getDecorView().setSystemUiVisibility(UiSetting);
-       // musicPlayer.start();
-       StartAsync();
+        // musicPlayer.start();
+        StartAsync();
         setting.StartRead();
         SetSetting();
     }
@@ -195,7 +194,6 @@ public class FullscreenActivity extends AppCompatActivity {
             catTask.cancel(false);*/
         isAsyn=false;
     }
-
 
     private void PlayMusic(String fileName){
         try {
@@ -216,12 +214,12 @@ public class FullscreenActivity extends AppCompatActivity {
         }
     }
     private void PlaySound(String fileName){
-            File f=new File(pathSDcard+'/'+SettingFolder+'/'+setting.SoundFolder+'/'+fileName);
-            soundPlayer.add(f.getAbsolutePath());
+        File f=new File(pathSDcard+'/'+SettingFolder+'/'+setting.SoundFolder+'/'+fileName);
+        soundPlayer.add(f.getAbsolutePath());
     }
     private void PlaySpecialSound(String fileName){
-            File f=new File(pathSDcard+'/'+SettingFolder+'/'+setting.SpecialSoundFolder+'/'+fileName);
-            specialSoundPlayer.add(f.getAbsolutePath());
+        File f=new File(pathSDcard+'/'+SettingFolder+'/'+setting.SpecialSoundFolder+'/'+fileName);
+        specialSoundPlayer.add(f.getAbsolutePath());
     }
     private void SetBackGraund(String fileName){
         File f=new File(pathSDcard+'/'+SettingFolder+'/'+setting.BackGroundFolder+'/'+fileName);
@@ -246,15 +244,15 @@ public class FullscreenActivity extends AppCompatActivity {
         try {
             File f=new File(pathSDcard + '/' + setting.MainPath + '/' + folderName + '/' + fileName);
             if(f.canRead()) {
-            BufferedReader br = new BufferedReader(new FileReader(f.getAbsoluteFile()));
-            StringBuilder sb=new StringBuilder();
-            String s=br.readLine();
-            while (s!=null) {
-                sb.append(s+'\n');
-                s=br.readLine();
-            }
-            tv.setText(sb.toString());
-            br.close();
+                BufferedReader br = new BufferedReader(new FileReader(f.getAbsoluteFile()));
+                StringBuilder sb=new StringBuilder();
+                String s=br.readLine();
+                while (s!=null) {
+                    sb.append(s+'\n');
+                    s=br.readLine();
+                }
+                tv.setText(sb.toString());
+                br.close();
             }else{
                 Toast.makeText(this,"Cann't read massage file",Toast.LENGTH_LONG);
             }
@@ -267,14 +265,14 @@ public class FullscreenActivity extends AppCompatActivity {
         View decorView=null;
         if(Build.VERSION.SDK_INT < 19) {//19 or above api
             decorView = this.getWindow().getDecorView();
-        decorView.setSystemUiVisibility(View.GONE|UiSetting);
-    } else {
-        //for lower api versions.
-         decorView = getWindow().getDecorView();
-        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY  |  UiSetting;
-        decorView.setSystemUiVisibility(uiOptions);
+            decorView.setSystemUiVisibility(View.GONE|UiSetting);
+        } else {
+            //for lower api versions.
+            decorView = getWindow().getDecorView();
+            int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY  |  UiSetting;
+            decorView.setSystemUiVisibility(uiOptions);
+        }
     }
-}
     private void Initialaze() {
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
@@ -418,9 +416,9 @@ public class FullscreenActivity extends AppCompatActivity {
 
     }
     public void RunWiFiTusk(){
-            StopWiFiTusk();
-            wiFiDirectActivity=new WiFiDirectActivity(this);
-            wiFiDirectActivity.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+        wiFiDirectActivity=new WiFiDirectActivity(this);
+        wiFiDirectActivity.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
     public void StopWiFiTusk(){
         if(wiFiDirectActivity!=null)
@@ -498,9 +496,9 @@ public class FullscreenActivity extends AppCompatActivity {
                         }
                     }
                 });
-               // musicPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                // musicPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
                 musicPlayer.pause();
-               // musicPlayer.start();
+                // musicPlayer.start();
             }
         }
         @Override
@@ -531,10 +529,10 @@ public class FullscreenActivity extends AppCompatActivity {
                  }*/
 
             while(true){
-             if (isCancelled()) {
-                 ftDriver.end();
-                 return null;
-             }
+                if (isCancelled()) {
+                    ftDriver.end();
+                    return null;
+                }
                 System.gc();
                 //isOpen=ftDriver.isConnection();
                 //isOpen=ftDriver.begin(FTDriver.BAUD9600);// work while it commented (2d branch)
@@ -552,6 +550,8 @@ public class FullscreenActivity extends AppCompatActivity {
                 }catch (InterruptedException e){}
             }
         }
+
+
         @Override
         protected void onProgressUpdate(byte[]... values) {
             super.onProgressUpdate(values);
@@ -708,7 +708,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 Intent intent = new Intent(context,ActivitySetting.class);
                 startActivity(intent);
             }else if(b==ValAlert){//2
-              //  setContentView(R.layout.white);
+                //  setContentView(R.layout.white);
                 Intent intent = new Intent(context,AlertActivity.class);
                 startActivity(intent);
             }else if(b==3){
@@ -785,7 +785,7 @@ public class FullscreenActivity extends AppCompatActivity {
             }
             if(isMassage)
                 sBuf.add(s.toString());
-           SetFragment(Fragment.Text);
+            SetFragment(Fragment.Text);
             StringBuilder vS=new StringBuilder();
             for(int i=sBuf.size()-1;i>=0&&i>sBuf.size()-10;i--)
             {
@@ -890,7 +890,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
             if(value1==1){
                 imageArrow.setImageResource(R.drawable.up);
-                
+
                 fragmentTransaction.replace(R.id.fragment,fragImage);
                 myFrag=fragImage;
             }
@@ -942,7 +942,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 }
                 PlaySound(String.valueOf(val)+".mp3");
                 ring.setImageResource(R.drawable.ring);
-               // mediaPlayer.pause();
+                // mediaPlayer.pause();
             }
             else{
                 ring.setImageBitmap(null);
@@ -966,7 +966,7 @@ public class FullscreenActivity extends AppCompatActivity {
             }
             else if(isFire==true)
             {
-               // fire.setVisibility(View.INVISIBLE);
+                // fire.setVisibility(View.INVISIBLE);
                 fire.setImageBitmap(null);
                 isFire=false;
                 fragmentTransaction.replace(R.id.fragment,myFrag);
