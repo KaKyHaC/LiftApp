@@ -136,6 +136,7 @@ public class DeviceList implements PeerListListener {
         peers.clear();
         peers.addAll(peerList.getDeviceList());
         tryConnect();
+        findAndAddMac();
     }
 
     public List<WifiP2pDevice> getPeers(){return peers;}
@@ -176,6 +177,13 @@ public class DeviceList implements PeerListListener {
                     break;
                 }
             }
+        }
+
+    }
+    private void findAndAddMac(){
+        for(WifiP2pDevice device:peers){
+            if(device.status==WifiP2pDevice.CONNECTED)
+                wiFiDirectActivity.addMac(device.deviceAddress);
         }
     }
     public interface DeviceActionListener {

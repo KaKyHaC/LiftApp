@@ -196,8 +196,8 @@ public class WiFiDirectActivity extends AsyncTask<Void,String,Void> implements C
             @Override
             public void onSuccess() {
                 isConnected=true;
-                makeToast( "Connect succesed!"                       );
-                clientMac=(config.deviceAddress);
+                makeToast( "Connect succesed!"   );
+                clientMac=config.deviceAddress;
                 manager.createGroup(channel, new ActionListener() {
                     @Override
                     public void onSuccess() {
@@ -263,8 +263,8 @@ public class WiFiDirectActivity extends AsyncTask<Void,String,Void> implements C
 
     @Override
     public void cancelDisconnect() {
-        //isFinding=false;
-
+        isFinding=false;
+        isConnected=false;
         /*
          * A cancel abort request by user. Disconnect i.e. removeGroup if
          * already connected. Else, request WifiP2pManager to abort the ongoing
