@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.Instrumentation;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.content.Intent;
@@ -154,7 +155,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        StartAsync();
+//        StartAsync();
 
     }
 
@@ -194,6 +195,7 @@ public class FullscreenActivity extends AppCompatActivity {
             catTask.cancel(false);*/
         isAsyn=false;
     }
+
 
     private void PlayMusic(String fileName){
         try {
@@ -416,9 +418,13 @@ public class FullscreenActivity extends AppCompatActivity {
 
     }
     public void RunWiFiTusk(){
-
+            StopWiFiTusk();
             wiFiDirectActivity=new WiFiDirectActivity(this);
             wiFiDirectActivity.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+    public void StopWiFiTusk(){
+        if(wiFiDirectActivity!=null)
+            wiFiDirectActivity.cancel(false);
     }
 
 
@@ -444,30 +450,7 @@ public class FullscreenActivity extends AppCompatActivity {
             });
         }
     }
-    class CatTask extends AsyncTask<Void, Integer, Void> {
-        @Override
-        protected Void doInBackground(Void... params) {
-            try {
-                while(true) {
-                    if (isCancelled()) return null;
-                    TimeUnit.SECONDS.sleep(2);
-                    publishProgress(1);
-                    //onDataReceived(new byte[5],5);
-                                    }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
 
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-            //getWindow().getDecorView().setSystemUiVisibility(UiSetting);
-            FullScreencall();
-        }
-
-    }
 
     enum Fragment{Video,Image,Text};
     class Main extends AsyncTask<Void,byte[],Void>{
@@ -569,8 +552,6 @@ public class FullscreenActivity extends AppCompatActivity {
                 }catch (InterruptedException e){}
             }
         }
-
-
         @Override
         protected void onProgressUpdate(byte[]... values) {
             super.onProgressUpdate(values);
@@ -723,25 +704,20 @@ public class FullscreenActivity extends AppCompatActivity {
                 frameLayout.setBackground(drawable);
             }}
         void SpecialThings(byte b){
-            if(b==1)
-            {
+            if(b==1) {
                 Intent intent = new Intent(context,ActivitySetting.class);
                 startActivity(intent);
-            }
-
-            if(b==ValAlert){//2
+            }else if(b==ValAlert){//2
               //  setContentView(R.layout.white);
                 Intent intent = new Intent(context,AlertActivity.class);
                 startActivity(intent);
-            }
-            if(b==3){
+            }else if(b==3){
                 PowerManager manager = (PowerManager) getSystemService(Context.POWER_SERVICE);
                 PowerManager.WakeLock wl = manager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Your Tag");
                 wl.acquire();
                 wl.release();
 
-            }
-            if(b==4){
+            }else if(b==4){
                 try {
                     Process mSU = Runtime.getRuntime().exec("su");
                     DataOutputStream os = new DataOutputStream(mSU.getOutputStream());
@@ -749,20 +725,21 @@ public class FullscreenActivity extends AppCompatActivity {
                     os.flush();
                     os.close();
                 }catch (IOException e){}
-            }
-            if(b==5){
+            }else if(b==5){
                 WindowManager.LayoutParams params = getWindow().getAttributes();
                 params.screenBrightness = 0;
                 getWindow().setAttributes(params);
-            }
-            if(b==6){
+            }else if(b==6){
                 WindowManager.LayoutParams params = getWindow().getAttributes();
                 params.screenBrightness = 100;
                 getWindow().setAttributes(params);
-            }
-            if(b==7){
+            }else if(b==7){
                 DevicePolicyManager mDPM = (DevicePolicyManager)getSystemService(Context.DEVICE_POLICY_SERVICE);
                 mDPM.lockNow();
+            }else if(b==8){
+                RunWiFiTusk();
+            }else if(b==9){
+                StopWiFiTusk();
             }
            /* if(b==8){
                 InputConnection ic = getCurrentInputConnection();
