@@ -121,19 +121,22 @@ public class DeviceList implements PeerListListener {
         this.device = device;
         wiFiDirectActivity.changeName(Security.setPref(device.deviceName,Security.prefLift));
         if(device.status==WifiP2pDevice.CONNECTED){
-            wiFiDirectActivity.addMac(device.deviceAddress);
+            /*wiFiDirectActivity.makeToast("addMac");
+            wiFiDirectActivity.addMac(device.deviceAddress);*/
+
         }
     }
 
     @Override
     public void onPeersAvailable(WifiP2pDeviceList peerList) {
-        Toast.makeText(wiFiDirectActivity.fullscreenActivity,"peers updateed",Toast.LENGTH_SHORT).show();
+        wiFiDirectActivity.makeToast("peers updateed");
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
         peers.clear();
         peers.addAll(peerList.getDeviceList());
         tryConnect();
+        findAndAddMac();
     }
 
     public List<WifiP2pDevice> getPeers(){return peers;}
@@ -165,7 +168,7 @@ public class DeviceList implements PeerListListener {
                         isHave = true;
                 }
                 if (!isHave&&Security.hasPref(device.deviceName,Security.prefSetting)) {
-                    Toast.makeText(wiFiDirectActivity.fullscreenActivity,"try connect",Toast.LENGTH_SHORT).show();
+                    wiFiDirectActivity.makeToast("try connect");
                     WifiP2pConfig config = new WifiP2pConfig();
                     config.deviceAddress = device.deviceAddress;
                     config.wps.setup = WpsInfo.PBC;
@@ -174,6 +177,13 @@ public class DeviceList implements PeerListListener {
                     break;
                 }
             }
+        }
+
+    }
+    private void findAndAddMac(){
+        for(WifiP2pDevice device:peers){
+            if(device.status==WifiP2pDevice.CONNECTED)
+                wiFiDirectActivity.addMac(device.deviceAddress);
         }
     }
     public interface DeviceActionListener {

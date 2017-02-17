@@ -84,8 +84,7 @@ public class ColorSetting extends SettingItem {
 
     @Override
     public String getColor() {
-//        return ColorsMap.getArgbHexColor(alpha,bufIndex);
-        return Integer.toHexString(Color.argb(alpha,Color.red(color),Color.green(color),Color.blue(color)));
+       return ColorsMap.getArgbHexColor(alpha,bufIndex);
     }
 
     @Override

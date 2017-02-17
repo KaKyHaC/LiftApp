@@ -51,7 +51,7 @@ public class ColorsMap {
     public static int colorAt(int index){
         return colors.elementAt(index%size()).value;
     }
-    public static String nameAt(int index){return colors.elementAt(index&size()).Name;}
+    public static String nameAt(int index){return colors.elementAt(index%size()).Name;}
     public static int size(){return colors.size();}
     public static int getColorIndex(String Name,int color){
         color=makeRGB(color);
@@ -69,13 +69,17 @@ public class ColorsMap {
         return Color.argb(Color.alpha(Color.BLACK),Color.red(color),Color.green(color),Color.blue(color));
     }
     public static int makeARGB(int alpha,int color){
-        return Color.argb(Color.alpha(alpha),Color.red(color),Color.green(color),Color.blue(color));
+        return Color.argb(alpha,Color.red(color),Color.green(color),Color.blue(color));
     }
 
     public static String getArgbHexColor(int alpha,int index){
         int c=colorAt(index);
         c=makeARGB(alpha,c);
         return Integer.toHexString(c);
+    }
+    public static int getArgbColorAt(int alpha,int index){
+        int c=colorAt(index);
+        return makeARGB(alpha,c);
     }
 
 }

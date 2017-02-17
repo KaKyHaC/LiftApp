@@ -93,13 +93,13 @@ public class FragmentVideo extends MyFragment {
     public void onUpdate(int floor, final int signal) {
         lastSignal=signal;
         if (video != null) {
-            if (video.isPlaying()&&signal == 1) {
+            if (video.isPlaying()&&signal == 0) {
                 video.pause();
             }
-             if (!video.isPlaying()&&signal==2) {
+             if (!video.isPlaying()&&signal==1) {
                 video.start();
             }
-            if(signal==3){
+            if(signal==2){
                 curPos=0;
                 video.setVideoPath(videos.get(++nVideo % videos.size()));
                 video.start();
