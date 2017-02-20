@@ -413,7 +413,7 @@ public class FullscreenActivity extends AppCompatActivity {
     public void SetSettingFromWiFi(){
         setting.StartRead();
         this.SetSetting();
-
+        main.setFiles();
     }
     public void RunWiFiTusk(){
 
@@ -471,14 +471,7 @@ public class FullscreenActivity extends AppCompatActivity {
             ftDriver=new FTDriver((UsbManager)getSystemService(Context.USB_SERVICE));
             isOpen=ftDriver.begin(NumberedSetting.BAUDRATE[setting.indexBAUDRATE.value%NumberedSetting.BAUDRATE.length],setting.sizeOfBuffer.value);
 
-            massage.setText(FileManager.getAllTextFromDirectory(PathToLiftApp + setting.MassageFolder));
-            images= FileManager.getAllFilesPath(PathToLiftApp+setting.ImageFolder,"BMP","bmp","jpg","JPG");
-            backGrounds=FileManager.getAllFilesPath(PathToLiftApp+setting.BackGroundFolder,"BMP","bmp","jpg","JPG");
-            musics=FileManager.getAllFilesPath(PathToLiftApp+setting.MusicFolder,"mp3","wav");
-            videos=FileManager.getAllFilesPath(PathToLiftApp+setting.ResourcesFolder,"mp4","3gp");
-
-            fragVideo.setVideos(videos);
-            fragImage.setLists(images,musics);
+            setFiles();
 
             if(musics.size()!=0) {
                 musicPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -501,32 +494,30 @@ public class FullscreenActivity extends AppCompatActivity {
                 // musicPlayer.start();
             }
         }
+        public void setFiles(){
+            synchronized (massage) {
+                massage.setText(FileManager.getAllTextFromDirectory(PathToLiftApp + setting.MassageFolder));
+            }synchronized (images) {
+                images = FileManager.getAllFilesPath(PathToLiftApp + setting.ImageFolder, "BMP", "bmp", "jpg", "JPG");
+            }synchronized (backGrounds){
+                backGrounds=FileManager.getAllFilesPath(PathToLiftApp+setting.BackGroundFolder,"BMP","bmp","jpg","JPG");
+            }synchronized (musics) {
+                musics = FileManager.getAllFilesPath(PathToLiftApp + setting.MusicFolder, "mp3", "wav");
+            }synchronized (videos) {
+                videos = FileManager.getAllFilesPath(PathToLiftApp + setting.ResourcesFolder, "mp4", "3gp");
+                fragVideo.setVideos(videos);
+            }
+            fragImage.setLists(images,musics);
+        }
+
         @Override
         protected Void doInBackground(Void... params) {
-            byte[] buf = new byte[setting.sizeOfBuffer.value];//work while size=64
+//            return testProcess();
+            return mainProcess();
+        }
 
-          /*  isOpen=true;
-          byte[][] test=new byte[][]{
-          //          0 1 2 3 4 5 6 7 8 9
-                    {50,1,1,0,0,0,0,0,0,0},
-                    {50,2,2,0,0,0,0,0,0,0},
-                    {50,3,2,0,0,1,0,1,1,0},
-                    {50,4,0,0,0,0,0,1,0,0},
-                    {50,5,0,0,0,9,0,0,0,0},
-                    {50,6,4,1,0,0,0,2,0,0},
-                    {50,7,5,0,0,4,0,2,1,0},
-                    {50,8,0,0,0,9,0,0,0,0},
-                    {50,9,6,0,0,9,0,1,0,0},
-                    {50,(byte)231,0,4,0,0,0,0,0,0},
-                    {50,8,0,5,0,0,0,3,1,0}};
-            int index=0;
-            while(true){
-                if (isCancelled()) return null;
-                publishProgress(test[index++%test.length]);
-                try{
-                TimeUnit.SECONDS.sleep(2);
-                 }catch(InterruptedException e){}
-                 }*/
+        private Void mainProcess(){
+            byte[] buf = new byte[setting.sizeOfBuffer.value];//work while size=64
 
             while(true){
                 if (isCancelled()) {
@@ -550,7 +541,32 @@ public class FullscreenActivity extends AppCompatActivity {
                 }catch (InterruptedException e){}
             }
         }
+        private Void testProcess(){
+            byte[] buf = new byte[setting.sizeOfBuffer.value];//work while size=64
 
+            isOpen=true;
+          byte[][] test=new byte[][]{
+          //          0 1 2 3 4 5 6 7 8 9
+                    {50,1,1,0,0,0,0,0,0,0},
+                    {50,2,2,0,0,0,0,0,0,0},
+                    {50,3,2,0,0,1,0,1,1,0},
+                    {50,4,0,0,0,0,0,1,0,0},
+                    {50,5,0,0,0,9,0,0,0,0},
+                    {50,6,4,1,0,0,0,2,0,0},
+                    {50,7,5,0,0,4,0,2,1,0},
+                    {50,8,0,0,0,9,0,0,0,0},
+                    {50,9,6,0,0,9,0,1,0,0},
+                    {50,(byte)231,0,4,0,0,0,0,0,0},
+                    {50,8,0,5,0,0,0,3,1,0}};
+            int index=0;
+            while(true){
+                if (isCancelled()) return null;
+                publishProgress(test[index++%test.length]);
+                try{
+                TimeUnit.SECONDS.sleep(2);
+                 }catch(InterruptedException e){}
+                 }
+        }
 
         @Override
         protected void onProgressUpdate(byte[]... values) {
@@ -804,196 +820,5 @@ public class FullscreenActivity extends AppCompatActivity {
         }
     }
 
-    class Demo extends  AsyncTask<Void,Integer,Void>{
-        private int index=1;
-        String PathToLiftApp=pathSDcard + '/' + setting.MainPath +'/' ;
-        List<String> images,backGrounds,musics,videos;
-        int nImage=1,nBack=1,nMusic=0,nVideo=0;
-        int maxLvl=9;
-        boolean isFire=false;
-        MyFragment myFrag;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            massage.setText(FileManager.getAllTextFromDirectory(PathToLiftApp + setting.MassageFolder));
-            /*------------------------*/
-            images= FileManager.getAllFilesPath(PathToLiftApp+setting.ImageFolder,"BMP","bmp","jpg","JPG");
-            backGrounds=FileManager.getAllFilesPath(PathToLiftApp+setting.BackGroundFolder,"BMP","bmp","jpg","JPG");
-            musics=FileManager.getAllFilesPath(PathToLiftApp+setting.MusicFolder,"mp3","wav");
-            videos=FileManager.getAllFilesPath(PathToLiftApp+setting.ResourcesFolder,"mp4","3gp");
-
-           /* if(videos.size()!=0) {
-                videoView.setVideoPath(videos.get(nVideo++ % videos.size()));
-                videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        videoView.setVideoPath(videos.get(nVideo++ % videos.size()));
-                        videoView.start();
-                    }
-                });
-                videoView.start();
-            }*/
-            fragVideo.setVideos(videos);
-            fragImage.setLists(images,musics);
-
-        }
-
-        @Override
-
-        protected Void doInBackground(Void... params) {
-
-            int i=-1;
-            publishProgress(1,1);
-            try {
-                while (true) {
-
-                    for (i+=2 ; i <= maxLvl; i++) {
-                        if (i == 9) {
-                            publishProgress(i, 0);
-                            TimeUnit.SECONDS.sleep(6);
-                        }
-                        if (i == maxLvl)
-                            publishProgress(i, -1);
-                        else
-                            publishProgress(i, 1);
-                        TimeUnit.SECONDS.sleep(3);
-                    }
-
-                    for (i-=2; i >= 1; i--) {
-                        if (i == 3) {
-                            publishProgress(i, 0);
-                            TimeUnit.SECONDS.sleep(6);
-                        }
-                        if(i==1)
-                            publishProgress(i,1);
-                        else
-                            publishProgress(i,-1);
-                        TimeUnit.SECONDS.sleep(3);
-                    }
-
-                    publishProgress(2, 2);//fire
-                    TimeUnit.SECONDS.sleep(5);
-
-                }
-            }catch (InterruptedException r){
-
-            }
-            return null;
-        }
-
-        protected void directionOfMovement(int value1 ){
-            FragmentManager fragmentManager = getFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager
-                    .beginTransaction();
-
-
-            if(value1==1){
-                imageArrow.setImageResource(R.drawable.up);
-
-                fragmentTransaction.replace(R.id.fragment,fragImage);
-                myFrag=fragImage;
-            }
-            else if(value1==-1)
-            {
-                imageArrow.setImageResource(R.drawable.down);
-                if(videos.size()>0) {
-                    fragmentTransaction.replace(R.id.fragment, fragVideo);
-                    myFrag = fragVideo;
-                }
-            }
-
-            fragmentTransaction.commit();
-        }
-        protected void isStopOnFloor(int value1,int val){
-            if(value1==0){
-                final Animation animationFlipOut,animationFlipIn;
-                animationFlipIn = AnimationUtils.loadAnimation(context,
-                        android.R.anim.slide_in_left);
-                animationFlipOut = AnimationUtils.loadAnimation(context,
-                        android.R.anim.slide_out_right);
-                animationFlipOut.setAnimationListener(new Animation.AnimationListener() {
-                    @Override
-                    public void onAnimationStart(Animation animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-                        if(backGrounds.size()!=0) {
-                            Drawable drawable = BitmapDrawable.createFromPath(backGrounds.get((nBack++ % backGrounds.size())));
-                            frameLayout.setBackground(drawable);
-                            frameLayout.startAnimation(animationFlipIn);
-                        }
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animation animation) {
-
-                    }
-                });
-
-                imageArrow.setImageBitmap(null);
-
-                if(backGrounds.size()>0) {
-                    //frameLayout.startAnimation(animationFlipOut);
-                    Drawable drawable = BitmapDrawable.createFromPath(backGrounds.get((nBack++ % backGrounds.size())));
-                    frameLayout.setBackground(drawable);
-                }
-                PlaySound(String.valueOf(val)+".mp3");
-                ring.setImageResource(R.drawable.ring);
-                // mediaPlayer.pause();
-            }
-            else{
-                ring.setImageBitmap(null);
-                //mediaPlayer.start();
-            }
-        }
-        protected void isFireAlert(int value1){
-            FragmentManager fragmentManager = getFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager
-                    .beginTransaction();
-            if(value1==2)
-            {
-                imageArrow.setImageBitmap(null);
-                fire.setImageResource(R.drawable.fire1);
-                //fire.setVisibility(View.VISIBLE);
-                isFire=true;
-                fragmentTransaction.replace(R.id.fragment,fragText);
-
-                PlaySpecialSound("fire.mp3");
-
-            }
-            else if(isFire==true)
-            {
-                // fire.setVisibility(View.INVISIBLE);
-                fire.setImageBitmap(null);
-                isFire=false;
-                fragmentTransaction.replace(R.id.fragment,myFrag);
-            }
-            fragmentTransaction.commit();
-        }
-
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-
-            int val=values[0];
-            directionOfMovement(values[1]);
-            isStopOnFloor(values[1],val);
-            isFireAlert(values[1]);
-
-
-            number.setText(String.valueOf(val));
-            myFrag.onUpdate(val,values[1]);
-
-          /*  if(images.size()!=0&&val%2==0) {
-                Bitmap bm = BitmapFactory.decodeFile(images.get(nImage++ % images.size()));
-                fragImage.setImage(bm);
-            }*/
-
-        }
-    }
 
 }
