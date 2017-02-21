@@ -48,8 +48,8 @@ public class FragmentText extends MyFragment {
     public void onResume() {
         super.onResume();
         Setting setting=new Setting(SettingFolder,settingFile);
-        tv.setTextColor((int)Long.parseLong(setting.textFragmentColor.toString(),16));
-        tv.setTextSize(setting.textFragmenSize.value);
+        tv.setTextColor((int)Long.parseLong(setting.colorTextFragment.toString(),16));
+        tv.setTextSize(setting.sizeTextFragment.value);
     }
 
     @Override

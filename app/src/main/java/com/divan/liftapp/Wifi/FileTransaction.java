@@ -133,17 +133,17 @@ public abstract class FileTransaction {
     private static String getPathToSave(final FileType fileType,final Setting setting){
         String path=setting.pathLiftFolder+'/';
         switch (fileType){
-            case setting:path+=setting.settingFile;
+            case setting:path+=setting.fileSetting;
                 break;
-            case image:path+=setting.ImageFolder;
+            case image:path+=setting.folderImage;
                 break;
-            case video:path+=setting.ResourcesFolder;
+            case video:path+=setting.folderVideo;
                 break;
-            case music:path+=setting.MusicFolder;
+            case music:path+=setting.folderMusic;
                 break;
-            case sound:path+=setting.SoundFolder;
+            case sound:path+=setting.folderSound;
                 break;
-            case backgraund:path+=setting.BackGroundFolder;
+            case backgraund:path+=setting.folderBackGraund;
                 break;
             case undefined:
             default:return null;

@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import com.divan.liftapp.R;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -26,7 +27,7 @@ public class FragmentImage extends MyFragment {
      Animation animationFlipOut,animationFlipIn;
 
     ImageView image;
-    List<String> images,musics;
+    List<String> images=new LinkedList<>(),musics=new LinkedList<>();
     int nImage=0,nMusic=0;
     int lastSignal=0;
 

@@ -100,20 +100,20 @@ public class ActivitySetting extends AppCompatActivity {
 
         onListItemClick(0);
         context=this;
-        StartAsync();
+//        StartAsync();
 
     }
     private void InitSettingItems(){
         settingItems=new Vector<>();
-        settingItems.add(setting.LayOutBackGraundColor);
-        settingItems.add(setting.textColorHex);
-        settingItems.add(setting.textFragmentColor);
-        settingItems.add(setting.iconColor);
-        settingItems.add(setting.NumberSize);
-        settingItems.add(setting.TextDateSize);
-        settingItems.add(setting.TextInfoSize);
-        settingItems.add(setting.TextMassageSize);
-        settingItems.add(setting.textFragmenSize);
+        settingItems.add(setting.colorLayoutBackgraund);
+        settingItems.add(setting.colorIcon);
+        settingItems.add(setting.colorText);
+        settingItems.add(setting.colorTextFragment);
+        settingItems.add(setting.sizeNumber);
+        settingItems.add(setting.sizeTextDate);
+        settingItems.add(setting.sizeTextFragment);
+        settingItems.add(setting.sizeTextInfo);
+        settingItems.add(setting.sizeTextMassage);
         settingItems.add(setting.sizeTextSetting);
         settingItems.add(setting.sizeOfBuffer);
         settingItems.add(setting.indexBAUDRATE);
@@ -288,7 +288,7 @@ public class ActivitySetting extends AppCompatActivity {
         Toast.makeText(context, "make default", Toast.LENGTH_LONG);
     }
     public void SendByte(){
-        byteToSend=(byte)(setting.indexCurStation%stationNames.length+1);
+        byteToSend=(byte)(setting.indexCurStation.value%stationNames.length+1);
     }
     public void SendByte(byte b){
         byteToSend=b;

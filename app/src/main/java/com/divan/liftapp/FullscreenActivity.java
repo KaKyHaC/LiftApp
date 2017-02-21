@@ -71,6 +71,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
@@ -132,7 +133,6 @@ public class FullscreenActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fullscreen);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-        Initialaze();
         getWindow().getDecorView().setSystemUiVisibility(UiSetting);
 
         ActionBar supportActionBar = getSupportActionBar();
@@ -141,11 +141,9 @@ public class FullscreenActivity extends AppCompatActivity {
         android.app.ActionBar actionBar=getActionBar();
         if(actionBar!=null)actionBar.hide();
 
-
         setting=new Setting(SettingFolder,settingFile);
-        SetSetting();
-
-        mTimer.schedule(mMyTimerTask, 1000, 1000);
+        Initialaze();
+//        mTimer.schedule(mMyTimerTask, 1000, 1000);
 
         ((FrameLayout)findViewById(R.id.fragment)).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,32 +152,24 @@ public class FullscreenActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        StartAsync();
 
     }
 
     private void StartAsync(){
         if(!isAsyn) {
-            // catTask = new CatTask();
             main = new Main();
-
-            if (!isAsyn &&  main != null) {
-                RunWiFiTusk();
-                //   catTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                main.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                isAsyn = true;
-
-            }
+            main.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            RunWiFiTusk();
+            isAsyn = true;
         }
     }
     @Override
     protected void onResume() {
         super.onResume();
         getWindow().getDecorView().setSystemUiVisibility(UiSetting);
-        // musicPlayer.start();
-        StartAsync();
         setting.StartRead();
         SetSetting();
+        StartAsync();
     }
     @Override
     protected void onPause() {
@@ -190,8 +180,6 @@ public class FullscreenActivity extends AppCompatActivity {
             main.cancel(false);
         if(wiFiDirectActivity!=null)
             wiFiDirectActivity.cancel(false);
-        /*if(catTask!=null)
-            catTask.cancel(false);*/
         isAsyn=false;
     }
 
@@ -199,7 +187,7 @@ public class FullscreenActivity extends AppCompatActivity {
         try {
             //mediaPlayer = new MediaPlayer();
             //mediaPlayer.setDataSource(filePath);
-            File f=new File(pathSDcard+'/'+SettingFolder+'/'+setting.MusicFolder+'/'+fileName);
+            File f=new File(pathSDcard+'/'+SettingFolder+'/'+setting.folderMusic+'/'+fileName);
             if(f.canRead()) {
                 musicPlayer.reset();
                 musicPlayer.setDataSource(f.getAbsolutePath());
@@ -214,15 +202,15 @@ public class FullscreenActivity extends AppCompatActivity {
         }
     }
     private void PlaySound(String fileName){
-        File f=new File(pathSDcard+'/'+SettingFolder+'/'+setting.SoundFolder+'/'+fileName);
+        File f=new File(pathSDcard+'/'+SettingFolder+'/'+setting.folderSound+'/'+fileName);
         soundPlayer.add(f.getAbsolutePath());
     }
     private void PlaySpecialSound(String fileName){
-        File f=new File(pathSDcard+'/'+SettingFolder+'/'+setting.SpecialSoundFolder+'/'+fileName);
+        File f=new File(pathSDcard+'/'+SettingFolder+'/'+setting.folderSpecialSound+'/'+fileName);
         specialSoundPlayer.add(f.getAbsolutePath());
     }
     private void SetBackGraund(String fileName){
-        File f=new File(pathSDcard+'/'+SettingFolder+'/'+setting.BackGroundFolder+'/'+fileName);
+        File f=new File(pathSDcard+'/'+SettingFolder+'/'+setting.folderBackGraund+'/'+fileName);
         if(f.canRead()) {
             Bitmap bp = BitmapFactory.decodeFile(f.getAbsolutePath());
             Drawable d = new BitmapDrawable(getResources(), bp);
@@ -232,7 +220,7 @@ public class FullscreenActivity extends AppCompatActivity {
         }
     }
     private void SetImageViewIcon(ImageView iv,String folderName,String fileName){
-        File f=new File(pathSDcard+'/'+setting.MainPath+'/'+folderName+'/'+fileName);
+        File f=new File(pathSDcard+'/'+setting.folderLiftApp+'/'+folderName+'/'+fileName);
         if(f.canRead()) {
             Bitmap bp = BitmapFactory.decodeFile(f.getAbsolutePath());
             iv.setImageBitmap(bp);
@@ -242,7 +230,7 @@ public class FullscreenActivity extends AppCompatActivity {
     }
     private void SetTextViewMassage(TextView tv,String folderName,String fileName){
         try {
-            File f=new File(pathSDcard + '/' + setting.MainPath + '/' + folderName + '/' + fileName);
+            File f=new File(pathSDcard + '/' + setting.folderLiftApp + '/' + folderName + '/' + fileName);
             if(f.canRead()) {
                 BufferedReader br = new BufferedReader(new FileReader(f.getAbsoluteFile()));
                 StringBuilder sb=new StringBuilder();
@@ -274,6 +262,9 @@ public class FullscreenActivity extends AppCompatActivity {
         }
     }
     private void Initialaze() {
+//        main=new Main();
+//        wiFiDirectActivity=new WiFiDirectActivity(this);
+
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
         mContentView = findViewById(R.id.fullscreen_content);
@@ -292,10 +283,7 @@ public class FullscreenActivity extends AppCompatActivity {
         drawableDown=getResources().getDrawable(R.drawable.down);
         drawableRing=getResources().getDrawable(R.drawable.ring);
 
-
         frameLayout=(FrameLayout)findViewById(R.id.mainLayout);
-        //con=new Controller();
-
 
         String infoSt="Производитель : РФ \n" +
                 "400кг 5 пасс. \n" +
@@ -304,13 +292,13 @@ public class FullscreenActivity extends AppCompatActivity {
         info.setText(infoSt);
 
 
-        StringBuilder sb=new StringBuilder(massage.getText());
+        /*StringBuilder sb=new StringBuilder(massage.getText());
         for(int i=0;i<100;i++)
             sb.append("  ");
         sb.append(massage.getText());
         for(int i=0;i<100;i++)
             sb.append("  ");
-        //massage.setText(sb.toString());
+        //massage.setText(sb.toString());*/
 
         massage.setSelected(true);
 
@@ -322,32 +310,26 @@ public class FullscreenActivity extends AppCompatActivity {
         fragText=new FragmentText();
         fragImage=new FragmentImage();
 
-
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager
                 .beginTransaction();
 
         //TODO wtf 2 add
         fragmentTransaction.add(R.id.fragment,fragImage);
-        //fragmentTransaction.add(R.id.fragment, fragText);
+//        fragmentTransaction.add(R.id.fragment, fragText);
 
         fragmentTransaction.commit();
-
-        //videoView=((VideoView) fragVideo.getView().findViewById(R.id.videoFragment));
-
-
-        wiFiDirectActivity=new WiFiDirectActivity(this);
     }
 
     private void SetSetting() {
         pathSDcard=setting.pathSDcard;
-        date.setTextSize(setting.TextDateSize.value);
-        massage.setTextSize(setting.TextMassageSize.value);
-        info.setTextSize(setting.TextInfoSize.value);
-        number.setTextSize(setting.NumberSize.value);
-        SetTextViewMassage(info,setting.InformationFolder,"information.txt");
+        date.setTextSize(setting.sizeTextDate.value);
+        massage.setTextSize(setting.sizeTextMassage.value);
+        info.setTextSize(setting.sizeTextInfo.value);
+        number.setTextSize(setting.sizeNumber.value);
+        SetTextViewMassage(info,setting.folderInformation.toString(),"information.txt");
 
-        int color=(int)Long.parseLong(setting.textColorHex.toString(),16);
+        int color=(int)Long.parseLong(setting.colorText.toString(),16);
         date.setTextColor(color);
         massage.setTextColor(color);
         info.setTextColor(color);
@@ -356,10 +338,10 @@ public class FullscreenActivity extends AppCompatActivity {
 
 
 
-        int colorBack=(int )Long.parseLong(setting.LayOutBackGraundColor.toString(),16);
+        int colorBack=(int )Long.parseLong(setting.colorLayoutBackgraund.toString(),16);
         SetBackGraunds(colorBack);
 
-        int iconColor=(int )Long.parseLong(setting.iconColor.getColor(),16);
+        int iconColor=(int )Long.parseLong(setting.colorIcon.getColor(),16);
         drawableUp.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN);
         drawableDown.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN);
         drawableRing.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN);
@@ -416,7 +398,6 @@ public class FullscreenActivity extends AppCompatActivity {
         main.setFiles();
     }
     public void RunWiFiTusk(){
-
         wiFiDirectActivity=new WiFiDirectActivity(this);
         wiFiDirectActivity.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
@@ -434,7 +415,7 @@ public class FullscreenActivity extends AppCompatActivity {
             Date curDate =calendar.getTime();
 //            Long deltaTime=setting.year.deltaTime+setting.month.deltaTime+setting.day.deltaTime+setting.hour.deltaTime+setting.min.deltaTime;
             curDate.setTime(curDate.getTime()+ DateSetting.deltaTime);
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(setting.typeDate, Locale.getDefault()); //"dd:MM:yyyy EEEE HH:mm"
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(setting.typeDate.toString(), Locale.getDefault()); //"dd:MM:yyyy EEEE HH:mm"
             final String strDate = simpleDateFormat.format(curDate);
 
             runOnUiThread(new Runnable() {
@@ -452,7 +433,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
     enum Fragment{Video,Image,Text};
     class Main extends AsyncTask<Void,byte[],Void>{
-        String PathToLiftApp=pathSDcard + '/' + setting.MainPath +'/' ;
+        String PathToLiftApp=pathSDcard + '/' + setting.folderLiftApp +'/' ;
         List<String> images,backGrounds,musics,videos;
         FTDriver ftDriver;
         MyFragment myFrag;
@@ -460,7 +441,9 @@ public class FullscreenActivity extends AppCompatActivity {
         int musicSeek=0;
         boolean isOpen=false;
         boolean isMusicPlayed=false;
-
+        public Main(){
+            super();
+        }
 
         @Override
         protected void onPreExecute() {
@@ -470,6 +453,11 @@ public class FullscreenActivity extends AppCompatActivity {
 
             ftDriver=new FTDriver((UsbManager)getSystemService(Context.USB_SERVICE));
             isOpen=ftDriver.begin(NumberedSetting.BAUDRATE[setting.indexBAUDRATE.value%NumberedSetting.BAUDRATE.length],setting.sizeOfBuffer.value);
+
+            images=new LinkedList<>();
+            backGrounds=new LinkedList<>();
+            musics=new LinkedList<>();
+            videos=new LinkedList<>();
 
             setFiles();
 
@@ -496,15 +484,15 @@ public class FullscreenActivity extends AppCompatActivity {
         }
         public void setFiles(){
             synchronized (massage) {
-                massage.setText(FileManager.getAllTextFromDirectory(PathToLiftApp + setting.MassageFolder));
+                massage.setText(FileManager.getAllTextFromDirectory(PathToLiftApp + setting.folderMassage));
             }synchronized (images) {
-                images = FileManager.getAllFilesPath(PathToLiftApp + setting.ImageFolder, "BMP", "bmp", "jpg", "JPG");
+                images = FileManager.getAllFilesPath(PathToLiftApp + setting.folderImage, "BMP", "bmp", "jpg", "JPG");
             }synchronized (backGrounds){
-                backGrounds=FileManager.getAllFilesPath(PathToLiftApp+setting.BackGroundFolder,"BMP","bmp","jpg","JPG");
+                backGrounds=FileManager.getAllFilesPath(PathToLiftApp+setting.folderBackGraund,"BMP","bmp","jpg","JPG");
             }synchronized (musics) {
-                musics = FileManager.getAllFilesPath(PathToLiftApp + setting.MusicFolder, "mp3", "wav");
+                musics = FileManager.getAllFilesPath(PathToLiftApp + setting.folderMusic, "mp3", "wav");
             }synchronized (videos) {
-                videos = FileManager.getAllFilesPath(PathToLiftApp + setting.ResourcesFolder, "mp4", "3gp");
+                videos = FileManager.getAllFilesPath(PathToLiftApp + setting.folderVideo, "mp4", "3gp");
                 fragVideo.setVideos(videos);
             }
             fragImage.setLists(images,musics);
@@ -644,8 +632,8 @@ public class FullscreenActivity extends AppCompatActivity {
                 case 2:imageArrow.setImageDrawable(drawableDown);break;
                 case 3:imageArrow.setImageResource(R.drawable.fire1);break;
                 case 4:imageArrow.setImageDrawable(drawableRing);break;
-                case 5:SetImageViewIcon(imageArrow,setting.ImageFolder,"overload.png");break;
-                case 6:SetImageViewIcon(imageArrow,setting.ImageFolder,"photoreverse.png");break;
+                case 5:SetImageViewIcon(imageArrow,setting.folderImage.toString(),"overload.png");break;
+                case 6:SetImageViewIcon(imageArrow,setting.folderImage.toString(),"photoreverse.png");break;
                 case 7:imageArrow.setImageBitmap(null);
             }
         }
@@ -680,13 +668,13 @@ public class FullscreenActivity extends AppCompatActivity {
         }
         void Sounds(byte b){
             if(b!=0) {
-                soundPlayer.add(PathToLiftApp + setting.SoundFolder + '/' + String.valueOf(b) + ".mp3");
+                soundPlayer.add(PathToLiftApp + setting.folderSound + '/' + String.valueOf(b) + ".mp3");
                 priorityPause();
             }
         }
         void SpecialSound(byte b){
             if(b!=0) {
-                specialSoundPlayer.add(PathToLiftApp + setting.SpecialSoundFolder + '/' + String.valueOf(b) + ".mp3");
+                specialSoundPlayer.add(PathToLiftApp + setting.folderSpecialSound + '/' + String.valueOf(b) + ".mp3");
                 priorityPause();
             }
         }
