@@ -143,7 +143,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
         setting=new Setting(SettingFolder,settingFile);
         Initialaze();
-//        mTimer.schedule(mMyTimerTask, 1000, 1000);
+        mTimer.schedule(mMyTimerTask, 1000, 1000);
 
         ((FrameLayout)findViewById(R.id.fragment)).setOnClickListener(new View.OnClickListener() {
             @Override

@@ -131,7 +131,7 @@ public class Setting {
             writeItem(colorLayoutBackgraund,bw);
             writeItem(colorIcon,bw);
 
-            bw.write("\n\n@@ size @@");
+            bw.write("\n\n@@ sizes @@");
             writeItem(sizeTextSetting,bw);
             writeItem(sizeTextMassage,bw);
             writeItem(sizeTextInfo,bw);
@@ -157,7 +157,6 @@ public class Setting {
             bw.write('\n' + item.getName() + '=' + item);
         }catch (IOException e){}
     }
-    //TODO remake reading function
 
     public void StartRead() {
         File settFile = new File(pathLiftFolder, fileSetting);
@@ -230,7 +229,6 @@ public class Setting {
         return v;
     }
 
-
     private void CreateFolder(File sdPath) {
         new File(sdPath.getAbsolutePath()+'/'+folderBackGraund).mkdir();
         new File(sdPath.getAbsolutePath()+'/'+folderImage).mkdir();
@@ -241,7 +239,7 @@ public class Setting {
         new File(sdPath.getAbsolutePath()+'/'+folderVideo).mkdir();
         new File(sdPath.getAbsolutePath()+'/'+folderSpecialSound).mkdir();
     }
-    //TODO add accessor
+
     private String confirmString="Setting 2.0";
     private void confirmSetting(BufferedWriter bw){
         try{
