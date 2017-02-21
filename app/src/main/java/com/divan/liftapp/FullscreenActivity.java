@@ -106,7 +106,7 @@ public class FullscreenActivity extends AppCompatActivity {
     private boolean mVisible,voiceSupport=false;
     private Timer mTimer;
     private MyTimerTask mMyTimerTask;
-    private Setting setting;
+    public Setting setting;
     MediaPlayer musicPlayer;
     QueuePlayer soundPlayer,specialSoundPlayer;
     AudioManager am;

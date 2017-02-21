@@ -142,15 +142,16 @@ public class DeviceDetail implements ConnectionInfoListener {
 					Socket client = serverSocket.accept();
 					Log.d(WiFiDirectActivity.TAG, "Server: connection done");
 					publishProgress("Connection done",null);
-					final File f = new File(settingPath);
+					/*final File f = new File(settingPath);
 					File dirs = new File(f.getParent());
 					if (!dirs.exists())
 						dirs.mkdirs();
-					f.createNewFile();
+					f.createNewFile();*/
 
-					Log.d(WiFiDirectActivity.TAG, "server: copying files " + f.toString());
+//					Log.d(WiFiDirectActivity.TAG, "server: copying files " + f.toString());
 					InputStream inputstream = client.getInputStream();
-					copyFile(inputstream, new FileOutputStream(f));
+					FileTransaction.receiveFile(inputstream,fullscreenActivity.setting);
+					//copyFile(inputstream, new FileOutputStream(f));
 					serverSocket.close();
 					publishProgress("Set setting from wifi","q");
 				}

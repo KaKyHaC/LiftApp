@@ -22,21 +22,21 @@ import java.io.OutputStream;
 public abstract class FileTransaction {
     public enum FileType{setting,image,video,music,sound,backgraund,undefined}
 
-    public static boolean sendFile(File file,OutputStream soccet){
+    public static boolean sendFile(File file,OutputStream socket){
         if(!file.isFile())
             return false;
         try {
             InputStream is = new FileInputStream(file);
-            return sendFile(is,soccet,getFileType(file));
+            return sendFile(is,socket,getFileType(file));
         }catch (FileNotFoundException e){}
         return false;
     }
-    public static boolean sendFile(File file,OutputStream soccet,FileType fileType){
+    public static boolean sendFile(File file,OutputStream socket,FileType fileType){
         if(!file.isFile())
             return false;
         try {
             InputStream is = new FileInputStream(file);
-            return sendFile(is,soccet,fileType);
+            return sendFile(is,socket,fileType);
         }catch (FileNotFoundException e){}
         return false;
     }
@@ -59,16 +59,16 @@ public abstract class FileTransaction {
     }
 
     @NonNull
-    public static boolean receiveFile(InputStream soccet, final Setting setting ){
+    public static boolean receiveFile(InputStream socket, final Setting setting ){
         try {
-            int typeCode=soccet.read();
+            int typeCode=socket.read();
             FileType fileType = getFileType(typeCode);
             String path=getPathToSave(fileType,setting);
             if(path==null)
                 return false;
 
             OutputStream out=new FileOutputStream(path);
-            return copyFile(soccet,out);
+            return copyFile(socket,out);
 
         }catch (IOException e){}
         return false;
