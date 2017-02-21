@@ -92,4 +92,9 @@ public class NumberedSetting extends SettingItem {
     public String getColor() {
         return null;
     }
+
+    @Override
+    public void setValue(String value) {
+        this.value=Integer.parseInt(value);
+    }
 }

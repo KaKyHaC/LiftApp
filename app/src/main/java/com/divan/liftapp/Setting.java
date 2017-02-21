@@ -7,6 +7,7 @@ import android.os.Environment;
 import com.divan.liftapp.settingmenu.AccessSetting;
 import com.divan.liftapp.settingmenu.ColorSetting;
 import com.divan.liftapp.settingmenu.DateSetting;
+import com.divan.liftapp.settingmenu.SettingItem;
 import com.divan.liftapp.settingmenu.StringSetting;
 import com.divan.liftapp.settingmenu.NumberedSetting;
 
@@ -16,6 +17,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Vector;
 
 /**
  * Created by Димка on 03.12.2016.
@@ -90,29 +92,22 @@ public class Setting {
         this.fileSetting=fileSetting;
         pathSDcard=setStoragePath();
         pathLiftFolder=pathSDcard+ "/" + folderLiftApp;
-
-//        if(sizeNumber==null)
-            InitDefault();
+        new File(pathLiftFolder).mkdir();
+//      if(sizeNumber==null)
+        InitDefault();
         StartRead();
+        CreateFolder(new File(pathLiftFolder));
     }
 
     public void WriteSetting(){
         try{
-           File sdPath=new File(pathSDcard);
-            // добавляем свой каталог к пути
-            sdPath = new File(sdPath.getAbsolutePath() + "/" + folderLiftApp);
-            // создаем каталог
-            sdPath.mkdirs();
-            // формируем объект File, который содержит путь к файлу
-            File sdFile = new File(sdPath, fileSetting);
-
+            File sdFile = new File(pathLiftFolder, fileSetting);
             FileWriter fw=new FileWriter(sdFile);
-
             BufferedWriter bw=new BufferedWriter(fw);
-           
+            confirmSetting(bw);
             WriteSetting(bw);
-
             bw.close();
+            fw.close();
         }catch (IOException r){
 
         }
@@ -121,115 +116,120 @@ public class Setting {
         try {
             bw.write("\n\n@@ folders @@");
 //            bw.write("\nfolderLiftApp=" + folderLiftApp);
-            bw.write("\n"+folderBackGraund.getName()+"=" + folderBackGraund);
-            bw.write("\n"+folderImage.getName()+"=" + folderImage);
-            bw.write("\n"+folderSound.getName()+"=" + folderSound);
-            bw.write("\n"+folderMusic.getName()+"=" + folderMusic);
-            bw.write("\n"+folderMassage.getName()+"=" + folderMassage);
-            bw.write("\n"+folderInformation.getName()+"=" + folderInformation);
-            bw.write("\n"+folderVideo.getName()+"=" + folderVideo);
-            bw.write("\n"+folderSpecialSound.getName()+"=" + folderSpecialSound);
+            writeItem(folderVideo,bw);
+            writeItem(folderSpecialSound,bw);
+            writeItem(folderSound,bw);
+            writeItem(folderMusic,bw);
+            writeItem(folderBackGraund,bw);
+            writeItem(folderImage,bw);
+            writeItem(folderInformation,bw);
+            writeItem(folderMassage,bw);
             
             bw.write("\n\n@@ colors @@");
-            bw.write("\n"+colorLayoutBackgraund.getName()+"=" + colorLayoutBackgraund);
-            bw.write("\n"+colorText.getName()+"=" + colorText);
-            bw.write("\n"+colorIcon.getName()+"=" + colorIcon);
-            bw.write("\n"+colorTextFragment.getName()+"=" + colorTextFragment);
+            writeItem(colorTextFragment,bw);
+            writeItem(colorText,bw);
+            writeItem(colorLayoutBackgraund,bw);
+            writeItem(colorIcon,bw);
 
             bw.write("\n\n@@ size @@");
-            bw.write("\n"+sizeNumber.getName()+"=" + sizeNumber);
-            bw.write("\n"+sizeOfBuffer.getName()+"=" + sizeOfBuffer);
-            bw.write("\n"+sizeTextDate.getName()+"=" + sizeTextDate);
-            bw.write("\n"+sizeTextFragment.getName()+"=" + sizeTextFragment);
-            bw.write("\n"+sizeTextInfo.getName()+"=" + sizeTextInfo);
-            bw.write("\n"+sizeTextMassage.getName()+"=" + sizeTextMassage);
-            bw.write("\n"+sizeTextSetting.getName()+"=" + sizeTextSetting);
+            writeItem(sizeTextSetting,bw);
+            writeItem(sizeTextMassage,bw);
+            writeItem(sizeTextInfo,bw);
+            writeItem(sizeTextFragment,bw);
+            writeItem(sizeNumber,bw);
+            writeItem(sizeOfBuffer,bw);
+            writeItem(sizeTextDate,bw);
 
             bw.write("\n\n@@ special @@");
-            bw.write("\n"+typeDate.getName()+"=" + typeDate);
-            bw.write("\n"+volumeDay.getName()+"=" + volumeDay);
-            bw.write("\n"+volumeNight.getName()+"=" + volumeNight);
-            bw.write("\n"+indexCurStation.getName()+"=" + indexCurStation);
-            bw.write("\n"+accessVideo.getName()+"=" + accessVideo);
-            bw.write("\n"+accessMusic.getName()+"=" + accessMusic);
-            bw.write("\n"+indexBAUDRATE.getName()+"=" + indexBAUDRATE);
-            bw.write("\n"+sizeTextSetting.getName()+"=" + sizeTextSetting);
+            writeItem(volumeNight,bw);
+            writeItem(volumeDay,bw);
+            writeItem(typeDate,bw);
+            writeItem(indexCurStation,bw);
+            writeItem(indexBAUDRATE,bw);
+            writeItem(accessVideo,bw);
+            writeItem(accessMusic,bw);
+            writeItem(year,bw);
 
-            bw.write("\ndeltaTime="+DateSetting.deltaTime);
+        }catch (IOException e){}
+    }
+    private void writeItem(SettingItem item,BufferedWriter bw){
+        try {
+            bw.write('\n' + item.getName() + '=' + item);
         }catch (IOException e){}
     }
     //TODO remake reading function
-    private void ReadSettings(BufferedReader br){
-        try {
-            folderLiftApp = getValueInString(br.readLine());
-            folderBackGraund= getValueInString(br.readLine());
-            folderImage= getValueInString(br.readLine());
-            folderSound= getValueInString(br.readLine());
-            folderMusic= getValueInString(br.readLine());
-            folderMassage= getValueInString(br.readLine());
-            folderInformation= getValueInString(br.readLine());
-            folderVideo= getValueInString(br.readLine());
-            folderSpecialSound= getValueInString(br.readLine());
-            colorLayoutBackgraund.setColor(getValueInString(br.readLine()));
-            colorText.setColor(getValueInString(br.readLine()));
-            sizeTextInfo.value=Integer.parseInt(getValueInString(br.readLine()));
-            sizeTextDate.value=Integer.parseInt(getValueInString(br.readLine()));
-            sizeTextMassage.value=Integer.parseInt(getValueInString(br.readLine()));
-            sizeNumber.value=Integer.parseInt(getValueInString(br.readLine()));
-            typeDate= getValueInString(br.readLine());
-            colorTextFragment.setColor(getValueInString(br.readLine()));
-            sizeTextFragment.value=Integer.parseInt(getValueInString(br.readLine()));
-            volumeDay.value=Integer.parseInt(getValueInString(br.readLine()));
-            volumeNight.value=Integer.parseInt(getValueInString(br.readLine()));
-            colorIcon.setColor(getValueInString(br.readLine()));
-            indexCurStation=Integer.parseInt(getValueInString(br.readLine()));
-            sizeOfBuffer.value=Integer.parseInt(getValueInString(br.readLine()));
-            accessVideo.Access=Boolean.parseBoolean(getValueInString(br.readLine()));
-            accessMusic.Access=Boolean.parseBoolean(getValueInString(br.readLine()));
 
-            sizeTextSetting.value=Integer.parseInt(getValueInString(br.readLine()));
-            indexBAUDRATE.value=Integer.parseInt(getValueInString(br.readLine()));
-
-            DateSetting.deltaTime=Long.parseLong(getValueInString(br.readLine()));
-            /*month.deltaTime=Long.parseLong(getValueInString(br.readLine()));
-            day.deltaTime=Long.parseLong(getValueInString(br.readLine()));
-            hour.deltaTime=Long.parseLong(getValueInString(br.readLine()));
-            min.deltaTime=Long.parseLong(getValueInString(br.readLine()));*/
-
-
-        }catch (IOException r)
-        {
-
-        }
-    }
     public void StartRead() {
-       File sdPath=new File(pathSDcard);
-        // добавляем свой каталог к пути
-        sdPath = new File(sdPath.getAbsolutePath() + "/" + folderLiftApp);
-        // создаем каталог
-        sdPath.mkdirs();
-        // формируем объект File, который содержит путь к файлу
-        File sdFile = new File(sdPath, fileSetting);
+        File settFile = new File(pathLiftFolder, fileSetting);
+        Vector<String> strings=readAllFromFile(settFile);
+        if(!confirmSetting(strings))
+            WriteSetting();
+        else{
+            SetAllItemsValues(strings);
+        }
+
+
+    }
+    private void SetAllItemsValues(Vector<String> strings){
+        SetItemValue(folderBackGraund,strings);
+        SetItemValue(folderImage,strings);
+        SetItemValue(folderInformation,strings);
+        SetItemValue(folderMassage,strings);
+        SetItemValue(folderMusic,strings);
+        SetItemValue(folderSound,strings);
+        SetItemValue(folderSpecialSound,strings);
+        SetItemValue(folderVideo,strings);
+
+        SetItemValue(colorIcon,strings);
+        SetItemValue(colorLayoutBackgraund,strings);
+        SetItemValue(colorText,strings);
+        SetItemValue(colorTextFragment,strings);
+
+        SetItemValue(sizeNumber,strings);
+        SetItemValue(sizeOfBuffer,strings);
+        SetItemValue(sizeTextDate,strings);
+        SetItemValue(sizeTextFragment,strings);
+        SetItemValue(sizeTextInfo,strings);
+        SetItemValue(sizeTextMassage,strings);
+        SetItemValue(sizeTextSetting,strings);
+
+        SetItemValue(volumeDay,strings);
+        SetItemValue(volumeNight,strings);
+        SetItemValue(accessMusic,strings);
+        SetItemValue(accessVideo,strings);
+
+        SetItemValue(indexCurStation,strings);
+        SetItemValue(indexBAUDRATE,strings);
+        SetItemValue(typeDate,strings);
+
+        SetItemValue(year,strings);
+    }
+
+    private Vector<String> readAllFromFile(File file){
+        Vector<String> strings=new Vector<>();
         try{
-            if(!sdFile.canRead()||sdFile.getUsableSpace()<100)
-            {
-                WriteSetting();
-            }
-            FileReader reader=new FileReader(sdFile);
-            if(reader!=null) {
-                BufferedReader br = new BufferedReader(reader);
-                ReadSettings(br);
-                br.close();
-                if(reader!=null)
-                reader.close();
-            }
-            CreateFolder(sdPath);
+            FileReader reader=new FileReader(file);
+            BufferedReader br = new BufferedReader(reader);
+            strings=readAllFromThread(br);
+            br.close();
+            reader.close();
         }catch (IOException e)
         {
             System.out.println(e.getMessage());
         }
-
+        return strings;
     }
+    private Vector<String> readAllFromThread(BufferedReader br){
+        Vector<String> v=new Vector<>();
+        String s=new String();
+        try {
+            while ((s = br.readLine()) != null) {
+                v.add(s);
+            }
+        }catch (IOException e){}
+        return v;
+    }
+
 
     private void CreateFolder(File sdPath) {
         new File(sdPath.getAbsolutePath()+'/'+folderBackGraund).mkdir();
@@ -241,33 +241,52 @@ public class Setting {
         new File(sdPath.getAbsolutePath()+'/'+folderVideo).mkdir();
         new File(sdPath.getAbsolutePath()+'/'+folderSpecialSound).mkdir();
     }
-
     //TODO add accessor
     private String confirmString="Setting 2.0";
     private void confirmSetting(BufferedWriter bw){
         try{
-            bw.write(confirmString+'\n');
+            bw.write('\n'+confirmString+'\n');
         }catch (IOException e){}
     }
-    private boolean confirmSetting(BufferedReader br){
-        try{
-            String ac=br.readLine();
-            return ac.equals(confirmString);
-        }catch (IOException e){}
+    private boolean confirmSetting(Vector<String> strings){
+        for(String s:strings){
+            if(s.equals(confirmString))
+                return true;
+        }
+        return false;
     }
 
-    private String getValueInString(String s) {
-        //TODO remake for '='
+    private void SetItemValue(SettingItem item,Vector<String> strings){
+        String val=findValueByName(item.getName(),strings);
+        if(val!=null)
+            item.setValue(val);
+    }
+    private String findValueByName(String name,Vector<String> strings){
+        for(String s:strings){
+            if(name.equals(getNameInString(s)))
+                return getValueInString(s);
+        }
+        return null;
+    }
+    private String getNameInString(String s){
         StringBuilder sb=new StringBuilder();
-        for (int i=0;i<s.length();i++) {
-            char cur=s.charAt(i);
-            if(!(cur=='-'&&s.charAt(i+1)=='-'))
-                sb.append(cur);
-            else
-                break;
+        for(char c:s.toCharArray()){
+            if(c=='=')return sb.toString();
+            sb.append(c);
+        }
+        return null;
+    }
+    private String getValueInString(String s){
+        StringBuilder sb=new StringBuilder();
+        boolean isValue=false;
+
+        for(char c:s.toCharArray()){
+            if(isValue)sb.append(c);
+            else if(c=='=')isValue=true;
         }
         return sb.toString();
     }
+
 
     public Uri getUri(){
         File sdPath= new File(pathSDcard);

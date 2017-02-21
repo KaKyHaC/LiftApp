@@ -34,10 +34,10 @@ public class SpecialSetting extends SettingItem {
                     indexBufStation+=stationNames.length;
                 switch (key) {
                     case up:indexCurStation++;indexBufStation=indexCurStation;activitySetting.SendByte((byte)(indexCurStation%stationNames.length+1));
-                        activitySetting.setting.indexCurStation = indexCurStation;
+                        activitySetting.setting.indexCurStation.value = indexCurStation;
                         break;
                     case down:indexCurStation--;indexBufStation=indexCurStation;activitySetting.SendByte((byte)(indexCurStation%stationNames.length+1));
-                        activitySetting.setting.indexCurStation = indexCurStation;
+                        activitySetting.setting.indexCurStation.value = indexCurStation;
                         break;
                     case left:indexBufStation--;
                         break;
@@ -94,9 +94,9 @@ public class SpecialSetting extends SettingItem {
         hasFocus=isFocus;
         if(typeSpecialItem==TypeSpecialItem.STATION) {
             if (isFocus)
-                indexCurStation = activitySetting.setting.indexCurStation;//TODO it's bad code
+                indexCurStation = activitySetting.setting.indexCurStation.value;//TODO it's bad code
             if (!isFocus)
-                activitySetting.setting.indexCurStation = indexCurStation;
+                activitySetting.setting.indexCurStation.value = indexCurStation;
             indexBufStation = indexCurStation;
         }
     }
@@ -104,5 +104,10 @@ public class SpecialSetting extends SettingItem {
     @Override
     public String toString() {
         return  Name ;
+    }
+
+    @Override
+    public void setValue(String value) {
+        Name=value;
     }
 }
