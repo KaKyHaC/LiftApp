@@ -22,50 +22,56 @@ import java.util.List;
  */
 
 public class Setting {
-    private final String LOG_TAG="LiftApp";
-    private String folderSetting,settingFile;
-    public String pathSDcard=null;
-    private File StoragePath;
-    public String MainPath,BackGroundFolder,ImageFolder,SoundFolder,MusicFolder,MassageFolder,InformationFolder,ResourcesFolder,SpecialSoundFolder;
-    public String typeDate="dd/MM/yyyy EEEE HH:mm";
+    public String folderLiftApp,fileSetting;
+    public String pathLiftFolder,pathSDcard=null;
+    public String folderBackGraund,folderImage,folderSound,folderMusic,folderMassage,folderInformation,folderVideo,folderSpecialSound;
+    public String typeDate;
 
-    public ColorSetting textColorHex;//Integer.toHexString(Color.WHITE);
-    public ColorSetting LayOutBackGraundColor;
-    public NumberedSetting TextInfoSize,TextDateSize,TextMassageSize;//30
-    public NumberedSetting NumberSize;//230
-    public ColorSetting textFragmentColor;
-    public NumberedSetting textFragmenSize;
+    public ColorSetting colorText;//Integer.toHexString(Color.WHITE);
+    public ColorSetting colorLayoutBackgraund;
+    public NumberedSetting sizeTextInfo,sizeTextDate,sizeTextMassage;//30
+    public NumberedSetting sizeNumber;//230
+    public ColorSetting colorTextFragment;
+    public NumberedSetting sizeTextFragment;
     public NumberedSetting volumeDay;
     public NumberedSetting volumeNight;
-    public ColorSetting iconColor;
+    public ColorSetting colorIcon;
     public int indexCurStation;
     public NumberedSetting sizeOfBuffer;
     public AccessSetting accessVideo;
     public AccessSetting accessMusic;
-
     public NumberedSetting sizeTextSetting;
-
     public NumberedSetting indexBAUDRATE;
-
     public DateSetting year,month,day,hour,min;
 
 
 
     public void InitDefault(){
-            textColorHex = new ColorSetting("Цвет текста", Color.RED);
-            LayOutBackGraundColor = new ColorSetting("Цвет подложки", Integer.parseInt("5300ff00",16));// Integer.parseInt("534056ff",16)
-            TextInfoSize = new NumberedSetting(30, "Размер шрифта информации");
-            TextDateSize = new NumberedSetting(15, "Размер шрифта времени");
-            TextMassageSize = new NumberedSetting(30, "Размер шрифта сообщеня");
-            NumberSize = new NumberedSetting(230, "Размер шрифта этажа");
+        folderImage="Image";
+        folderSpecialSound="SpecialSound";
+        folderBackGraund="BackGraund";
+        folderVideo="Video";
+        folderInformation="Information";
+        folderMassage="Massage";
+        folderMusic="Music";
+        folderSound="Sound";
+        
+        
+        typeDate="dd/MM/yyyy EEEE HH:mm";
+            colorText = new ColorSetting("Цвет текста", Color.RED);
+            colorLayoutBackgraund = new ColorSetting("Цвет подложки", Integer.parseInt("5300ff00",16));// Integer.parseInt("534056ff",16)
+            sizeTextInfo = new NumberedSetting(30, "Размер шрифта информации");
+            sizeTextDate = new NumberedSetting(15, "Размер шрифта времени");
+            sizeTextMassage = new NumberedSetting(30, "Размер шрифта сообщеня");
+            sizeNumber = new NumberedSetting(230, "Размер шрифта этажа");
 
-        textFragmentColor = new ColorSetting("Цвет текста фрагмента",Color.RED);
-        textFragmenSize=new NumberedSetting(100,"Размер шрифта фрагмента");
+        colorTextFragment = new ColorSetting("Цвет текста фрагмента",Color.RED);
+        sizeTextFragment=new NumberedSetting(100,"Размер шрифта фрагмента");
 
         volumeDay=new NumberedSetting(100,"Громкость днем", NumberedSetting.NumberedType.Volume);
         volumeNight=new NumberedSetting(50,"Громкость ночью", NumberedSetting.NumberedType.Volume);
 
-        iconColor=new ColorSetting("Цвет иконок",Color.YELLOW);
+        colorIcon=new ColorSetting("Цвет иконок",Color.YELLOW);
 
         sizeOfBuffer=new NumberedSetting(64,"Размер буффера", NumberedSetting.NumberedType.Buffer);
 
@@ -88,102 +94,114 @@ public class Setting {
 
 
     }
-    public Setting(String folderSetting, String settingFile) {
-        this.folderSetting=folderSetting;
-        this.settingFile=settingFile;
-        setStoragePath();
-        if(NumberSize==null)
+    public Setting(String folderLiftApp, String fileSetting) {
+        this.folderLiftApp=folderLiftApp;
+        this.fileSetting=fileSetting;
+        pathSDcard=setStoragePath();
+        pathLiftFolder=pathSDcard+ "/" + folderLiftApp;
+
+//        if(sizeNumber==null)
             InitDefault();
         StartRead();
-        MainPath=folderSetting;
     }
 
     public void WriteSetting(){
         try{
-           File sdPath=StoragePath;
+           File sdPath=new File(pathSDcard);
             // добавляем свой каталог к пути
-            sdPath = new File(sdPath.getAbsolutePath() + "/" + folderSetting);
+            sdPath = new File(sdPath.getAbsolutePath() + "/" + folderLiftApp);
             // создаем каталог
             sdPath.mkdirs();
             // формируем объект File, который содержит путь к файлу
-            File sdFile = new File(sdPath, settingFile);
+            File sdFile = new File(sdPath, fileSetting);
 
             FileWriter fw=new FileWriter(sdFile);
 
             BufferedWriter bw=new BufferedWriter(fw);
-            bw.write(folderSetting+"--  mainPath\n");
-            bw.write("BackGround"+"--  BackGround Folder\n");
-            bw.write("Image"+"--  Image Folder\n");
-            bw.write("Sound"+"--  Sound Folder\n");
-            bw.write("Music"+"--  Music Folder\n");
-            bw.write("Massage"+"--  Massage Folder\n");
-            bw.write("Information"+"--  Information Folder\n");
-            bw.write("Resources"+"--  Resources Folder\n");
-            bw.write("SpecialSound"+"--  Special Sound Folder\n");
-            bw.write(LayOutBackGraundColor+"--  LayOut BackGraund Color\n");
-            bw.write(textColorHex+"-- цвет текста (Text Color)\n");
-            bw.write(TextInfoSize+"--  Текст Information Size\n");
-            bw.write(TextDateSize+"--  Text Date Size\n");
-            bw.write(TextMassageSize+"--  Text Massage Size\n");
-            bw.write(NumberSize+"--  Number Size\n");
-            bw.write(typeDate+"--  type Date\n");
-            bw.write(textFragmentColor+"--  text Fragment Color\n");
-            bw.write(textFragmenSize+"--  text Fragment Color\n");
-            bw.write(volumeDay+"--  volume Day\n");
-            bw.write(volumeNight+"--  volume Night\n");
-            bw.write(iconColor+"--  icon Color\n");
-            bw.write(indexCurStation+"--  indexCurStation\n");
-            bw.write(sizeOfBuffer+"--  size Of Buffer\n");
-            bw.write(accessVideo+"--  accessVideo\n");
-            bw.write(accessMusic+"--  accessMusic\n");
-
-            bw.write(sizeTextSetting+"--  sizeTextSetting\n");
-            bw.write(indexBAUDRATE+"--  indexBAUDRATE\n");
-
-            bw.write(DateSetting.deltaTime+"--  deltaTime\n");
-
+           
+            WriteSetting(bw);
 
             bw.close();
         }catch (IOException r){
 
         }
     }
+    private void WriteSetting(BufferedWriter bw) {
+        try {
+            bw.write("\n\n@@ folders @@");
+            bw.write("\nfolderLiftApp=" + folderLiftApp);
+            bw.write("\nfolderBackGraund=" + folderBackGraund);
+            bw.write("\nfolderImage=" + folderImage);
+            bw.write("\nfolderSound=" + folderSound);
+            bw.write("\nfolderMusic=" + folderMusic);
+            bw.write("\nfolderMassage=" + folderMassage);
+            bw.write("\nfolderInformation=" + folderInformation);
+            bw.write("\nfolderVideo=" + folderVideo);
+            bw.write("\nfolderSpecialSound=" + folderSpecialSound);
+            
+            bw.write("\n\n@@ colors @@");
+            bw.write("\ncolorLayoutBackgraund=" + colorLayoutBackgraund);
+            bw.write("\ncolorText="+colorText);
+            bw.write("\ncolorIcon="+colorIcon);
+            bw.write("\ncolorTextFragment="+colorTextFragment);
+
+            bw.write("\n\n@@ size @@");
+            bw.write("\nsizeNumber="+sizeNumber);
+            bw.write("\nsizeOfBuffer="+sizeOfBuffer);
+            bw.write("\nsizeTextDate="+sizeTextDate);
+            bw.write("\nsizeTextFragment="+sizeTextFragment);
+            bw.write("\nsizeTextInfo="+sizeTextInfo);
+            bw.write("\nsizeTextMassage="+sizeTextMassage);
+            bw.write("\nsizeTextSetting="+sizeTextSetting);
+
+            bw.write("\n\n@@ special @@");
+            bw.write("\ntypeDate="+typeDate);
+            bw.write("\nvolumeDay="+volumeDay);
+            bw.write("\nvolumeNight="+volumeNight);
+            bw.write("\nindexCurStation="+indexCurStation);
+            bw.write("\naccessVideo="+accessVideo);
+            bw.write("\naccessMusic="+accessMusic);
+            bw.write("\nindexBAUDRATE="+indexBAUDRATE);
+            bw.write("\ndeltaTime="+DateSetting.deltaTime);
+        }catch (IOException e){}
+    }
+    //TODO remake reading function
     private void ReadSettings(BufferedReader br){
         try {
-            MainPath = getStringBeforCommends(br.readLine());
-            BackGroundFolder= getStringBeforCommends(br.readLine());
-            ImageFolder= getStringBeforCommends(br.readLine());
-            SoundFolder= getStringBeforCommends(br.readLine());
-            MusicFolder= getStringBeforCommends(br.readLine());
-            MassageFolder= getStringBeforCommends(br.readLine());
-            InformationFolder= getStringBeforCommends(br.readLine());
-            ResourcesFolder= getStringBeforCommends(br.readLine());
-            SpecialSoundFolder= getStringBeforCommends(br.readLine());
-            LayOutBackGraundColor.setColor(getStringBeforCommends(br.readLine()));
-            textColorHex.setColor(getStringBeforCommends(br.readLine()));
-            TextInfoSize.value=Integer.parseInt(getStringBeforCommends(br.readLine()));
-            TextDateSize.value=Integer.parseInt(getStringBeforCommends(br.readLine()));
-            TextMassageSize.value=Integer.parseInt(getStringBeforCommends(br.readLine()));
-            NumberSize.value=Integer.parseInt(getStringBeforCommends(br.readLine()));
-            typeDate= getStringBeforCommends(br.readLine());
-            textFragmentColor.setColor(getStringBeforCommends(br.readLine()));
-            textFragmenSize.value=Integer.parseInt(getStringBeforCommends(br.readLine()));
-            volumeDay.value=Integer.parseInt(getStringBeforCommends(br.readLine()));
-            volumeNight.value=Integer.parseInt(getStringBeforCommends(br.readLine()));
-            iconColor.setColor(getStringBeforCommends(br.readLine()));
-            indexCurStation=Integer.parseInt(getStringBeforCommends(br.readLine()));
-            sizeOfBuffer.value=Integer.parseInt(getStringBeforCommends(br.readLine()));
-            accessVideo.Access=Boolean.parseBoolean(getStringBeforCommends(br.readLine()));
-            accessMusic.Access=Boolean.parseBoolean(getStringBeforCommends(br.readLine()));
+            folderLiftApp = getValueInString(br.readLine());
+            folderBackGraund= getValueInString(br.readLine());
+            folderImage= getValueInString(br.readLine());
+            folderSound= getValueInString(br.readLine());
+            folderMusic= getValueInString(br.readLine());
+            folderMassage= getValueInString(br.readLine());
+            folderInformation= getValueInString(br.readLine());
+            folderVideo= getValueInString(br.readLine());
+            folderSpecialSound= getValueInString(br.readLine());
+            colorLayoutBackgraund.setColor(getValueInString(br.readLine()));
+            colorText.setColor(getValueInString(br.readLine()));
+            sizeTextInfo.value=Integer.parseInt(getValueInString(br.readLine()));
+            sizeTextDate.value=Integer.parseInt(getValueInString(br.readLine()));
+            sizeTextMassage.value=Integer.parseInt(getValueInString(br.readLine()));
+            sizeNumber.value=Integer.parseInt(getValueInString(br.readLine()));
+            typeDate= getValueInString(br.readLine());
+            colorTextFragment.setColor(getValueInString(br.readLine()));
+            sizeTextFragment.value=Integer.parseInt(getValueInString(br.readLine()));
+            volumeDay.value=Integer.parseInt(getValueInString(br.readLine()));
+            volumeNight.value=Integer.parseInt(getValueInString(br.readLine()));
+            colorIcon.setColor(getValueInString(br.readLine()));
+            indexCurStation=Integer.parseInt(getValueInString(br.readLine()));
+            sizeOfBuffer.value=Integer.parseInt(getValueInString(br.readLine()));
+            accessVideo.Access=Boolean.parseBoolean(getValueInString(br.readLine()));
+            accessMusic.Access=Boolean.parseBoolean(getValueInString(br.readLine()));
 
-            sizeTextSetting.value=Integer.parseInt(getStringBeforCommends(br.readLine()));
-            indexBAUDRATE.value=Integer.parseInt(getStringBeforCommends(br.readLine()));
+            sizeTextSetting.value=Integer.parseInt(getValueInString(br.readLine()));
+            indexBAUDRATE.value=Integer.parseInt(getValueInString(br.readLine()));
 
-            DateSetting.deltaTime=Long.parseLong(getStringBeforCommends(br.readLine()));
-            /*month.deltaTime=Long.parseLong(getStringBeforCommends(br.readLine()));
-            day.deltaTime=Long.parseLong(getStringBeforCommends(br.readLine()));
-            hour.deltaTime=Long.parseLong(getStringBeforCommends(br.readLine()));
-            min.deltaTime=Long.parseLong(getStringBeforCommends(br.readLine()));*/
+            DateSetting.deltaTime=Long.parseLong(getValueInString(br.readLine()));
+            /*month.deltaTime=Long.parseLong(getValueInString(br.readLine()));
+            day.deltaTime=Long.parseLong(getValueInString(br.readLine()));
+            hour.deltaTime=Long.parseLong(getValueInString(br.readLine()));
+            min.deltaTime=Long.parseLong(getValueInString(br.readLine()));*/
 
 
         }catch (IOException r)
@@ -192,13 +210,13 @@ public class Setting {
         }
     }
     public void StartRead() {
-       File sdPath=StoragePath;
+       File sdPath=new File(pathSDcard);
         // добавляем свой каталог к пути
-        sdPath = new File(sdPath.getAbsolutePath() + "/" + folderSetting);
+        sdPath = new File(sdPath.getAbsolutePath() + "/" + folderLiftApp);
         // создаем каталог
         sdPath.mkdirs();
         // формируем объект File, который содержит путь к файлу
-        File sdFile = new File(sdPath, settingFile);
+        File sdFile = new File(sdPath, fileSetting);
         try{
             if(!sdFile.canRead()||sdFile.getUsableSpace()<100)
             {
@@ -220,19 +238,32 @@ public class Setting {
 
     }
 
-    private void CreateFolder(File sdPath)
-    {
-        new File(sdPath.getAbsolutePath()+'/'+BackGroundFolder).mkdir();
-        new File(sdPath.getAbsolutePath()+'/'+ImageFolder).mkdir();
-        new File(sdPath.getAbsolutePath()+'/'+SoundFolder).mkdir();
-        new File(sdPath.getAbsolutePath()+'/'+MusicFolder).mkdir();
-        new File(sdPath.getAbsolutePath()+'/'+MassageFolder).mkdir();
-        new File(sdPath.getAbsolutePath()+'/'+InformationFolder).mkdir();
-        new File(sdPath.getAbsolutePath()+'/'+ResourcesFolder).mkdir();
-        new File(sdPath.getAbsolutePath()+'/'+SpecialSoundFolder).mkdir();
+    private void CreateFolder(File sdPath) {
+        new File(sdPath.getAbsolutePath()+'/'+folderBackGraund).mkdir();
+        new File(sdPath.getAbsolutePath()+'/'+folderImage).mkdir();
+        new File(sdPath.getAbsolutePath()+'/'+folderSound).mkdir();
+        new File(sdPath.getAbsolutePath()+'/'+folderMusic).mkdir();
+        new File(sdPath.getAbsolutePath()+'/'+folderMassage).mkdir();
+        new File(sdPath.getAbsolutePath()+'/'+folderInformation).mkdir();
+        new File(sdPath.getAbsolutePath()+'/'+folderVideo).mkdir();
+        new File(sdPath.getAbsolutePath()+'/'+folderSpecialSound).mkdir();
     }
 
-    private String getStringBeforCommends(String s) {
+    private String confirmString="Setting 2.0";
+    private void confirmSetting(BufferedWriter bw){
+        try{
+            bw.write(confirmString+'\n');
+        }catch (IOException e){}
+    }
+    private boolean confirmSetting(BufferedReader br){
+        try{
+            String ac=br.readLine();
+            return ac.equals(confirmString);
+        }catch (IOException e){}
+    }
+
+    private String getValueInString(String s) {
+        //TODO remake for '='
         StringBuilder sb=new StringBuilder();
         for (int i=0;i<s.length();i++) {
             char cur=s.charAt(i);
@@ -245,16 +276,16 @@ public class Setting {
     }
 
     public Uri getUri(){
-        File sdPath= StoragePath;
+        File sdPath= new File(pathSDcard);
         // добавляем свой каталог к пути
-        sdPath = new File(sdPath.getAbsolutePath() + "/" + folderSetting);
+        sdPath = new File(sdPath.getAbsolutePath() + "/" + folderLiftApp);
         // создаем каталог
         sdPath.mkdirs();
         // формируем объект File, который содержит путь к файлу
-        File sdFile = new File(sdPath, settingFile);
+        File sdFile = new File(sdPath, fileSetting);
         return Uri.fromFile(sdFile);
     }
-    private void setStoragePath(){
+    private String setStoragePath(){
         File sdPath= Environment.getExternalStorageDirectory();
         File parent=sdPath.getParentFile();
         if(parent!=null) {
@@ -267,7 +298,6 @@ public class Setting {
                 }
             }
         }
-        pathSDcard=sdPath.getAbsolutePath();
-        StoragePath=sdPath;
+        return sdPath.getAbsolutePath();
     }
 }
