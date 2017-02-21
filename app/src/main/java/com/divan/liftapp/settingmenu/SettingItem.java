@@ -12,4 +12,7 @@ public abstract class SettingItem {
     public abstract String getValue();
     public abstract String getColor();
     public abstract void setFocus(boolean isFocus);
+
+    public abstract String toString();
+    public abstract void setValue(String value);
 }

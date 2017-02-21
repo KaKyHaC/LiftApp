@@ -7,6 +7,7 @@ import android.os.Environment;
 import com.divan.liftapp.settingmenu.AccessSetting;
 import com.divan.liftapp.settingmenu.ColorSetting;
 import com.divan.liftapp.settingmenu.DateSetting;
+import com.divan.liftapp.settingmenu.StringSetting;
 import com.divan.liftapp.settingmenu.NumberedSetting;
 
 import java.io.BufferedReader;
@@ -15,7 +16,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Created by Димка on 03.12.2016.
@@ -24,40 +24,31 @@ import java.util.List;
 public class Setting {
     public String folderLiftApp,fileSetting;
     public String pathLiftFolder,pathSDcard=null;
-    public String folderBackGraund,folderImage,folderSound,folderMusic,folderMassage,folderInformation,folderVideo,folderSpecialSound;
-    public String typeDate;
 
-    public ColorSetting colorText;//Integer.toHexString(Color.WHITE);
-    public ColorSetting colorLayoutBackgraund;
-    public NumberedSetting sizeTextInfo,sizeTextDate,sizeTextMassage;//30
-    public NumberedSetting sizeNumber;//230
-    public ColorSetting colorTextFragment;
-    public NumberedSetting sizeTextFragment;
-    public NumberedSetting volumeDay;
-    public NumberedSetting volumeNight;
-    public ColorSetting colorIcon;
-    public int indexCurStation;
-    public NumberedSetting sizeOfBuffer;
-    public AccessSetting accessVideo;
-    public AccessSetting accessMusic;
-    public NumberedSetting sizeTextSetting;
+    public StringSetting folderBackGraund,folderImage,folderSound,folderMusic,folderMassage,folderInformation,folderVideo,folderSpecialSound;
+    public ColorSetting colorText, colorLayoutBackgraund,colorTextFragment,colorIcon;;
+    public NumberedSetting sizeTextInfo,sizeTextDate,sizeTextMassage,sizeNumber,sizeTextFragment,sizeOfBuffer,sizeTextSetting;;//230
+    public NumberedSetting volumeDay, volumeNight;
     public NumberedSetting indexBAUDRATE;
-    public DateSetting year,month,day,hour,min;
+    public AccessSetting accessVideo,accessMusic;
+    public DateSetting year,month,day,hour,min;//TODO universal date
 
+    public NumberedSetting indexCurStation;
+    public StringSetting typeDate;
 
 
     public void InitDefault(){
-        folderImage="Image";
-        folderSpecialSound="SpecialSound";
-        folderBackGraund="BackGraund";
-        folderVideo="Video";
-        folderInformation="Information";
-        folderMassage="Massage";
-        folderMusic="Music";
-        folderSound="Sound";
+        folderImage=new StringSetting("Папка с Изображением","Image");
+        folderSpecialSound=new StringSetting("Папка с Спец. Звуками","SpecialSound");
+        folderBackGraund=new StringSetting("Папка с Фонами","BackGraund");
+        folderVideo=new StringSetting("Папка с Видео","Video");
+        folderInformation=new StringSetting("Папка с информацией","Information");
+        folderMassage=new StringSetting("Папка с сообщениями","Massage");
+        folderMusic=new StringSetting("Папка с музыкой","Music");
+        folderSound=new StringSetting("Папка с звуками","Sound");
         
         
-        typeDate="dd/MM/yyyy EEEE HH:mm";
+        typeDate=new StringSetting("формат даты","dd/MM/yyyy EEEE HH:mm");
             colorText = new ColorSetting("Цвет текста", Color.RED);
             colorLayoutBackgraund = new ColorSetting("Цвет подложки", Integer.parseInt("5300ff00",16));// Integer.parseInt("534056ff",16)
             sizeTextInfo = new NumberedSetting(30, "Размер шрифта информации");
@@ -75,7 +66,7 @@ public class Setting {
 
         sizeOfBuffer=new NumberedSetting(64,"Размер буффера", NumberedSetting.NumberedType.Buffer);
 
-        indexCurStation=0;
+        indexCurStation=new NumberedSetting(0,"индекс станции");
 
         accessVideo=new AccessSetting("Воспроизведение видео",AccessSetting.typeAccess[0]);
         accessMusic=new AccessSetting("Воспроизведение музыки",AccessSetting.typeAccess[0]);
@@ -129,39 +120,41 @@ public class Setting {
     private void WriteSetting(BufferedWriter bw) {
         try {
             bw.write("\n\n@@ folders @@");
-            bw.write("\nfolderLiftApp=" + folderLiftApp);
-            bw.write("\nfolderBackGraund=" + folderBackGraund);
-            bw.write("\nfolderImage=" + folderImage);
-            bw.write("\nfolderSound=" + folderSound);
-            bw.write("\nfolderMusic=" + folderMusic);
-            bw.write("\nfolderMassage=" + folderMassage);
-            bw.write("\nfolderInformation=" + folderInformation);
-            bw.write("\nfolderVideo=" + folderVideo);
-            bw.write("\nfolderSpecialSound=" + folderSpecialSound);
+//            bw.write("\nfolderLiftApp=" + folderLiftApp);
+            bw.write("\n"+folderBackGraund.getName()+"=" + folderBackGraund);
+            bw.write("\n"+folderImage.getName()+"=" + folderImage);
+            bw.write("\n"+folderSound.getName()+"=" + folderSound);
+            bw.write("\n"+folderMusic.getName()+"=" + folderMusic);
+            bw.write("\n"+folderMassage.getName()+"=" + folderMassage);
+            bw.write("\n"+folderInformation.getName()+"=" + folderInformation);
+            bw.write("\n"+folderVideo.getName()+"=" + folderVideo);
+            bw.write("\n"+folderSpecialSound.getName()+"=" + folderSpecialSound);
             
             bw.write("\n\n@@ colors @@");
-            bw.write("\ncolorLayoutBackgraund=" + colorLayoutBackgraund);
-            bw.write("\ncolorText="+colorText);
-            bw.write("\ncolorIcon="+colorIcon);
-            bw.write("\ncolorTextFragment="+colorTextFragment);
+            bw.write("\n"+colorLayoutBackgraund.getName()+"=" + colorLayoutBackgraund);
+            bw.write("\n"+colorText.getName()+"=" + colorText);
+            bw.write("\n"+colorIcon.getName()+"=" + colorIcon);
+            bw.write("\n"+colorTextFragment.getName()+"=" + colorTextFragment);
 
             bw.write("\n\n@@ size @@");
-            bw.write("\nsizeNumber="+sizeNumber);
-            bw.write("\nsizeOfBuffer="+sizeOfBuffer);
-            bw.write("\nsizeTextDate="+sizeTextDate);
-            bw.write("\nsizeTextFragment="+sizeTextFragment);
-            bw.write("\nsizeTextInfo="+sizeTextInfo);
-            bw.write("\nsizeTextMassage="+sizeTextMassage);
-            bw.write("\nsizeTextSetting="+sizeTextSetting);
+            bw.write("\n"+sizeNumber.getName()+"=" + sizeNumber);
+            bw.write("\n"+sizeOfBuffer.getName()+"=" + sizeOfBuffer);
+            bw.write("\n"+sizeTextDate.getName()+"=" + sizeTextDate);
+            bw.write("\n"+sizeTextFragment.getName()+"=" + sizeTextFragment);
+            bw.write("\n"+sizeTextInfo.getName()+"=" + sizeTextInfo);
+            bw.write("\n"+sizeTextMassage.getName()+"=" + sizeTextMassage);
+            bw.write("\n"+sizeTextSetting.getName()+"=" + sizeTextSetting);
 
             bw.write("\n\n@@ special @@");
-            bw.write("\ntypeDate="+typeDate);
-            bw.write("\nvolumeDay="+volumeDay);
-            bw.write("\nvolumeNight="+volumeNight);
-            bw.write("\nindexCurStation="+indexCurStation);
-            bw.write("\naccessVideo="+accessVideo);
-            bw.write("\naccessMusic="+accessMusic);
-            bw.write("\nindexBAUDRATE="+indexBAUDRATE);
+            bw.write("\n"+typeDate.getName()+"=" + typeDate);
+            bw.write("\n"+volumeDay.getName()+"=" + volumeDay);
+            bw.write("\n"+volumeNight.getName()+"=" + volumeNight);
+            bw.write("\n"+indexCurStation.getName()+"=" + indexCurStation);
+            bw.write("\n"+accessVideo.getName()+"=" + accessVideo);
+            bw.write("\n"+accessMusic.getName()+"=" + accessMusic);
+            bw.write("\n"+indexBAUDRATE.getName()+"=" + indexBAUDRATE);
+            bw.write("\n"+sizeTextSetting.getName()+"=" + sizeTextSetting);
+
             bw.write("\ndeltaTime="+DateSetting.deltaTime);
         }catch (IOException e){}
     }
@@ -249,6 +242,7 @@ public class Setting {
         new File(sdPath.getAbsolutePath()+'/'+folderSpecialSound).mkdir();
     }
 
+    //TODO add accessor
     private String confirmString="Setting 2.0";
     private void confirmSetting(BufferedWriter bw){
         try{

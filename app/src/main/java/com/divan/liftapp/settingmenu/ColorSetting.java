@@ -37,12 +37,12 @@ public class ColorSetting extends SettingItem {
     public String toString() {
         return Integer.toHexString(color);
     }
-   /* private void setColor(ColorPair p){
-        this.color=p.value;
-    }*/
-    /*public void setColor(String hexColor){
-        this.color =(int) Long.parseLong(hexColor,16);
-    }*/
+
+    @Override
+    public void setValue(String value) {
+        setColor(value);
+    }
+
     @Override
     public void onClick(Key key) {
       //  Vector<ColorPair> v=ColorsMap.getColors();
@@ -78,7 +78,6 @@ public class ColorSetting extends SettingItem {
 
     @Override
     public String getValue() {
-
         return ColorsMap.nameAt(bufIndex);
     }
 

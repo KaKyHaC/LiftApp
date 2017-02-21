@@ -5,7 +5,7 @@ package com.divan.liftapp.settingmenu;
  */
 
 public class AccessSetting extends SettingItem {
-    public static String [] typeAccess={"Разрешено","Запрещено"};
+    public static String [] typeAccess={"Разрешено","Запрещено"};//TODO remake for emun
     public boolean Access=false;
     private boolean tmpAccess;
     String Name;
@@ -63,4 +63,8 @@ public class AccessSetting extends SettingItem {
         return Boolean.toString(Access);
    }
 
+    @Override
+    public void setValue(String value) {
+        this.Access=Boolean.valueOf(value);
+    }
 }

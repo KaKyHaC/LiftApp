@@ -140,6 +140,16 @@ public class DateSetting extends SettingItem {
         curDate = Calendar.getInstance();
         resDate=Calendar.getInstance();
     }
+
+    @Override
+    public String toString() {
+        return deltaTime.toString();
+    }
+
+    @Override
+    public void setValue(String value) {
+        deltaTime=Long.parseLong(value);
+    }
 }
 
 
