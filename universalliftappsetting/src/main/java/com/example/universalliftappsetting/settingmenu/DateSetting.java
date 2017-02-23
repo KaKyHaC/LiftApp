@@ -1,11 +1,8 @@
-package com.divan.liftapp.settingmenu;
-
-import com.divan.liftapp.Setting;
+package com.example.universalliftappsetting.settingmenu;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Locale;
 
 /**

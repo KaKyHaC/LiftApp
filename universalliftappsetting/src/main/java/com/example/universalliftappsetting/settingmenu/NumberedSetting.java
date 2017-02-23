@@ -1,4 +1,4 @@
-package com.divan.liftapp.settingmenu;
+package com.example.universalliftappsetting.settingmenu;
 
 /**
  * Created by Димка on 06.01.2017.
@@ -11,7 +11,7 @@ public class NumberedSetting extends SettingItem {
     private int bufValue;
     private String Name;
 
-    private NumberedType type=NumberedType.Text;
+    private NumberedType type= NumberedType.Text;
 
     public NumberedSetting(int value, String name) {
         this.value = value;
@@ -68,9 +68,9 @@ public class NumberedSetting extends SettingItem {
 
     @Override
     public String getValue() {
-        if(type==NumberedType.BaudRate)
+        if(type== NumberedType.BaudRate)
             return String.valueOf(BAUDRATE[bufValue%BAUDRATE.length]);
-        return String.valueOf(bufValue)+((type==NumberedType.Volume)?"%":"");
+        return String.valueOf(bufValue)+((type== NumberedType.Volume)?"%":"");
     }
 
     @Override

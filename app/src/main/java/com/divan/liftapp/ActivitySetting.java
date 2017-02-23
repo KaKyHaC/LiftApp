@@ -1,63 +1,44 @@
 package com.divan.liftapp;
 
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
-import android.app.admin.DevicePolicyManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.hardware.usb.UsbManager;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Environment;
-import android.os.PowerManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.divan.liftapp.Fragments.MyFragment;
-import com.divan.liftapp.R;
-import com.divan.liftapp.Setting;
-import com.divan.liftapp.settingmenu.DateSetting;
-import com.divan.liftapp.settingmenu.NumberedSetting;
-import com.divan.liftapp.settingmenu.SettingItem;
-import com.divan.liftapp.settingmenu.SpecialSetting;
+import com.example.universalliftappsetting.settingmenu.SpecialSetting;
+import com.example.universalliftappsetting.Setting;
 
 
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.util.List;
 import java.util.Vector;
-import java.util.concurrent.TimeUnit;
-import java.util.jar.Attributes;
 
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 import static com.divan.liftapp.FullscreenActivity.BAUDRATE;
 import static com.divan.liftapp.FullscreenActivity.PosSetStation;
-import static com.divan.liftapp.FullscreenActivity.SIZEOFMASSAGE;
-import static com.divan.liftapp.settingmenu.SpecialSetting.stationNames;
+import static com.example.universalliftappsetting.settingmenu.SpecialSetting.stationNames;
 
-public class ActivitySetting extends AppCompatActivity {
+import com.example.universalliftappsetting.settingmenu.DateSetting;
+import com.example.universalliftappsetting.settingmenu.NumberedSetting;
+import com.example.universalliftappsetting.settingmenu.SettingItem;
+import com.example.universalliftappsetting.settingmenu.SpecialSetting;
+
+public class ActivitySetting extends AppCompatActivity implements SpecialSetting.SpecialActivity {
     public static final int UiSetting= View.SYSTEM_UI_FLAG_FULLSCREEN|View.SYSTEM_UI_FLAG_HIDE_NAVIGATION| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
     final String SettingFolder="LiftApp",settingFile="setting.txt",GONG="gong.wav",EXIT="Выход",DEFAULT="По умолчанию",STATION="Станции";
-    Vector<SettingItem> settingItems;
+    Vector<com.example.universalliftappsetting.settingmenu.SettingItem> settingItems;
     public Setting setting=new Setting(SettingFolder,settingFile);
 
     ListView listView;
@@ -65,7 +46,7 @@ public class ActivitySetting extends AppCompatActivity {
     //int indexSelected=-1;
    // boolean isSelect=false;
     View selectedView;
-    SettingItem curItem;
+    com.example.universalliftappsetting.settingmenu.SettingItem curItem;
     CharSequence curText=null;
     byte byteToSend=0;
 
@@ -280,6 +261,7 @@ public class ActivitySetting extends AppCompatActivity {
             main.cancel(false);
     }
 
+    //interface method
     public void Exit(){finish();}
     public void MakeDefaultSetting(){
         setting.InitDefault();
@@ -306,6 +288,12 @@ public class ActivitySetting extends AppCompatActivity {
             // Instruct the user to install a PDF reader here, or something
         }
     }
+    public void SetIndexCurStation(int index) {
+        setting.indexCurStation.value=index;
+    }
+    public int GetIndexCurStation() {
+        return setting.indexCurStation.value;
+    }
 
     class Main extends AsyncTask<Void,byte[],Void> {
         FTDriver ftDriver;
@@ -315,7 +303,7 @@ public class ActivitySetting extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             ftDriver=new FTDriver((UsbManager)getSystemService(Context.USB_SERVICE));
-            isOpen=ftDriver.begin(NumberedSetting.BAUDRATE[setting.indexBAUDRATE.value%NumberedSetting.BAUDRATE.length],setting.sizeOfBuffer.value);
+            isOpen=ftDriver.begin(NumberedSetting.BAUDRATE[setting.indexBAUDRATE.value% NumberedSetting.BAUDRATE.length],setting.sizeOfBuffer.value);
             onListItemClick(index);
         }
         @Override

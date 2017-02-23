@@ -1,15 +1,16 @@
-package com.divan.liftapp;
+package com.example.universalliftappsetting;
 
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Environment;
 
-import com.divan.liftapp.settingmenu.AccessSetting;
-import com.divan.liftapp.settingmenu.ColorSetting;
-import com.divan.liftapp.settingmenu.DateSetting;
-import com.divan.liftapp.settingmenu.SettingItem;
-import com.divan.liftapp.settingmenu.StringSetting;
-import com.divan.liftapp.settingmenu.NumberedSetting;
+import com.example.universalliftappsetting.*;
+import com.example.universalliftappsetting.settingmenu.AccessSetting;
+import com.example.universalliftappsetting.settingmenu.ColorSetting;
+import com.example.universalliftappsetting.settingmenu.DateSetting;
+import com.example.universalliftappsetting.settingmenu.NumberedSetting;
+import com.example.universalliftappsetting.settingmenu.SettingItem;
+import com.example.universalliftappsetting.settingmenu.StringSetting;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -152,7 +153,7 @@ public class Setting {
 
         }catch (IOException e){}
     }
-    private void writeItem(SettingItem item,BufferedWriter bw){
+    private void writeItem(SettingItem item, BufferedWriter bw){
         try {
             bw.write('\n' + item.getName() + '=' + item);
         }catch (IOException e){}

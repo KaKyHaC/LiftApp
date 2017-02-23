@@ -1,6 +1,5 @@
 package com.divan.liftapp;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.hardware.usb.UsbManager;
@@ -8,24 +7,17 @@ import android.os.AsyncTask;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.os.Handler;
-import android.view.MotionEvent;
-import android.view.View;
 import android.widget.TextView;
-
-import com.divan.liftapp.settingmenu.NumberedSetting;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 
 import static com.divan.liftapp.FullscreenActivity.BAUDRATE;
 import static com.divan.liftapp.FullscreenActivity.SIZEOFMASSAGE;
 import static com.divan.liftapp.FullscreenActivity.UiSetting;
-import static com.divan.liftapp.FullscreenActivity.ValAlert;
 import static com.divan.liftapp.FullscreenActivity.ValNormal;
 
 /**

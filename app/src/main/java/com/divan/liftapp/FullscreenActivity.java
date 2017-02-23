@@ -1,25 +1,16 @@
 package com.divan.liftapp;
 
-import android.annotation.SuppressLint;
-
-import android.app.Dialog;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.hardware.usb.UsbManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -27,41 +18,26 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
 import android.os.PowerManager;
-import android.support.annotation.UiThread;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
-import android.util.Xml;
-import android.view.Gravity;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.inputmethod.InputConnection;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.VideoView;
 
 import com.divan.liftapp.Fragments.FragmentImage;
 import com.divan.liftapp.Fragments.FragmentText;
 import com.divan.liftapp.Fragments.FragmentVideo;
 import com.divan.liftapp.Fragments.MyFragment;
-import com.divan.liftapp.ActivitySetting;
 import com.divan.liftapp.Wifi.WiFiDirectActivity;
-import com.divan.liftapp.settingmenu.DateSetting;
-import com.divan.liftapp.settingmenu.NumberedSetting;
 
-import org.xmlpull.v1.XmlPullParser;
+import com.example.universalliftappsetting.Setting;
+import com.example.universalliftappsetting.settingmenu.DateSetting;
+import com.example.universalliftappsetting.settingmenu.NumberedSetting;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -74,11 +50,9 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
-import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -431,7 +405,7 @@ public class FullscreenActivity extends AppCompatActivity {
     }
 
 
-    enum Fragment{Video,Image,Text};
+    enum Fragment{Video,Image,Text}
     class Main extends AsyncTask<Void,byte[],Void>{
         String PathToLiftApp=pathSDcard + '/' + setting.folderLiftApp +'/' ;
         List<String> images,backGrounds,musics,videos;

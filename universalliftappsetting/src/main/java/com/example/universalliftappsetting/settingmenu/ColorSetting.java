@@ -1,11 +1,9 @@
-package com.divan.liftapp.settingmenu;
+package com.example.universalliftappsetting.settingmenu;
 
 /**
  * Created by Димка on 06.01.2017.
  */
 import android.graphics.Color;
-
-import java.util.Vector;
 
 public class ColorSetting extends SettingItem {
     String Name;

@@ -1,4 +1,4 @@
-package com.divan.liftapp.Wifi;
+package com.example.universalliftappsetting;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -16,7 +16,6 @@ import java.io.OutputStream;
  */
 
 public abstract class FileTransaction {
-    //TODO make as library
     public enum FileType{setting,image,video,music,sound,backgraund,undefined,massage}
     public static final int MEGABYTE=1024;
 
@@ -53,7 +52,6 @@ public abstract class FileTransaction {
             out.close();
             in.close();
         } catch (IOException e) {
-            Log.d(WiFiDirectActivity.TAG, e.toString());
             return false;
         }
         return true;
@@ -89,14 +87,13 @@ public abstract class FileTransaction {
             out.close();
             inputStream.close();
         } catch (IOException e) {
-            Log.d(WiFiDirectActivity.TAG, e.toString());
             return false;
         }
         return true;
     }
 
     private static int getCode(FileType fileType){
-        FileType[] types=FileType.values();
+        FileType[] types= FileType.values();
         for(int i=0;i<types.length;i++){
             if(fileType.equals(types[i]))
                 return i;
@@ -104,7 +101,7 @@ public abstract class FileTransaction {
         return -1;
     }
     private static FileType getFileType(int Code){
-        FileType[] types=FileType.values();
+        FileType[] types= FileType.values();
         if(Code>=0&&Code<types.length)
             return types[Code];
         return FileType.undefined;

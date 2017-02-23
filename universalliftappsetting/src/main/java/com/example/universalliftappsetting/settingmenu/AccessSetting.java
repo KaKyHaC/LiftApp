@@ -1,4 +1,4 @@
-package com.divan.liftapp.settingmenu;
+package com.example.universalliftappsetting.settingmenu;
 
 /**
  * Created by Димка on 21.01.2017.
