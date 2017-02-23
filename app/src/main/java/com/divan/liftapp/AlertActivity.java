@@ -9,6 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import com.example.universalliftappsetting.Setting;
+import com.example.universalliftappsetting.settingmenu.NumberedSetting;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;

@@ -16,7 +16,7 @@ import java.io.OutputStream;
  */
 
 public abstract class FileTransaction {
-    public enum FileType{setting,image,video,music,sound,backgraund,undefined,massage}
+    public enum FileType{setting,image,video,music,sound,backgraund,undefined,massage}//TODO add all types and make path
     public static final int MEGABYTE=1024;
 
     public static boolean sendFile(File file,OutputStream socket){

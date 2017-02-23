@@ -25,6 +25,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.divan.liftapp.FullscreenActivity;
+import com.example.universalliftappsetting.FileTransaction;
+import com.example.universalliftappsetting.Setting;
 
 import java.io.IOException;
 import java.io.InputStream;
