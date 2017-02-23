@@ -134,7 +134,7 @@ public class WiFiDirectActivity extends AsyncTask<Void,String,Void> implements C
     @Override
     protected void onCancelled() {
         super.onCancelled();
-        if(isConnected)
+//        if(isConnected)
             disconnect();
         fullscreenActivity.unregisterReceiver(receiver);
     }

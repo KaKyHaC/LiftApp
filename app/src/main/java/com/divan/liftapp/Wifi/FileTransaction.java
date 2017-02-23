@@ -21,7 +21,7 @@ import java.io.OutputStream;
 
 public abstract class FileTransaction {
     //TODO make as library
-    public enum FileType{setting,image,video,music,sound,backgraund,undefined}
+    public enum FileType{setting,image,video,music,sound,backgraund,undefined,massage}
     public static final int MEGABYTE=1024;
 
     public static boolean sendFile(File file,OutputStream socket){
@@ -83,7 +83,7 @@ public abstract class FileTransaction {
         return false;
     }
     public static boolean copyFile(InputStream inputStream, OutputStream out) {
-        byte buf[] = new byte[1024];
+        byte buf[] = new byte[MEGABYTE];
         int len;
         try {
             while ((len = inputStream.read(buf)) != -1) {
@@ -126,16 +126,27 @@ public abstract class FileTransaction {
             else if(c=='.')
                 isType=true;
         }
-        switch (type.toString()){
-            case "jpeg":
-            case "jpg":return FileType.image;
-            case "mp3":
-            case "wav":return FileType.sound;
-            case "txt":return FileType.setting;
-            case "mp4":
-            case "3gp":return  FileType.video;
-            default:return FileType.undefined;
+        String[] tImage={"jpeg","jpg","bmp","JPEG","JPG","BMP"};
+        String[] tSound={"mp3","MP3","wav","WAV"};
+        String[] tVideo={"mp4","3gp","MP4"};
+        String[] tText={"txt"};
+        for(String s:tImage)
+        {
+            if(type.toString()==s)return FileType.image;
         }
+        for(String s:tSound)
+        {
+            if(type.toString()==s)return FileType.sound;
+        }
+        for(String s:tVideo)
+        {
+            if(type.toString()==s)return FileType.video;
+        }
+        for(String s:tText)
+        {
+            if(type.toString()==s)return FileType.massage;
+        }
+        return FileType.undefined;
 
     }
 
@@ -154,6 +165,8 @@ public abstract class FileTransaction {
             case sound:path+=setting.folderSound;
                 break;
             case backgraund:path+=setting.folderBackGraund;
+                break;
+            case massage:path+=setting.folderMassage;
                 break;
             case undefined:
             default:return null;
