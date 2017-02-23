@@ -20,14 +20,16 @@ import java.io.OutputStream;
  */
 
 public abstract class FileTransaction {
+    //TODO make as library
     public enum FileType{setting,image,video,music,sound,backgraund,undefined}
+    public static final int MEGABYTE=1024;
 
     public static boolean sendFile(File file,OutputStream socket){
         if(!file.isFile())
             return false;
         try {
             InputStream is = new FileInputStream(file);
-            return sendFile(is,socket,getFileType(file));
+            return sendFile(is,socket,getFileType(file),file.getAbsolutePath());
         }catch (FileNotFoundException e){}
         return false;
     }
@@ -36,18 +38,21 @@ public abstract class FileTransaction {
             return false;
         try {
             InputStream is = new FileInputStream(file);
-            return sendFile(is,socket,fileType);
+            return sendFile(is,socket,fileType,file.getAbsolutePath());
         }catch (FileNotFoundException e){}
         return false;
     }
-    public static boolean sendFile(InputStream in,OutputStream out,FileType fileType){
-        byte buf[] = new byte[1024];
+    private static boolean sendFile(InputStream in,OutputStream out,FileType fileType,String fullPath){
+        byte buf[] = new byte[MEGABYTE];
         int len;
         try {
             out.write(getCode(fileType));
+
+            String stName=giveNameOfFile(fullPath);
+            byte[] mbName=convertNameToMB(stName);
+            out.write(mbName);
             while ((len = in.read(buf)) != -1) {
                 out.write(buf, 0, len);
-
             }
             out.close();
             in.close();
@@ -67,6 +72,10 @@ public abstract class FileTransaction {
             if(path==null)
                 return false;
 
+            byte[] mbName=new byte[MEGABYTE];
+            socket.read(mbName);
+            String stName=convertMBtoName(mbName);
+            path+=stName;
             OutputStream out=new FileOutputStream(path);
             return copyFile(socket,out);
 
@@ -133,8 +142,9 @@ public abstract class FileTransaction {
     private static String getPathToSave(final FileType fileType,final Setting setting){
         String path=setting.pathLiftFolder+'/';
         switch (fileType){
-            case setting:path+=setting.fileSetting;
-                break;
+            case setting:
+                //path+=setting.fileSetting;
+                return path;
             case image:path+=setting.folderImage;
                 break;
             case video:path+=setting.folderVideo;
@@ -148,6 +158,37 @@ public abstract class FileTransaction {
             case undefined:
             default:return null;
         }
-        return path;
+        return path+'/';
+    }
+
+    private static byte[] convertNameToMB(String name){
+        byte[] buf=new byte[MEGABYTE];
+        char[] cName=name.toCharArray();
+        for(int i=0;i<cName.length;i++){
+            buf[i]=(byte)cName[i];
+        }
+        return buf;
+    }
+    private static String convertMBtoName(byte[] mb){
+        StringBuilder sb=new StringBuilder();
+        for(byte b:mb){
+            if(b==0)break;
+            sb.append((char)b);
+        }
+        return sb.toString();
+    }
+
+    private static String giveNameOfFile(String fullPath){
+        int i;
+        for(i=fullPath.length()-1;i>=0;i--){
+            if(fullPath.charAt(i)=='/')
+                break;
+        }
+        StringBuilder sb=new StringBuilder();
+        for(i++;i<fullPath.length();i++){
+            sb.append(fullPath.charAt(i));
+        }
+        return sb.toString();
+
     }
 }
