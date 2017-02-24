@@ -1,25 +1,16 @@
 package com.divan.liftapp;
 
-import android.annotation.SuppressLint;
-
-import android.app.Dialog;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.hardware.usb.UsbManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -27,41 +18,26 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
 import android.os.PowerManager;
-import android.support.annotation.UiThread;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
-import android.util.Xml;
-import android.view.Gravity;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.inputmethod.InputConnection;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.VideoView;
 
 import com.divan.liftapp.Fragments.FragmentImage;
 import com.divan.liftapp.Fragments.FragmentText;
 import com.divan.liftapp.Fragments.FragmentVideo;
 import com.divan.liftapp.Fragments.MyFragment;
-import com.divan.liftapp.ActivitySetting;
 import com.divan.liftapp.Wifi.WiFiDirectActivity;
-import com.divan.liftapp.settingmenu.DateSetting;
-import com.divan.liftapp.settingmenu.NumberedSetting;
 
-import org.xmlpull.v1.XmlPullParser;
+import com.example.universalliftappsetting.Setting;
+import com.example.universalliftappsetting.settingmenu.DateSetting;
+import com.example.universalliftappsetting.settingmenu.NumberedSetting;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -71,13 +47,12 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
-import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -105,7 +80,7 @@ public class FullscreenActivity extends AppCompatActivity {
     private boolean mVisible,voiceSupport=false;
     private Timer mTimer;
     private MyTimerTask mMyTimerTask;
-    private Setting setting;
+    public Setting setting;
     MediaPlayer musicPlayer;
     QueuePlayer soundPlayer,specialSoundPlayer;
     AudioManager am;
@@ -132,7 +107,6 @@ public class FullscreenActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fullscreen);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-        Initialaze();
         getWindow().getDecorView().setSystemUiVisibility(UiSetting);
 
         ActionBar supportActionBar = getSupportActionBar();
@@ -141,10 +115,8 @@ public class FullscreenActivity extends AppCompatActivity {
         android.app.ActionBar actionBar=getActionBar();
         if(actionBar!=null)actionBar.hide();
 
-
         setting=new Setting(SettingFolder,settingFile);
-        SetSetting();
-
+        Initialaze();
         mTimer.schedule(mMyTimerTask, 1000, 1000);
 
         ((FrameLayout)findViewById(R.id.fragment)).setOnClickListener(new View.OnClickListener() {
@@ -154,32 +126,24 @@ public class FullscreenActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        StartAsync();
 
     }
 
     private void StartAsync(){
         if(!isAsyn) {
-            // catTask = new CatTask();
             main = new Main();
-
-            if (!isAsyn &&  main != null) {
-                RunWiFiTusk();
-                //   catTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                main.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                isAsyn = true;
-
-            }
+            main.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            RunWiFiTusk();
+            isAsyn = true;
         }
     }
     @Override
     protected void onResume() {
         super.onResume();
         getWindow().getDecorView().setSystemUiVisibility(UiSetting);
-        // musicPlayer.start();
-        StartAsync();
         setting.StartRead();
         SetSetting();
+        StartAsync();
     }
     @Override
     protected void onPause() {
@@ -190,8 +154,6 @@ public class FullscreenActivity extends AppCompatActivity {
             main.cancel(false);
         if(wiFiDirectActivity!=null)
             wiFiDirectActivity.cancel(false);
-        /*if(catTask!=null)
-            catTask.cancel(false);*/
         isAsyn=false;
     }
 
@@ -199,7 +161,7 @@ public class FullscreenActivity extends AppCompatActivity {
         try {
             //mediaPlayer = new MediaPlayer();
             //mediaPlayer.setDataSource(filePath);
-            File f=new File(pathSDcard+'/'+SettingFolder+'/'+setting.MusicFolder+'/'+fileName);
+            File f=new File(pathSDcard+'/'+SettingFolder+'/'+setting.folderMusic+'/'+fileName);
             if(f.canRead()) {
                 musicPlayer.reset();
                 musicPlayer.setDataSource(f.getAbsolutePath());
@@ -214,15 +176,15 @@ public class FullscreenActivity extends AppCompatActivity {
         }
     }
     private void PlaySound(String fileName){
-        File f=new File(pathSDcard+'/'+SettingFolder+'/'+setting.SoundFolder+'/'+fileName);
+        File f=new File(pathSDcard+'/'+SettingFolder+'/'+setting.folderSound+'/'+fileName);
         soundPlayer.add(f.getAbsolutePath());
     }
     private void PlaySpecialSound(String fileName){
-        File f=new File(pathSDcard+'/'+SettingFolder+'/'+setting.SpecialSoundFolder+'/'+fileName);
+        File f=new File(pathSDcard+'/'+SettingFolder+'/'+setting.folderSpecialSound+'/'+fileName);
         specialSoundPlayer.add(f.getAbsolutePath());
     }
     private void SetBackGraund(String fileName){
-        File f=new File(pathSDcard+'/'+SettingFolder+'/'+setting.BackGroundFolder+'/'+fileName);
+        File f=new File(pathSDcard+'/'+SettingFolder+'/'+setting.folderBackGraund+'/'+fileName);
         if(f.canRead()) {
             Bitmap bp = BitmapFactory.decodeFile(f.getAbsolutePath());
             Drawable d = new BitmapDrawable(getResources(), bp);
@@ -232,7 +194,7 @@ public class FullscreenActivity extends AppCompatActivity {
         }
     }
     private void SetImageViewIcon(ImageView iv,String folderName,String fileName){
-        File f=new File(pathSDcard+'/'+setting.MainPath+'/'+folderName+'/'+fileName);
+        File f=new File(pathSDcard+'/'+setting.folderLiftApp+'/'+folderName+'/'+fileName);
         if(f.canRead()) {
             Bitmap bp = BitmapFactory.decodeFile(f.getAbsolutePath());
             iv.setImageBitmap(bp);
@@ -242,7 +204,7 @@ public class FullscreenActivity extends AppCompatActivity {
     }
     private void SetTextViewMassage(TextView tv,String folderName,String fileName){
         try {
-            File f=new File(pathSDcard + '/' + setting.MainPath + '/' + folderName + '/' + fileName);
+            File f=new File(pathSDcard + '/' + setting.folderLiftApp + '/' + folderName + '/' + fileName);
             if(f.canRead()) {
                 BufferedReader br = new BufferedReader(new FileReader(f.getAbsoluteFile()));
                 StringBuilder sb=new StringBuilder();
@@ -274,6 +236,9 @@ public class FullscreenActivity extends AppCompatActivity {
         }
     }
     private void Initialaze() {
+//        main=new Main();
+//        wiFiDirectActivity=new WiFiDirectActivity(this);
+
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
         mContentView = findViewById(R.id.fullscreen_content);
@@ -292,10 +257,7 @@ public class FullscreenActivity extends AppCompatActivity {
         drawableDown=getResources().getDrawable(R.drawable.down);
         drawableRing=getResources().getDrawable(R.drawable.ring);
 
-
         frameLayout=(FrameLayout)findViewById(R.id.mainLayout);
-        //con=new Controller();
-
 
         String infoSt="Производитель : РФ \n" +
                 "400кг 5 пасс. \n" +
@@ -304,13 +266,13 @@ public class FullscreenActivity extends AppCompatActivity {
         info.setText(infoSt);
 
 
-        StringBuilder sb=new StringBuilder(massage.getText());
+        /*StringBuilder sb=new StringBuilder(massage.getText());
         for(int i=0;i<100;i++)
             sb.append("  ");
         sb.append(massage.getText());
         for(int i=0;i<100;i++)
             sb.append("  ");
-        //massage.setText(sb.toString());
+        //massage.setText(sb.toString());*/
 
         massage.setSelected(true);
 
@@ -322,32 +284,26 @@ public class FullscreenActivity extends AppCompatActivity {
         fragText=new FragmentText();
         fragImage=new FragmentImage();
 
-
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager
                 .beginTransaction();
 
         //TODO wtf 2 add
         fragmentTransaction.add(R.id.fragment,fragImage);
-        //fragmentTransaction.add(R.id.fragment, fragText);
+//        fragmentTransaction.add(R.id.fragment, fragText);
 
         fragmentTransaction.commit();
-
-        //videoView=((VideoView) fragVideo.getView().findViewById(R.id.videoFragment));
-
-
-        wiFiDirectActivity=new WiFiDirectActivity(this);
     }
 
     private void SetSetting() {
         pathSDcard=setting.pathSDcard;
-        date.setTextSize(setting.TextDateSize.value);
-        massage.setTextSize(setting.TextMassageSize.value);
-        info.setTextSize(setting.TextInfoSize.value);
-        number.setTextSize(setting.NumberSize.value);
-        SetTextViewMassage(info,setting.InformationFolder,"information.txt");
+        date.setTextSize(setting.sizeTextDate.value);
+        massage.setTextSize(setting.sizeTextMassage.value);
+        info.setTextSize(setting.sizeTextInfo.value);
+        number.setTextSize(setting.sizeNumber.value);
+        SetTextViewMassage(info,setting.folderInformation.toString(),"information.txt");
 
-        int color=(int)Long.parseLong(setting.textColorHex.toString(),16);
+        int color=(int)Long.parseLong(setting.colorText.toString(),16);
         date.setTextColor(color);
         massage.setTextColor(color);
         info.setTextColor(color);
@@ -356,10 +312,10 @@ public class FullscreenActivity extends AppCompatActivity {
 
 
 
-        int colorBack=(int )Long.parseLong(setting.LayOutBackGraundColor.toString(),16);
+        int colorBack=(int )Long.parseLong(setting.colorLayoutBackgraund.toString(),16);
         SetBackGraunds(colorBack);
 
-        int iconColor=(int )Long.parseLong(setting.iconColor.getColor(),16);
+        int iconColor=(int )Long.parseLong(setting.colorIcon.getColor(),16);
         drawableUp.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN);
         drawableDown.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN);
         drawableRing.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN);
@@ -413,10 +369,9 @@ public class FullscreenActivity extends AppCompatActivity {
     public void SetSettingFromWiFi(){
         setting.StartRead();
         this.SetSetting();
-
+        main.setFiles();
     }
     public void RunWiFiTusk(){
-
         wiFiDirectActivity=new WiFiDirectActivity(this);
         wiFiDirectActivity.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
@@ -434,7 +389,7 @@ public class FullscreenActivity extends AppCompatActivity {
             Date curDate =calendar.getTime();
 //            Long deltaTime=setting.year.deltaTime+setting.month.deltaTime+setting.day.deltaTime+setting.hour.deltaTime+setting.min.deltaTime;
             curDate.setTime(curDate.getTime()+ DateSetting.deltaTime);
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(setting.typeDate, Locale.getDefault()); //"dd:MM:yyyy EEEE HH:mm"
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(setting.typeDate.toString(), Locale.getDefault()); //"dd:MM:yyyy EEEE HH:mm"
             final String strDate = simpleDateFormat.format(curDate);
 
             runOnUiThread(new Runnable() {
@@ -450,9 +405,9 @@ public class FullscreenActivity extends AppCompatActivity {
     }
 
 
-    enum Fragment{Video,Image,Text};
+    enum Fragment{Video,Image,Text}
     class Main extends AsyncTask<Void,byte[],Void>{
-        String PathToLiftApp=pathSDcard + '/' + setting.MainPath +'/' ;
+        String PathToLiftApp=pathSDcard + '/' + setting.folderLiftApp +'/' ;
         List<String> images,backGrounds,musics,videos;
         FTDriver ftDriver;
         MyFragment myFrag;
@@ -460,7 +415,9 @@ public class FullscreenActivity extends AppCompatActivity {
         int musicSeek=0;
         boolean isOpen=false;
         boolean isMusicPlayed=false;
-
+        public Main(){
+            super();
+        }
 
         @Override
         protected void onPreExecute() {
@@ -471,14 +428,12 @@ public class FullscreenActivity extends AppCompatActivity {
             ftDriver=new FTDriver((UsbManager)getSystemService(Context.USB_SERVICE));
             isOpen=ftDriver.begin(NumberedSetting.BAUDRATE[setting.indexBAUDRATE.value%NumberedSetting.BAUDRATE.length],setting.sizeOfBuffer.value);
 
-            massage.setText(FileManager.getAllTextFromDirectory(PathToLiftApp + setting.MassageFolder));
-            images= FileManager.getAllFilesPath(PathToLiftApp+setting.ImageFolder,"BMP","bmp","jpg","JPG");
-            backGrounds=FileManager.getAllFilesPath(PathToLiftApp+setting.BackGroundFolder,"BMP","bmp","jpg","JPG");
-            musics=FileManager.getAllFilesPath(PathToLiftApp+setting.MusicFolder,"mp3","wav");
-            videos=FileManager.getAllFilesPath(PathToLiftApp+setting.ResourcesFolder,"mp4","3gp");
+            images=new LinkedList<>();
+            backGrounds=new LinkedList<>();
+            musics=new LinkedList<>();
+            videos=new LinkedList<>();
 
-            fragVideo.setVideos(videos);
-            fragImage.setLists(images,musics);
+            setFiles();
 
             if(musics.size()!=0) {
                 musicPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -501,32 +456,30 @@ public class FullscreenActivity extends AppCompatActivity {
                 // musicPlayer.start();
             }
         }
+        public void setFiles(){
+            synchronized (massage) {
+                massage.setText(FileManager.getAllTextFromDirectory(PathToLiftApp + setting.folderMassage));
+            }synchronized (images) {
+                images = FileManager.getAllFilesPath(PathToLiftApp + setting.folderImage, "BMP", "bmp", "jpg", "JPG");
+            }synchronized (backGrounds){
+                backGrounds=FileManager.getAllFilesPath(PathToLiftApp+setting.folderBackGraund,"BMP","bmp","jpg","JPG");
+            }synchronized (musics) {
+                musics = FileManager.getAllFilesPath(PathToLiftApp + setting.folderMusic, "mp3", "wav");
+            }synchronized (videos) {
+                videos = FileManager.getAllFilesPath(PathToLiftApp + setting.folderVideo, "mp4", "3gp");
+                fragVideo.setVideos(videos);
+            }
+            fragImage.setLists(images,musics);
+        }
+
         @Override
         protected Void doInBackground(Void... params) {
-            byte[] buf = new byte[setting.sizeOfBuffer.value];//work while size=64
+//            return testProcess();
+            return mainProcess();
+        }
 
-          /*  isOpen=true;
-          byte[][] test=new byte[][]{
-          //          0 1 2 3 4 5 6 7 8 9
-                    {50,1,1,0,0,0,0,0,0,0},
-                    {50,2,2,0,0,0,0,0,0,0},
-                    {50,3,2,0,0,1,0,1,1,0},
-                    {50,4,0,0,0,0,0,1,0,0},
-                    {50,5,0,0,0,9,0,0,0,0},
-                    {50,6,4,1,0,0,0,2,0,0},
-                    {50,7,5,0,0,4,0,2,1,0},
-                    {50,8,0,0,0,9,0,0,0,0},
-                    {50,9,6,0,0,9,0,1,0,0},
-                    {50,(byte)231,0,4,0,0,0,0,0,0},
-                    {50,8,0,5,0,0,0,3,1,0}};
-            int index=0;
-            while(true){
-                if (isCancelled()) return null;
-                publishProgress(test[index++%test.length]);
-                try{
-                TimeUnit.SECONDS.sleep(2);
-                 }catch(InterruptedException e){}
-                 }*/
+        private Void mainProcess(){
+            byte[] buf = new byte[setting.sizeOfBuffer.value];//work while size=64
 
             while(true){
                 if (isCancelled()) {
@@ -550,7 +503,32 @@ public class FullscreenActivity extends AppCompatActivity {
                 }catch (InterruptedException e){}
             }
         }
+        private Void testProcess(){
+            byte[] buf = new byte[setting.sizeOfBuffer.value];//work while size=64
 
+            isOpen=true;
+          byte[][] test=new byte[][]{
+          //          0 1 2 3 4 5 6 7 8 9
+                    {50,1,1,0,0,0,0,0,0,0},
+                    {50,2,2,0,0,0,0,0,0,0},
+                    {50,3,2,0,0,1,0,1,1,0},
+                    {50,4,0,0,0,0,0,1,0,0},
+                    {50,5,0,0,0,9,0,0,0,0},
+                    {50,6,4,1,0,0,0,2,0,0},
+                    {50,7,5,0,0,4,0,2,1,0},
+                    {50,8,0,0,0,9,0,0,0,0},
+                    {50,9,6,0,0,9,0,1,0,0},
+                    {50,(byte)231,0,4,0,0,0,0,0,0},
+                    {50,8,0,5,0,0,0,3,1,0}};
+            int index=0;
+            while(true){
+                if (isCancelled()) return null;
+                publishProgress(test[index++%test.length]);
+                try{
+                TimeUnit.SECONDS.sleep(2);
+                 }catch(InterruptedException e){}
+                 }
+        }
 
         @Override
         protected void onProgressUpdate(byte[]... values) {
@@ -628,8 +606,8 @@ public class FullscreenActivity extends AppCompatActivity {
                 case 2:imageArrow.setImageDrawable(drawableDown);break;
                 case 3:imageArrow.setImageResource(R.drawable.fire1);break;
                 case 4:imageArrow.setImageDrawable(drawableRing);break;
-                case 5:SetImageViewIcon(imageArrow,setting.ImageFolder,"overload.png");break;
-                case 6:SetImageViewIcon(imageArrow,setting.ImageFolder,"photoreverse.png");break;
+                case 5:SetImageViewIcon(imageArrow,setting.folderImage.toString(),"overload.png");break;
+                case 6:SetImageViewIcon(imageArrow,setting.folderImage.toString(),"photoreverse.png");break;
                 case 7:imageArrow.setImageBitmap(null);
             }
         }
@@ -664,13 +642,13 @@ public class FullscreenActivity extends AppCompatActivity {
         }
         void Sounds(byte b){
             if(b!=0) {
-                soundPlayer.add(PathToLiftApp + setting.SoundFolder + '/' + String.valueOf(b) + ".mp3");
+                soundPlayer.add(PathToLiftApp + setting.folderSound + '/' + String.valueOf(b) + ".mp3");
                 priorityPause();
             }
         }
         void SpecialSound(byte b){
             if(b!=0) {
-                specialSoundPlayer.add(PathToLiftApp + setting.SpecialSoundFolder + '/' + String.valueOf(b) + ".mp3");
+                specialSoundPlayer.add(PathToLiftApp + setting.folderSpecialSound + '/' + String.valueOf(b) + ".mp3");
                 priorityPause();
             }
         }
@@ -804,196 +782,5 @@ public class FullscreenActivity extends AppCompatActivity {
         }
     }
 
-    class Demo extends  AsyncTask<Void,Integer,Void>{
-        private int index=1;
-        String PathToLiftApp=pathSDcard + '/' + setting.MainPath +'/' ;
-        List<String> images,backGrounds,musics,videos;
-        int nImage=1,nBack=1,nMusic=0,nVideo=0;
-        int maxLvl=9;
-        boolean isFire=false;
-        MyFragment myFrag;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            massage.setText(FileManager.getAllTextFromDirectory(PathToLiftApp + setting.MassageFolder));
-            /*------------------------*/
-            images= FileManager.getAllFilesPath(PathToLiftApp+setting.ImageFolder,"BMP","bmp","jpg","JPG");
-            backGrounds=FileManager.getAllFilesPath(PathToLiftApp+setting.BackGroundFolder,"BMP","bmp","jpg","JPG");
-            musics=FileManager.getAllFilesPath(PathToLiftApp+setting.MusicFolder,"mp3","wav");
-            videos=FileManager.getAllFilesPath(PathToLiftApp+setting.ResourcesFolder,"mp4","3gp");
-
-           /* if(videos.size()!=0) {
-                videoView.setVideoPath(videos.get(nVideo++ % videos.size()));
-                videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        videoView.setVideoPath(videos.get(nVideo++ % videos.size()));
-                        videoView.start();
-                    }
-                });
-                videoView.start();
-            }*/
-            fragVideo.setVideos(videos);
-            fragImage.setLists(images,musics);
-
-        }
-
-        @Override
-
-        protected Void doInBackground(Void... params) {
-
-            int i=-1;
-            publishProgress(1,1);
-            try {
-                while (true) {
-
-                    for (i+=2 ; i <= maxLvl; i++) {
-                        if (i == 9) {
-                            publishProgress(i, 0);
-                            TimeUnit.SECONDS.sleep(6);
-                        }
-                        if (i == maxLvl)
-                            publishProgress(i, -1);
-                        else
-                            publishProgress(i, 1);
-                        TimeUnit.SECONDS.sleep(3);
-                    }
-
-                    for (i-=2; i >= 1; i--) {
-                        if (i == 3) {
-                            publishProgress(i, 0);
-                            TimeUnit.SECONDS.sleep(6);
-                        }
-                        if(i==1)
-                            publishProgress(i,1);
-                        else
-                            publishProgress(i,-1);
-                        TimeUnit.SECONDS.sleep(3);
-                    }
-
-                    publishProgress(2, 2);//fire
-                    TimeUnit.SECONDS.sleep(5);
-
-                }
-            }catch (InterruptedException r){
-
-            }
-            return null;
-        }
-
-        protected void directionOfMovement(int value1 ){
-            FragmentManager fragmentManager = getFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager
-                    .beginTransaction();
-
-
-            if(value1==1){
-                imageArrow.setImageResource(R.drawable.up);
-
-                fragmentTransaction.replace(R.id.fragment,fragImage);
-                myFrag=fragImage;
-            }
-            else if(value1==-1)
-            {
-                imageArrow.setImageResource(R.drawable.down);
-                if(videos.size()>0) {
-                    fragmentTransaction.replace(R.id.fragment, fragVideo);
-                    myFrag = fragVideo;
-                }
-            }
-
-            fragmentTransaction.commit();
-        }
-        protected void isStopOnFloor(int value1,int val){
-            if(value1==0){
-                final Animation animationFlipOut,animationFlipIn;
-                animationFlipIn = AnimationUtils.loadAnimation(context,
-                        android.R.anim.slide_in_left);
-                animationFlipOut = AnimationUtils.loadAnimation(context,
-                        android.R.anim.slide_out_right);
-                animationFlipOut.setAnimationListener(new Animation.AnimationListener() {
-                    @Override
-                    public void onAnimationStart(Animation animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-                        if(backGrounds.size()!=0) {
-                            Drawable drawable = BitmapDrawable.createFromPath(backGrounds.get((nBack++ % backGrounds.size())));
-                            frameLayout.setBackground(drawable);
-                            frameLayout.startAnimation(animationFlipIn);
-                        }
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animation animation) {
-
-                    }
-                });
-
-                imageArrow.setImageBitmap(null);
-
-                if(backGrounds.size()>0) {
-                    //frameLayout.startAnimation(animationFlipOut);
-                    Drawable drawable = BitmapDrawable.createFromPath(backGrounds.get((nBack++ % backGrounds.size())));
-                    frameLayout.setBackground(drawable);
-                }
-                PlaySound(String.valueOf(val)+".mp3");
-                ring.setImageResource(R.drawable.ring);
-                // mediaPlayer.pause();
-            }
-            else{
-                ring.setImageBitmap(null);
-                //mediaPlayer.start();
-            }
-        }
-        protected void isFireAlert(int value1){
-            FragmentManager fragmentManager = getFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager
-                    .beginTransaction();
-            if(value1==2)
-            {
-                imageArrow.setImageBitmap(null);
-                fire.setImageResource(R.drawable.fire1);
-                //fire.setVisibility(View.VISIBLE);
-                isFire=true;
-                fragmentTransaction.replace(R.id.fragment,fragText);
-
-                PlaySpecialSound("fire.mp3");
-
-            }
-            else if(isFire==true)
-            {
-                // fire.setVisibility(View.INVISIBLE);
-                fire.setImageBitmap(null);
-                isFire=false;
-                fragmentTransaction.replace(R.id.fragment,myFrag);
-            }
-            fragmentTransaction.commit();
-        }
-
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-
-            int val=values[0];
-            directionOfMovement(values[1]);
-            isStopOnFloor(values[1],val);
-            isFireAlert(values[1]);
-
-
-            number.setText(String.valueOf(val));
-            myFrag.onUpdate(val,values[1]);
-
-          /*  if(images.size()!=0&&val%2==0) {
-                Bitmap bm = BitmapFactory.decodeFile(images.get(nImage++ % images.size()));
-                fragImage.setImage(bm);
-            }*/
-
-        }
-    }
 
 }

@@ -121,6 +121,7 @@ public class DeviceList implements PeerListListener {
         this.device = device;
         wiFiDirectActivity.changeName(Security.setPref(device.deviceName,Security.prefLift));
         if(device.status==WifiP2pDevice.CONNECTED){
+            findAndAddMac();
             /*wiFiDirectActivity.makeToast("addMac");
             wiFiDirectActivity.addMac(device.deviceAddress);*/
 

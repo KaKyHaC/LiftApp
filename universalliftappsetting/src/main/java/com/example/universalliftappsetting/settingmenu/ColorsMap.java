@@ -1,4 +1,4 @@
-package com.divan.liftapp.settingmenu;
+package com.example.universalliftappsetting.settingmenu;
 
 import android.graphics.Color;
 

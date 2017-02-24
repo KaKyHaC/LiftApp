@@ -16,31 +16,20 @@
 
 package com.divan.liftapp.Wifi;
 
-import android.app.Fragment;
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.net.wifi.WpsInfo;
-import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.divan.liftapp.FullscreenActivity;
 import com.divan.liftapp.R;
-import com.divan.liftapp.Setting;
+import com.example.universalliftappsetting.FileTransaction;
+import com.example.universalliftappsetting.Setting;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -139,18 +128,20 @@ public class DeviceDetail implements ConnectionInfoListener {
 				while(server_running) {
 					ServerSocket serverSocket = new ServerSocket(PORT);
 					Log.d(WiFiDirectActivity.TAG, "Server: Socket opened");
+					publishProgress("Socket opened",null);
 					Socket client = serverSocket.accept();
 					Log.d(WiFiDirectActivity.TAG, "Server: connection done");
 					publishProgress("Connection done",null);
-					final File f = new File(settingPath);
+					/*final File f = new File(settingPath);
 					File dirs = new File(f.getParent());
 					if (!dirs.exists())
 						dirs.mkdirs();
-					f.createNewFile();
+					f.createNewFile();*/
 
-					Log.d(WiFiDirectActivity.TAG, "server: copying files " + f.toString());
+//					Log.d(WiFiDirectActivity.TAG, "server: copying files " + f.toString());
 					InputStream inputstream = client.getInputStream();
-					copyFile(inputstream, new FileOutputStream(f));
+					FileTransaction.receiveFile(inputstream,fullscreenActivity.setting);
+					//copyFile(inputstream, new FileOutputStream(f));
 					serverSocket.close();
 					publishProgress("Set setting from wifi","q");
 				}
@@ -190,7 +181,9 @@ public class DeviceDetail implements ConnectionInfoListener {
 		protected void onProgressUpdate(String... values) {
 			super.onProgressUpdate(values);
 			if(values[0]!=null) {
-				Toast.makeText(fullscreenActivity, values[0], Toast.LENGTH_SHORT).show();
+//				Toast.makeText(fullscreenActivity, values[0], Toast.LENGTH_SHORT).show();
+//				TextView info=(TextView)fullscreenActivity.findViewById(R.id.information);
+//				info.setText(values[0]);
 				if(values[1]!=null)
 					fullscreenActivity.SetSettingFromWiFi();
 			}

@@ -1,17 +1,13 @@
 package com.divan.liftapp.Fragments;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.divan.liftapp.FullscreenActivity;
 import com.divan.liftapp.R;
-import com.divan.liftapp.Setting;
+import com.example.universalliftappsetting.Setting;
 
 import static com.divan.liftapp.FullscreenActivity.SettingFolder;
 import static com.divan.liftapp.FullscreenActivity.settingFile;
@@ -48,8 +44,8 @@ public class FragmentText extends MyFragment {
     public void onResume() {
         super.onResume();
         Setting setting=new Setting(SettingFolder,settingFile);
-        tv.setTextColor((int)Long.parseLong(setting.textFragmentColor.toString(),16));
-        tv.setTextSize(setting.textFragmenSize.value);
+        tv.setTextColor((int)Long.parseLong(setting.colorTextFragment.toString(),16));
+        tv.setTextSize(setting.sizeTextFragment.value);
     }
 
     @Override

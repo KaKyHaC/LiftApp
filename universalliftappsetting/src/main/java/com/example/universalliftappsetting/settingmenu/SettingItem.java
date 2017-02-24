@@ -1,4 +1,4 @@
-package com.divan.liftapp.settingmenu;
+package com.example.universalliftappsetting.settingmenu;
 
 /**
  * Created by Димка on 06.01.2017.
@@ -12,4 +12,7 @@ public abstract class SettingItem {
     public abstract String getValue();
     public abstract String getColor();
     public abstract void setFocus(boolean isFocus);
+
+    public abstract String toString();
+    public abstract void setValue(String value);
 }

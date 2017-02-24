@@ -1,11 +1,8 @@
-package com.divan.liftapp.settingmenu;
-
-import com.divan.liftapp.Setting;
+package com.example.universalliftappsetting.settingmenu;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Locale;
 
 /**
@@ -139,6 +136,16 @@ public class DateSetting extends SettingItem {
         systemDate = Calendar.getInstance().getTime();
         curDate = Calendar.getInstance();
         resDate=Calendar.getInstance();
+    }
+
+    @Override
+    public String toString() {
+        return deltaTime.toString();
+    }
+
+    @Override
+    public void setValue(String value) {
+        deltaTime=Long.parseLong(value);
     }
 }
 

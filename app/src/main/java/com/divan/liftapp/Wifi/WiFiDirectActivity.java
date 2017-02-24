@@ -134,7 +134,7 @@ public class WiFiDirectActivity extends AsyncTask<Void,String,Void> implements C
     @Override
     protected void onCancelled() {
         super.onCancelled();
-        if(isConnected)
+//        if(isConnected)
             disconnect();
         fullscreenActivity.unregisterReceiver(receiver);
     }
@@ -316,6 +316,7 @@ public class WiFiDirectActivity extends AsyncTask<Void,String,Void> implements C
         }*/
     }
     public void addMac(String mac){
+        makeToast("Mac added");
         macs.add(clientMac);
         Utils.addMac(pathToMacs,clientMac);
         manager.createGroup(channel, new ActionListener() {

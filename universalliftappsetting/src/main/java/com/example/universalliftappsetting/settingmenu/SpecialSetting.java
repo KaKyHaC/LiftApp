@@ -1,6 +1,8 @@
-package com.divan.liftapp.settingmenu;
+package com.example.universalliftappsetting.settingmenu;
 
-import com.divan.liftapp.ActivitySetting;
+import com.example.universalliftappsetting.settingmenu.SettingItem;
+
+import static com.example.universalliftappsetting.settingmenu.SettingItem.Key.up;
 
 /**
  * Created by Димка on 11.01.2017.
@@ -13,12 +15,12 @@ public class SpecialSetting extends SettingItem {
     private int indexBufStation=indexCurStation;
 
     TypeSpecialItem typeSpecialItem;
-    ActivitySetting activitySetting;//TODO bad idea
+    SpecialActivity specialActivity;//TODO bad idea
     String Name;
 
-    public SpecialSetting(TypeSpecialItem typeSpecialItem, ActivitySetting activitySetting, String name) {
+    public SpecialSetting(TypeSpecialItem typeSpecialItem, SpecialActivity specialActivity, String name) {
         this.typeSpecialItem = typeSpecialItem;
-        this.activitySetting = activitySetting;
+        this.specialActivity = specialActivity;
         Name = name;
     }
 
@@ -33,11 +35,11 @@ public class SpecialSetting extends SettingItem {
                 if(indexBufStation<stationNames.length)
                     indexBufStation+=stationNames.length;
                 switch (key) {
-                    case up:indexCurStation++;indexBufStation=indexCurStation;activitySetting.SendByte((byte)(indexCurStation%stationNames.length+1));
-                        activitySetting.setting.indexCurStation = indexCurStation;
+                    case up:indexCurStation++;indexBufStation=indexCurStation;specialActivity.SendByte((byte)(indexCurStation%stationNames.length+1));
+                        specialActivity.SetIndexCurStation(indexCurStation);
                         break;
-                    case down:indexCurStation--;indexBufStation=indexCurStation;activitySetting.SendByte((byte)(indexCurStation%stationNames.length+1));
-                        activitySetting.setting.indexCurStation = indexCurStation;
+                    case down:indexCurStation--;indexBufStation=indexCurStation;specialActivity.SendByte((byte)(indexCurStation%stationNames.length+1));
+                        specialActivity.SetIndexCurStation(indexCurStation);
                         break;
                     case left:indexBufStation--;
                         break;
@@ -53,16 +55,16 @@ public class SpecialSetting extends SettingItem {
                 case up:
                 case down:
                     switch (typeSpecialItem){
-                        case EXIT:activitySetting.SendByte();
-                            activitySetting.Exit();
+                        case EXIT:specialActivity.SendByte();
+                            specialActivity.Exit();
                             break;
-                        case DEFAULT:activitySetting.MakeDefaultSetting();
+                        case DEFAULT:specialActivity.MakeDefaultSetting();
                             break;
                         case STATION:
                             indexCurStation=indexBufStation;
-//                            activitySetting.SendByte((byte)(indexCurStation%stationNames.length+1));
+//                            specialActivity.SendByte((byte)(indexCurStation%stationNames.length+1));
                             break;
-                        case INSTRUCTION:activitySetting.OpenInstruction();
+                        case INSTRUCTION:specialActivity.OpenInstruction();
                             break;
                     }
                     break;
@@ -94,9 +96,9 @@ public class SpecialSetting extends SettingItem {
         hasFocus=isFocus;
         if(typeSpecialItem==TypeSpecialItem.STATION) {
             if (isFocus)
-                indexCurStation = activitySetting.setting.indexCurStation;//TODO it's bad code
+                indexCurStation = specialActivity.GetIndexCurStation(); //TODO it's bad code
             if (!isFocus)
-                activitySetting.setting.indexCurStation = indexCurStation;
+                specialActivity.SetIndexCurStation(indexCurStation);
             indexBufStation = indexCurStation;
         }
     }
@@ -105,4 +107,19 @@ public class SpecialSetting extends SettingItem {
     public String toString() {
         return  Name ;
     }
+
+    @Override
+    public void setValue(String value) {
+        Name=value;
+    }
+    public interface SpecialActivity{
+        public void Exit();
+        public void MakeDefaultSetting();
+        public void SendByte();
+        public void SendByte(byte b);
+        public void OpenInstruction();
+        public void SetIndexCurStation(int index);
+        public int GetIndexCurStation();
+    }
 }
+
