@@ -22,9 +22,11 @@ import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.divan.liftapp.FullscreenActivity;
+import com.divan.liftapp.R;
 import com.example.universalliftappsetting.FileTransaction;
 import com.example.universalliftappsetting.Setting;
 
@@ -126,6 +128,7 @@ public class DeviceDetail implements ConnectionInfoListener {
 				while(server_running) {
 					ServerSocket serverSocket = new ServerSocket(PORT);
 					Log.d(WiFiDirectActivity.TAG, "Server: Socket opened");
+					publishProgress("Socket opened",null);
 					Socket client = serverSocket.accept();
 					Log.d(WiFiDirectActivity.TAG, "Server: connection done");
 					publishProgress("Connection done",null);
@@ -178,7 +181,9 @@ public class DeviceDetail implements ConnectionInfoListener {
 		protected void onProgressUpdate(String... values) {
 			super.onProgressUpdate(values);
 			if(values[0]!=null) {
-				Toast.makeText(fullscreenActivity, values[0], Toast.LENGTH_SHORT).show();
+//				Toast.makeText(fullscreenActivity, values[0], Toast.LENGTH_SHORT).show();
+//				TextView info=(TextView)fullscreenActivity.findViewById(R.id.information);
+//				info.setText(values[0]);
 				if(values[1]!=null)
 					fullscreenActivity.SetSettingFromWiFi();
 			}
