@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.divan.liftapp.R;
+import com.example.universalliftappsetting.Setting;
 
 import static com.divan.liftapp.FullscreenActivity.SettingFolder;
 import static com.divan.liftapp.FullscreenActivity.settingFile;
