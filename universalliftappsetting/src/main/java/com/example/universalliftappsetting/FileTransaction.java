@@ -16,7 +16,7 @@ import java.io.OutputStream;
  */
 
 public abstract class FileTransaction {
-    public enum FileType{setting,image,video,music,sound,backgraund,undefined,massage}//TODO add all types and make path
+    public enum FileType{setting,image,video,music,sound,backgraund,undefined,massage,information,specialsound}
     public static final int MEGABYTE=1024;
 
     public static boolean sendFile(File file,OutputStream socket){
@@ -160,6 +160,10 @@ public abstract class FileTransaction {
             case backgraund:path+=setting.folderBackGraund;
                 break;
             case massage:path+=setting.folderMassage;
+                break;
+            case information:path+=setting.folderInformation;
+                break;
+            case specialsound:path+=setting.folderSpecialSound;
                 break;
             case undefined:
             default:return null;

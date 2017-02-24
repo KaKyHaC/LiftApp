@@ -3,6 +3,7 @@ package com.example.universalliftappsetting;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 
 import com.example.universalliftappsetting.*;
 import com.example.universalliftappsetting.settingmenu.AccessSetting;
@@ -91,7 +92,7 @@ public class Setting {
     public Setting(String folderLiftApp, String fileSetting) {
         this.folderLiftApp=folderLiftApp;
         this.fileSetting=fileSetting;
-        pathSDcard=setStoragePath();
+        pathSDcard=getStoragePath();
         pathLiftFolder=pathSDcard+ "/" + folderLiftApp;
         new File(pathLiftFolder).mkdir();
 //      if(sizeNumber==null)
@@ -297,7 +298,8 @@ public class Setting {
         File sdFile = new File(sdPath, fileSetting);
         return Uri.fromFile(sdFile);
     }
-    private String setStoragePath(){
+    @NonNull
+    public static String getStoragePath(){
         File sdPath= Environment.getExternalStorageDirectory();
         File parent=sdPath.getParentFile();
         if(parent!=null) {
