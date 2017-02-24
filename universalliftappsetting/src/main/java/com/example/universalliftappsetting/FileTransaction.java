@@ -125,19 +125,19 @@ public abstract class FileTransaction {
         String[] tText={"txt"};
         for(String s:tImage)
         {
-            if(type.toString()==s)return FileType.image;
+            if(type.toString().equals(s))return FileType.image;
         }
         for(String s:tSound)
         {
-            if(type.toString()==s)return FileType.sound;
+            if(type.toString().equals(s))return FileType.sound;
         }
         for(String s:tVideo)
         {
-            if(type.toString()==s)return FileType.video;
+            if(type.toString().equals(s))return FileType.video;
         }
         for(String s:tText)
         {
-            if(type.toString()==s)return FileType.massage;
+            if(type.toString().equals(s))return FileType.massage;
         }
         return FileType.undefined;
 
