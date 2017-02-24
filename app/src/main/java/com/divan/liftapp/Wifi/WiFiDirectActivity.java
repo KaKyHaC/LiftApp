@@ -316,6 +316,7 @@ public class WiFiDirectActivity extends AsyncTask<Void,String,Void> implements C
         }*/
     }
     public void addMac(String mac){
+        makeToast("Mac added");
         macs.add(clientMac);
         Utils.addMac(pathToMacs,clientMac);
         manager.createGroup(channel, new ActionListener() {
@@ -331,7 +332,7 @@ public class WiFiDirectActivity extends AsyncTask<Void,String,Void> implements C
         });
     }
     public void makeToast(String text){
-//        Toast.makeText(fullscreenActivity,text,Toast.LENGTH_SHORT);
+        Toast.makeText(fullscreenActivity,text,Toast.LENGTH_SHORT);
     }
 
 }
