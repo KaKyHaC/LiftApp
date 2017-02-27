@@ -128,10 +128,10 @@ public class DeviceDetail implements ConnectionInfoListener {
 				while(server_running) {
 					ServerSocket serverSocket = new ServerSocket(PORT);
 					Log.d(WiFiDirectActivity.TAG, "Server: Socket opened");
-					publishProgress("Socket opened",null);
+					publishProgress("порт открыт",null);
 					Socket client = serverSocket.accept();
 					Log.d(WiFiDirectActivity.TAG, "Server: connection done");
-					publishProgress("Connection done",null);
+					publishProgress("соединение установлено.прием...",null);
 					/*final File f = new File(settingPath);
 					File dirs = new File(f.getParent());
 					if (!dirs.exists())
@@ -143,7 +143,7 @@ public class DeviceDetail implements ConnectionInfoListener {
 					FileTransaction.receiveFile(inputstream,fullscreenActivity.setting);
 					//copyFile(inputstream, new FileOutputStream(f));
 					serverSocket.close();
-					publishProgress("Set setting from wifi","q");
+					publishProgress("принято.применение обновлений","q");
 				}
 				server_running = false;
 //				return f.getAbsolutePath();
@@ -161,7 +161,7 @@ public class DeviceDetail implements ConnectionInfoListener {
 		@Override
 		protected void onPostExecute(String result) {
 			if (result != null) {
-				Toast.makeText(fullscreenActivity,"finish WiFi direct",Toast.LENGTH_SHORT).show();
+				Toast.makeText(fullscreenActivity,"конец обработки WiFi передачи",Toast.LENGTH_SHORT).show();
 				fullscreenActivity.SetSettingFromWiFi();
 				//fullscreenActivity.RunWiFiTusk();
 			}
@@ -174,14 +174,14 @@ public class DeviceDetail implements ConnectionInfoListener {
 		 */
 		@Override
 		protected void onPreExecute() {
-				Toast.makeText(fullscreenActivity,"start WiFi transaction",Toast.LENGTH_SHORT).show();
+				Toast.makeText(fullscreenActivity,"начало обработки WiFi передачи",Toast.LENGTH_SHORT).show();
 		}
 
 		@Override
 		protected void onProgressUpdate(String... values) {
 			super.onProgressUpdate(values);
 			if(values[0]!=null) {
-//				Toast.makeText(fullscreenActivity, values[0], Toast.LENGTH_SHORT).show();
+				Toast.makeText(fullscreenActivity, values[0], Toast.LENGTH_SHORT).show();
 //				TextView info=(TextView)fullscreenActivity.findViewById(R.id.information);
 //				info.setText(values[0]);
 				if(values[1]!=null)

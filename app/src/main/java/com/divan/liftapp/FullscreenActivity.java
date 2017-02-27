@@ -126,6 +126,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+//        StartAsync();
 
     }
 

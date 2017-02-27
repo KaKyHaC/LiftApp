@@ -130,7 +130,7 @@ public class DeviceList implements PeerListListener {
 
     @Override
     public void onPeersAvailable(WifiP2pDeviceList peerList) {
-        wiFiDirectActivity.makeToast("peers updateed");
+        wiFiDirectActivity.makeToast("список устройств обновлен");
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
@@ -160,6 +160,7 @@ public class DeviceList implements PeerListListener {
      */
     public void tryConnect(){
         if(!wiFiDirectActivity.isConnected) {
+            wiFiDirectActivity.makeToast("выбор устройства для подключения");
             //List<WifiP2pDevice> peers = getPeers();
             for (WifiP2pDevice device : peers) {
                 boolean isHave = false;
@@ -169,7 +170,7 @@ public class DeviceList implements PeerListListener {
                         isHave = true;
                 }
                 if (!isHave&&Security.hasPref(device.deviceName,Security.prefSetting)) {
-                    wiFiDirectActivity.makeToast("try connect");
+                    wiFiDirectActivity.makeToast("попытка подключения к " + device.deviceName);
                     WifiP2pConfig config = new WifiP2pConfig();
                     config.deviceAddress = device.deviceAddress;
                     config.wps.setup = WpsInfo.PBC;

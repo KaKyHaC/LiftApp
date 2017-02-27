@@ -101,11 +101,11 @@ public class WiFiDirectActivity extends AsyncTask<Void,String,Void> implements C
             }
             if (!isFinding) {
                 if (!isWifiP2pEnabled) {
-                    publishProgress("WiFiP2PDisabled");
+                    publishProgress("WiFiP2P выключен");
 
                 } else {
                     isFinding = true;
-                    publishProgress("Start Discover");
+                    publishProgress("начало поиска");
                      final DeviceList fragment = deviceList;
                     fragment.onInitiateDiscovery();
                     manager.discoverPeers(channel, new ActionListener() {
@@ -113,12 +113,12 @@ public class WiFiDirectActivity extends AsyncTask<Void,String,Void> implements C
                         @Override
                         public void onSuccess() {
                             List<WifiP2pDevice> e=deviceList.getPeers();
-                            makeToast( "Discovery onSuccess"         );
+                            makeToast( "поиск успешен");
                         }
 
                         @Override
                         public void onFailure(int reasonCode) {
-                            makeToast( "Discovery Failed : " + reasonCode      );
+                            makeToast( "поиск провален : " + reasonCode      );
                             isFinding=false;
                         }
                     });
@@ -142,7 +142,7 @@ public class WiFiDirectActivity extends AsyncTask<Void,String,Void> implements C
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        makeToast("Start WiFi Task");
+        makeToast("старт WiFi задачи");
         receiver = new WiFiDirectBroadcastReceiver(manager, channel, this);
         fullscreenActivity.registerReceiver(receiver, intentFilter);
     }
@@ -150,7 +150,7 @@ public class WiFiDirectActivity extends AsyncTask<Void,String,Void> implements C
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        makeToast("Finish WiFi Task");
+        makeToast("конец WiFi задачи");
     }
 
     @Override
@@ -164,7 +164,9 @@ public class WiFiDirectActivity extends AsyncTask<Void,String,Void> implements C
      * BroadcastReceiver receiving a state change event.
      */
     public void resetData() {
+        makeToast("сброс данных");
         isFinding=false;
+        isConnected=false;
 
         if (deviceList != null) {
             deviceList.clearPeers();
@@ -182,7 +184,7 @@ public class WiFiDirectActivity extends AsyncTask<Void,String,Void> implements C
         deviceDetail.showDetails(device);
         if(device.status== WifiP2pDevice.CONNECTED)
         {
-            makeToast("addMac from activity");
+            makeToast("добавления Mac из задачи");
             addMac(clientMac);
         }
 
@@ -196,12 +198,12 @@ public class WiFiDirectActivity extends AsyncTask<Void,String,Void> implements C
             @Override
             public void onSuccess() {
                 isConnected=true;
-                makeToast( "Connect succesed!"   );
+                makeToast( "подключение успешно!"   );
                 clientMac=config.deviceAddress;
                 manager.createGroup(channel, new ActionListener() {
                     @Override
                     public void onSuccess() {
-                        makeToast("Groupe created success");
+                        makeToast("группа сформирована успешно");
                     }
 
                     @Override
@@ -214,14 +216,14 @@ public class WiFiDirectActivity extends AsyncTask<Void,String,Void> implements C
 
             @Override
             public void onFailure(int reason) {
-                makeToast( "Connect failed. Retry."                       );
+                makeToast( "подключение провалено. повторите.");
             }
         });
     }
 
     @Override
     public void disconnect() {
-        makeToast("disconnect");
+        makeToast("отключение...");
 
         isFinding=false;
         isConnected=false;
@@ -232,13 +234,13 @@ public class WiFiDirectActivity extends AsyncTask<Void,String,Void> implements C
 
             @Override
             public void onFailure(int reasonCode) {
-                Log.d(TAG, "Disconnect failed. Reason :" + reasonCode);
+                Log.d(TAG, "отключение провалено. причина :" + reasonCode);
 
             }
 
             @Override
             public void onSuccess() {
-                makeToast("remove success");
+                makeToast("отключение успешно");
                 //fragment.getView().setVisibility(View.GONE);
             }
 
@@ -249,6 +251,7 @@ public class WiFiDirectActivity extends AsyncTask<Void,String,Void> implements C
     public void onChannelDisconnected() {
         isFinding=false;
         isConnected=false;
+        makeToast("канал отключен");
         // we will try once more
         if (manager != null && !retryChannel) {
             makeToast( "Channel lost. Trying again" );
@@ -265,6 +268,7 @@ public class WiFiDirectActivity extends AsyncTask<Void,String,Void> implements C
     public void cancelDisconnect() {
         isFinding=false;
         isConnected=false;
+        makeToast("закрыто отключение");
         /*
          * A cancel abort request by user. Disconnect i.e. removeGroup if
          * already connected. Else, request WifiP2pManager to abort the ongoing
@@ -316,9 +320,9 @@ public class WiFiDirectActivity extends AsyncTask<Void,String,Void> implements C
         }*/
     }
     public void addMac(String mac){
-        makeToast("Mac added");
         macs.add(clientMac);
         Utils.addMac(pathToMacs,clientMac);
+        makeToast("Mac: "+mac+" добавлен");
         manager.createGroup(channel, new ActionListener() {
             @Override
             public void onSuccess() {
@@ -332,7 +336,7 @@ public class WiFiDirectActivity extends AsyncTask<Void,String,Void> implements C
         });
     }
     public void makeToast(String text){
-//        Toast.makeText(fullscreenActivity,text,Toast.LENGTH_SHORT);
+        Toast.makeText(fullscreenActivity,text,Toast.LENGTH_SHORT).show();
     }
 
 }
