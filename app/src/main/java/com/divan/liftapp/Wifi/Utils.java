@@ -120,18 +120,22 @@ public class Utils {
 		return ipAddrStr;
 	}
 
-	public static void addMac(String path, String Mac){
+	public static boolean addMac(String path, String Mac){
 		File sdFile = new File(path);
 		if(!isHaveMac(path,Mac)) {
 			try {
 
-				FileWriter fw = new FileWriter(sdFile);
+				FileWriter fw = new FileWriter(sdFile,true);
 				BufferedWriter bw = new BufferedWriter(fw);
 				bw.append(Mac+"\n");
 				bw.close();
+				return true;
 			} catch (IOException e) {
+				return false;
 			}
-		}
+		}else
+			return false;
+
 
 	}
 	public static boolean isHaveMac(String path,String Mac){

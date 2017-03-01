@@ -99,7 +99,7 @@ public class WiFiDirectActivity extends AsyncTask<Void,String,Void> implements C
             if(isCancelled()){
                 return null;
             }
-            if (!isFinding) {
+            if (!isFinding) {//TODO make correct if
                 if (!isWifiP2pEnabled) {
                     publishProgress("WiFiP2P выключен");
 
@@ -120,13 +120,38 @@ public class WiFiDirectActivity extends AsyncTask<Void,String,Void> implements C
                         public void onFailure(int reasonCode) {
                             makeToast( "поиск провален : " + reasonCode      );
                             isFinding=false;
+                            manager.cancelConnect(channel, new ActionListener() {
+                                @Override
+                                public void onSuccess() {
+                                    manager.cancelConnect(channel, new ActionListener() {
+                                        @Override
+                                        public void onSuccess() {
+                                            makeToast("отмена подключений");
+                                        }
+
+                                        @Override
+                                        public void onFailure(int reason) {
+
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onFailure(int reason) {
+
+                                }
+                            });
                         }
                     });
                 }
             }
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
+            if(isFinding) {
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                }
+                if(!isConnected)
+                    isFinding=false;
             }
         }
     }
@@ -200,7 +225,7 @@ public class WiFiDirectActivity extends AsyncTask<Void,String,Void> implements C
                 isConnected=true;
                 makeToast( "подключение успешно!"   );
                 clientMac=config.deviceAddress;
-                manager.createGroup(channel, new ActionListener() {
+               /* manager.createGroup(channel, new ActionListener() {
                     @Override
                     public void onSuccess() {
                         makeToast("группа сформирована успешно");
@@ -210,7 +235,7 @@ public class WiFiDirectActivity extends AsyncTask<Void,String,Void> implements C
                     public void onFailure(int i) {
 
                     }
-                });
+                });*/
                 // WiFiDirectBroadcastReceiver will notify us. Ignore for now.
             }
 
@@ -298,6 +323,20 @@ public class WiFiDirectActivity extends AsyncTask<Void,String,Void> implements C
         }
 
     }
+    public void cancelConncet(){
+        manager.cancelConnect(channel, new ActionListener() {
+                    @Override
+                    public void onSuccess() {
+                        makeToast("подключение закрыто");
+                    }
+
+                    @Override
+                    public void onFailure(int reason) {
+                        makeToast("ошибка закрытия подключения");
+                    }
+                }
+        );
+    }
     public void changeName(String name){
        /* try {
             Method m = manager.getClass().getMethod(
@@ -321,8 +360,8 @@ public class WiFiDirectActivity extends AsyncTask<Void,String,Void> implements C
     }
     public void addMac(String mac){
         macs.add(clientMac);
-        Utils.addMac(pathToMacs,clientMac);
-        makeToast("Mac: "+mac+" добавлен");
+        if(Utils.addMac(pathToMacs,clientMac))
+            makeToast("Mac: "+mac+" добавлен");
         manager.createGroup(channel, new ActionListener() {
             @Override
             public void onSuccess() {
@@ -335,6 +374,7 @@ public class WiFiDirectActivity extends AsyncTask<Void,String,Void> implements C
             }
         });
     }
+
     public void makeToast(String text){
         Toast.makeText(fullscreenActivity,text,Toast.LENGTH_SHORT).show();
     }

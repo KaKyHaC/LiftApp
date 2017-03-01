@@ -37,6 +37,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -159,7 +160,7 @@ public class DeviceList implements PeerListListener {
      * events.
      */
     public void tryConnect(){
-        if(!wiFiDirectActivity.isConnected) {
+        if(!wiFiDirectActivity.isConnected&&device.status==WifiP2pDevice.AVAILABLE) {//TODO make correct if
             wiFiDirectActivity.makeToast("выбор устройства для подключения");
             //List<WifiP2pDevice> peers = getPeers();
             for (WifiP2pDevice device : peers) {
@@ -169,18 +170,40 @@ public class DeviceList implements PeerListListener {
                     if (mac .equals( curMac))
                         isHave = true;
                 }
-                if (!isHave&&Security.hasPref(device.deviceName,Security.prefSetting)) {
+                if (!isHave&&Security.hasPref(device.deviceName,Security.prefSetting)&&device.status==WifiP2pDevice.AVAILABLE) {
                     wiFiDirectActivity.makeToast("попытка подключения к " + device.deviceName);
                     WifiP2pConfig config = new WifiP2pConfig();
                     config.deviceAddress = device.deviceAddress;
                     config.wps.setup = WpsInfo.PBC;
                     config.groupOwnerIntent=15;
                     wiFiDirectActivity.connect(config);
+                    asyncCancelConectAlgoritm(10000);
                     break;
+                }else{
+                    wiFiDirectActivity.makeToast("подключения не будет к "+device.deviceName);
+//                    if(isHave)
+//                        wiFiDirectActivity.makeToast("мас адрес "+device.deviceName+" уже есть");
+//                    if(device.status!=WifiP2pDevice.AVAILABLE)
+//                        wiFiDirectActivity.makeToast(device.deviceName+" status:"+getDeviceStatus(device.status));
                 }
             }
-        }
+        }else  wiFiDirectActivity.makeToast(getDeviceStatus(device.status));
 
+    }
+    private void asyncCancelConectAlgoritm(final int time_delay){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                wiFiDirectActivity.isConnected=true;
+                try {
+                    Thread.sleep(time_delay);
+                }catch (InterruptedException e){}
+                if(device.status!=WifiP2pDevice.CONNECTED) {
+                    wiFiDirectActivity.isConnected=false;
+                    wiFiDirectActivity.cancelConncet();
+                }
+            }
+        }).start();
     }
     private void findAndAddMac(){
         for(WifiP2pDevice device:peers){
@@ -188,6 +211,8 @@ public class DeviceList implements PeerListListener {
                 wiFiDirectActivity.addMac(device.deviceAddress);
         }
     }
+
+    public int getDiviceStatus(){return device.status;}
     public interface DeviceActionListener {
 
         void showDetails(WifiP2pDevice device);
