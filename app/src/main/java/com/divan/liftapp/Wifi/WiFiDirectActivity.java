@@ -376,7 +376,7 @@ public class WiFiDirectActivity extends AsyncTask<Void,String,Void> implements C
     }
 
     public void makeToast(String text){
-        Toast.makeText(fullscreenActivity,text,Toast.LENGTH_SHORT).show();
+//        Toast.makeText(fullscreenActivity,text,Toast.LENGTH_SHORT).show();
     }
 
 }

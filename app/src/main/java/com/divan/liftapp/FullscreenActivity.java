@@ -510,17 +510,17 @@ public class FullscreenActivity extends AppCompatActivity {
             isOpen=true;
           byte[][] test=new byte[][]{
           //          0 1 2 3 4 5 6 7 8 9
-                    {50,1,1,0,0,0,0,0,0,0},
-                    {50,2,2,0,0,0,0,0,0,0},
-                    {50,3,2,0,0,1,0,1,1,0},
-                    {50,4,0,0,0,0,0,1,0,0},
+                    {50,4,0,2,0,0,0,0,0,0},
+                    {50,1,0,3,0,0,0,0,0,0},
+                    {50,2,0,4,0,0,0,0,0,0},
+                   /* {50,4,0,0,0,0,0,1,0,0},
                     {50,5,0,0,0,9,0,0,0,0},
                     {50,6,4,1,0,0,0,2,0,0},
                     {50,7,5,0,0,4,0,2,1,0},
                     {50,8,0,0,0,9,0,0,0,0},
                     {50,9,6,0,0,9,0,1,0,0},
-                    {50,(byte)231,0,4,0,0,0,0,0,0},
-                    {50,8,0,5,0,0,0,3,1,0}};
+                    {50,(byte)231,0,4,0,0,0,0,0,0},*/
+                    {50,3,0,3,0,0,0,0,0,0}};
             int index=0;
             while(true){
                 if (isCancelled()) return null;
@@ -738,7 +738,7 @@ public class FullscreenActivity extends AppCompatActivity {
             }
             else if(fragment==Fragment.Video&&myFrag!=fragVideo)
             {
-                if(videos.size()>0) {
+                if(videos.size()>0||true) {
                     fragmentTransaction.replace(R.id.fragment, fragVideo);
                     myFrag = fragVideo;
                 }
