@@ -130,8 +130,22 @@ public class FullscreenActivity extends AppCompatActivity {
 
     }
 
+    private boolean isContainSdCard(){
+        String sdPath=Setting.getStoragePath();
+        if(sdPath.contains("extsd"))
+            return true;
+        else{
+            FragmentManager fragmentManager = getFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager
+                    .beginTransaction();
+            fragmentTransaction.replace(R.id.fragment,fragText);
+            fragmentTransaction.commit();
+            fragText.onUpdate(0,5);//without SD card
+            return false;
+        }
+    }
     private void StartAsync(){
-        if(!isAsyn) {
+        if(!isAsyn&&isContainSdCard()) {
             main = new Main();
             main.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             RunWiFiTusk();
@@ -510,9 +524,9 @@ public class FullscreenActivity extends AppCompatActivity {
             isOpen=true;
           byte[][] test=new byte[][]{
           //          0 1 2 3 4 5 6 7 8 9
-                    {50,4,0,2,0,0,0,0,0,0},
+                    {50,4,0,2,0,0,0,0,1,0},
                     {50,1,0,3,0,0,0,0,0,0},
-                    {50,2,0,4,0,0,0,0,0,0},
+                    {50,2,0,4,0,0,0,0,1,0},
                    /* {50,4,0,0,0,0,0,1,0,0},
                     {50,5,0,0,0,9,0,0,0,0},
                     {50,6,4,1,0,0,0,2,0,0},
@@ -770,7 +784,7 @@ public class FullscreenActivity extends AppCompatActivity {
             {
                 vS.append(sBuf.elementAt(i)+'\n');
             }
-            fragText.SetText(vS.toString());
+            fragText.setText(vS.toString());
         }
         void priorityPause(){
             if(QueuePlayer.isPlaying()) {

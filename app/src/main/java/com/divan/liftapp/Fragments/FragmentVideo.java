@@ -38,7 +38,7 @@ public class FragmentVideo extends MyFragment {
 
             video = (VideoView) v.findViewById(R.id.videoFragment);
 
-            if (videos.size() > 0) {
+            if (videos.size() > 0&&video != null) {
                 video.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
                     public void onCompletion(MediaPlayer mp) {
@@ -69,7 +69,7 @@ public class FragmentVideo extends MyFragment {
     @Override
     public void onPause() {
         super.onDetach();
-        if(videos.size() > 0) {
+        if(videos.size() > 0&&video != null) {
             video.pause();
             curPos = video.getCurrentPosition();
         }
@@ -79,7 +79,7 @@ public class FragmentVideo extends MyFragment {
     @Override
     public void onStart() {
         super.onStart();
-        if(videos.size() > 0) {
+        if(videos.size() > 0&&video != null) {
             video.setVideoPath(videos.get(nVideo % videos.size()));
             video.seekTo(curPos);
             if(lastSignal==2)
@@ -93,7 +93,7 @@ public class FragmentVideo extends MyFragment {
     @Override
     public void onUpdate(int floor, final int signal) {
         lastSignal=signal;
-        if (videos.size() > 0) {
+        if (videos.size() > 0&&video != null) {
             if (video.isPlaying()&&signal == 1) {
                 video.pause();
             }
