@@ -126,26 +126,28 @@ public class FullscreenActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-//        StartAsync();
-
     }
 
     private boolean isContainSdCard(){
-        String sdPath=Setting.getStoragePath();
-        if(sdPath.contains("extsd"))
-            return true;
-        else{
-            FragmentManager fragmentManager = getFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager
-                    .beginTransaction();
-            fragmentTransaction.replace(R.id.fragment,fragText);
-            fragmentTransaction.commit();
-            fragText.onUpdate(0,5);//without SD card
-            return false;
+        File root=Environment.getExternalStorageDirectory().getParentFile();
+        for(File f : root.listFiles()) {
+            if (f.getAbsolutePath().contains("extsd")) {
+                if (f.getTotalSpace() > 0)
+                    return true;
+            }
         }
+        return false;
+    }
+    private void setTextFragmentAsWithoutSD(){
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager
+                .beginTransaction();
+        fragmentTransaction.replace(R.id.fragment,fragText);
+        fragmentTransaction.commit();
+        fragText.onUpdate(0,5);//without SD card
     }
     private void StartAsync(){
-        if(!isAsyn&&isContainSdCard()) {
+        if(!isAsyn) {
             main = new Main();
             main.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             RunWiFiTusk();
@@ -156,6 +158,11 @@ public class FullscreenActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         getWindow().getDecorView().setSystemUiVisibility(UiSetting);
+        if(!isContainSdCard())
+        {
+            setTextFragmentAsWithoutSD();
+            return;
+        }
         setting.StartRead();
         SetSetting();
         StartAsync();
