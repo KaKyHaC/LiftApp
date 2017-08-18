@@ -33,10 +33,10 @@ public class FragmentText extends MyFragment {
         onUpdate(0,lastSignal);
     }
 
-    public void SetText(String text){
+    public void setText(String text){
         if(tv!=null){
             tv.setText(text);
-            tv.setTextSize(20);
+           // tv.setTextSize(20);
         }
     }
 
@@ -51,19 +51,13 @@ public class FragmentText extends MyFragment {
     @Override
     public void onUpdate(int floor, int signal) {
         lastSignal=signal;
-        if (tv != null) {
-            if (signal == 1) {
-                tv.setText("Пожар");
-            }
-            else if (signal == 2) {
-                tv.setText("Перегруз");
-            }
-            else if(signal==3){
-                tv.setText("Нет связи со станцией");
-            }
-            else if(signal==4){
-                tv.setText("Нет связи с контроллером");
-            }
+        switch (signal){
+            case 1:setText("Пожар");break;
+            case 2:setText("Перегруз");break;
+            case 3:setText("Нет связи со станцией");break;
+            case 4:setText("Нет связи с контроллером");break;
+            case 5:setText("Отсутствует SD-карта." +
+                    " Вставте оригинальную SD-карту и перегрузитесь");break;
         }
     }
 }

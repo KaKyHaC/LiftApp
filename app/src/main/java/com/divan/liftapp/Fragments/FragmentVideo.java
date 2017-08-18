@@ -16,6 +16,7 @@ import android.widget.VideoView;
 import com.divan.liftapp.R;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -23,7 +24,7 @@ import java.util.List;
  */
 public class FragmentVideo extends MyFragment {
     VideoView video;
-    List<String> videos;
+    List<String> videos=new LinkedList<>();
     int nVideo = 0;
     boolean isPause=false;
     boolean isFirst=true;
@@ -37,7 +38,7 @@ public class FragmentVideo extends MyFragment {
 
             video = (VideoView) v.findViewById(R.id.videoFragment);
 
-            if (videos.size() != 0) {
+            if (videos.size() > 0&&video != null) {
                 video.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
                     public void onCompletion(MediaPlayer mp) {
@@ -68,7 +69,7 @@ public class FragmentVideo extends MyFragment {
     @Override
     public void onPause() {
         super.onDetach();
-        if(video!=null) {
+        if(videos.size() > 0&&video != null) {
             video.pause();
             curPos = video.getCurrentPosition();
         }
@@ -78,10 +79,10 @@ public class FragmentVideo extends MyFragment {
     @Override
     public void onStart() {
         super.onStart();
-        if(video!=null) {
+        if(videos.size() > 0&&video != null) {
             video.setVideoPath(videos.get(nVideo % videos.size()));
             video.seekTo(curPos);
-            if(lastSignal==1)
+            if(lastSignal==2)
                  video.start();
 
         }
@@ -92,14 +93,14 @@ public class FragmentVideo extends MyFragment {
     @Override
     public void onUpdate(int floor, final int signal) {
         lastSignal=signal;
-        if (video != null) {
-            if (video.isPlaying()&&signal == 0) {
+        if (videos.size() > 0&&video != null) {
+            if (video.isPlaying()&&signal == 1) {
                 video.pause();
             }
-             if (!video.isPlaying()&&signal==1) {
+             if (!video.isPlaying()&&signal==2) {
                 video.start();
             }
-            if(signal==2){
+            if(signal==3){
                 curPos=0;
                 video.setVideoPath(videos.get(++nVideo % videos.size()));
                 video.start();

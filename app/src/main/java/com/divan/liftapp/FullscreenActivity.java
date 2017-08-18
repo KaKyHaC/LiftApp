@@ -126,10 +126,26 @@ public class FullscreenActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-//        StartAsync();
-
     }
 
+    private boolean isContainSdCard(){
+        File root=Environment.getExternalStorageDirectory().getParentFile();
+        for(File f : root.listFiles()) {
+            if (f.getAbsolutePath().contains("extsd")) {
+                if (f.getTotalSpace() > 0)
+                    return true;
+            }
+        }
+        return false;
+    }
+    private void setTextFragmentAsWithoutSD(){
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager
+                .beginTransaction();
+        fragmentTransaction.replace(R.id.fragment,fragText);
+        fragmentTransaction.commit();
+        fragText.onUpdate(0,5);//without SD card
+    }
     private void StartAsync(){
         if(!isAsyn) {
             main = new Main();
@@ -142,6 +158,11 @@ public class FullscreenActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         getWindow().getDecorView().setSystemUiVisibility(UiSetting);
+        if(!isContainSdCard())
+        {
+            setTextFragmentAsWithoutSD();
+            return;
+        }
         setting.StartRead();
         SetSetting();
         StartAsync();
@@ -510,17 +531,17 @@ public class FullscreenActivity extends AppCompatActivity {
             isOpen=true;
           byte[][] test=new byte[][]{
           //          0 1 2 3 4 5 6 7 8 9
-                    {50,1,1,0,0,0,0,0,0,0},
-                    {50,2,2,0,0,0,0,0,0,0},
-                    {50,3,2,0,0,1,0,1,1,0},
-                    {50,4,0,0,0,0,0,1,0,0},
+                    {50,4,0,2,0,0,0,0,1,0},
+                    {50,1,0,3,0,0,0,0,0,0},
+                    {50,2,0,4,0,0,0,0,1,0},
+                   /* {50,4,0,0,0,0,0,1,0,0},
                     {50,5,0,0,0,9,0,0,0,0},
                     {50,6,4,1,0,0,0,2,0,0},
                     {50,7,5,0,0,4,0,2,1,0},
                     {50,8,0,0,0,9,0,0,0,0},
                     {50,9,6,0,0,9,0,1,0,0},
-                    {50,(byte)231,0,4,0,0,0,0,0,0},
-                    {50,8,0,5,0,0,0,3,1,0}};
+                    {50,(byte)231,0,4,0,0,0,0,0,0},*/
+                    {50,3,0,3,0,0,0,0,0,0}};
             int index=0;
             while(true){
                 if (isCancelled()) return null;
@@ -738,7 +759,7 @@ public class FullscreenActivity extends AppCompatActivity {
             }
             else if(fragment==Fragment.Video&&myFrag!=fragVideo)
             {
-                if(videos.size()>0) {
+                if(videos.size()>0||true) {
                     fragmentTransaction.replace(R.id.fragment, fragVideo);
                     myFrag = fragVideo;
                 }
@@ -770,7 +791,7 @@ public class FullscreenActivity extends AppCompatActivity {
             {
                 vS.append(sBuf.elementAt(i)+'\n');
             }
-            fragText.SetText(vS.toString());
+            fragText.setText(vS.toString());
         }
         void priorityPause(){
             if(QueuePlayer.isPlaying()) {
