@@ -5,7 +5,7 @@ package com.example.universalliftappsetting.settingmenu;
  */
 
 public class NumberedSetting extends SettingItem {
-    public enum NumberedType{Text,Volume,Buffer,BaudRate};
+    public enum NumberedType{Text,Volume,Buffer,BaudRate,Capacity};
     public static int [] BAUDRATE={2400,9600,14400,19200,38400,57600,115200,230400};
     public int value;
     private int bufValue;
@@ -70,6 +70,9 @@ public class NumberedSetting extends SettingItem {
     public String getValue() {
         if(type== NumberedType.BaudRate)
             return String.valueOf(BAUDRATE[bufValue%BAUDRATE.length]);
+        else if(type==NumberedType.Capacity){
+            return String.valueOf(bufValue)+'0';
+        }
         return String.valueOf(bufValue)+((type== NumberedType.Volume)?"%":"");
     }
 
