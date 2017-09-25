@@ -130,7 +130,10 @@ public class FullscreenActivity extends AppCompatActivity {
 
     private boolean isContainSdCard(){
         File root=Environment.getExternalStorageDirectory().getParentFile();
-        for(File f : root.listFiles()) {
+        File[] files=root.listFiles();
+        if(files==null)
+            return false;
+        for(File f : files) {
             if (f.getAbsolutePath().contains("extsd")) {
                 if (f.getTotalSpace() > 0)
                     return true;
@@ -323,7 +326,7 @@ public class FullscreenActivity extends AppCompatActivity {
         massage.setTextSize(setting.sizeTextMassage.value);
         info.setTextSize(setting.sizeTextInfo.value);
         number.setTextSize(setting.sizeNumber.value);
-        SetTextViewMassage(info,setting.folderInformation.toString(),"information.txt");
+//        SetTextViewMassage(info,setting.folderInformation.toString(),"information.txt");
 
         int color=(int)Long.parseLong(setting.colorText.toString(),16);
         date.setTextColor(color);
@@ -349,7 +352,10 @@ public class FullscreenActivity extends AppCompatActivity {
         if(curFrag!=null)
             curFrag.onUpdate(0,0);
 
-
+        //add 25.09.2017
+        info.setText("Производитель:РФ\n" +
+                setting.capacityMass+"кг, "+
+                setting.capacityPeople+" пасс.");
 
     }
     private void SetBackGraunds(int color){

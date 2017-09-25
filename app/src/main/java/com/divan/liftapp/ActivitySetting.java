@@ -97,7 +97,7 @@ public class ActivitySetting extends AppCompatActivity implements SpecialSetting
         settingItems.add(setting.sizeTextMassage);
         settingItems.add(setting.sizeTextSetting);
         settingItems.add(setting.sizeOfBuffer);
-        settingItems.add(setting.indexBAUDRATE);
+//        settingItems.add(setting.indexBAUDRATE);
         settingItems.add(setting.volumeDay);
         settingItems.add(setting.volumeNight);
         settingItems.add(setting.accessMusic);
@@ -107,10 +107,15 @@ public class ActivitySetting extends AppCompatActivity implements SpecialSetting
         settingItems.add(setting.day);
         settingItems.add(setting.hour);
         settingItems.add(setting.min);
+        //add 25.09.2017
+        settingItems.add(setting.capacityMass);
+        settingItems.add(setting.capacityPeople);
+
+
 
         settingItems.add(new SpecialSetting(SpecialSetting.TypeSpecialItem.STATION,this,STATION));
         settingItems.add(new SpecialSetting(SpecialSetting.TypeSpecialItem.DEFAULT,this,DEFAULT));
-        settingItems.add(new SpecialSetting(SpecialSetting.TypeSpecialItem.INSTRUCTION,this,"Инструкция"));
+//        settingItems.add(new SpecialSetting(SpecialSetting.TypeSpecialItem.INSTRUCTION,this,"Инструкция"));
         settingItems.add(new SpecialSetting(SpecialSetting.TypeSpecialItem.EXIT,this,EXIT));
 
 

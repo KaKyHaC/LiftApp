@@ -91,6 +91,7 @@
                         android:layout_margin="2dp"
                         android:id="@+id/information"
                         android:textAlignment="textStart"
+                        android:layout_gravity="start"
                         android:textSize="20sp" />
 
 
@@ -159,6 +160,7 @@
                 android:scrollHorizontally="true"
                 android:singleLine="true"
                 android:textAlignment="textStart"
+                android:layout_gravity="start"
                 android:textSize="20sp" />
         </LinearLayout>
     </FrameLayout>

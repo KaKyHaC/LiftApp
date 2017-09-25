@@ -40,6 +40,8 @@ public class Setting {
     public NumberedSetting indexCurStation;
     public StringSetting typeDate;
 
+    public NumberedSetting capacityPeople,capacityMass;
+
 
     public void InitDefault(){
         folderImage=new StringSetting("Папка с Изображением","Image");
@@ -84,6 +86,9 @@ public class Setting {
         day=new DateSetting("День", DateSetting.TypeDate.day);
         hour=new DateSetting("Час", DateSetting.TypeDate.hour);
         min=new DateSetting("Минуты", DateSetting.TypeDate.min);
+
+        capacityPeople=new NumberedSetting(5,"Вместимость ,человек");
+        capacityMass=new NumberedSetting(40,"Грузоподъемность ,кг", NumberedSetting.NumberedType.Capacity);
 
         DateSetting.deltaTime=new Long(0);
 
@@ -152,6 +157,9 @@ public class Setting {
             writeItem(accessMusic,bw);
             writeItem(year,bw);
 
+            writeItem(capacityMass,bw);
+            writeItem(capacityPeople,bw);
+
         }catch (IOException e){}
     }
     private void writeItem(SettingItem item, BufferedWriter bw){
@@ -204,6 +212,9 @@ public class Setting {
         SetItemValue(typeDate,strings);
 
         SetItemValue(year,strings);
+
+        SetItemValue(capacityMass,strings);
+        SetItemValue(capacityPeople,strings);
     }
 
     private Vector<String> readAllFromFile(File file){
@@ -257,6 +268,8 @@ public class Setting {
     }
 
     private void SetItemValue(SettingItem item,Vector<String> strings){
+        if(item==null)
+            return;
         String val=findValueByName(item.getName(),strings);
         if(val!=null)
             item.setValue(val);
