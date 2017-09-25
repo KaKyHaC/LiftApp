@@ -285,9 +285,7 @@ public class FullscreenActivity extends AppCompatActivity {
         frameLayout=(FrameLayout)findViewById(R.id.mainLayout);
 
         String infoSt="Производитель : РФ \n" +
-                "400кг 5 пасс. \n" +
-                "№0000000001 2016г \n" +
-                "Сделано в России";
+                "default text";
         info.setText(infoSt);
 
 
@@ -353,9 +351,11 @@ public class FullscreenActivity extends AppCompatActivity {
             curFrag.onUpdate(0,0);
 
         //add 25.09.2017
-        info.setText("Производитель:РФ\n" +
-                setting.capacityMass+"кг, "+
-                setting.capacityPeople+" пасс.");
+        StringBuilder sb=new StringBuilder();
+        sb.append("Производитель:РФ\n");
+        sb.append(setting.capacityMass.getValue()+" кг, ");
+        sb.append(setting.capacityPeople.getValue()+" пасс.");
+        info.setText(sb.toString());
 
     }
     private void SetBackGraunds(int color){
