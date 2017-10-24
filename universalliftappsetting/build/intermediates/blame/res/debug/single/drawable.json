@@ -1,11 +1,11 @@
 [
     {
-        "merged": "D:\\Android\\AndroidProject\\LIftApp\\LiftApp\\universalliftappsetting\\build\\intermediates\\res\\merged\\debug\\drawable\\abc_seekbar_track_material.xml",
-        "source": "C:\\Users\\Dima\\.android\\build-cache\\290b29fcdb1d28ceeecd20f25b4894de3b475424\\output\\res\\drawable\\abc_seekbar_track_material.xml"
-    },
-    {
         "merged": "D:\\Android\\AndroidProject\\LIftApp\\LiftApp\\universalliftappsetting\\build\\intermediates\\res\\merged\\debug\\drawable\\abc_textfield_search_material.xml",
         "source": "C:\\Users\\Dima\\.android\\build-cache\\290b29fcdb1d28ceeecd20f25b4894de3b475424\\output\\res\\drawable\\abc_textfield_search_material.xml"
+    },
+    {
+        "merged": "D:\\Android\\AndroidProject\\LIftApp\\LiftApp\\universalliftappsetting\\build\\intermediates\\res\\merged\\debug\\drawable\\abc_seekbar_track_material.xml",
+        "source": "C:\\Users\\Dima\\.android\\build-cache\\290b29fcdb1d28ceeecd20f25b4894de3b475424\\output\\res\\drawable\\abc_seekbar_track_material.xml"
     },
     {
         "merged": "D:\\Android\\AndroidProject\\LIftApp\\LiftApp\\universalliftappsetting\\build\\intermediates\\res\\merged\\debug\\drawable\\abc_seekbar_thumb_material.xml",
