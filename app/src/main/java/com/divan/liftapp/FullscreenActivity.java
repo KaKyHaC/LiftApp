@@ -33,6 +33,7 @@ import com.divan.liftapp.Fragments.FragmentImage;
 import com.divan.liftapp.Fragments.FragmentText;
 import com.divan.liftapp.Fragments.FragmentVideo;
 import com.divan.liftapp.Fragments.MyFragment;
+import com.divan.liftapp.Utils.DisconnectCounter;
 import com.divan.liftapp.Wifi.WiFiDirectActivity;
 
 import com.example.universalliftappsetting.Setting;
@@ -127,6 +128,63 @@ public class FullscreenActivity extends AppCompatActivity {
             }
         });
     }
+    private void Initialaze() {
+//        main=new Main();
+//        wiFiDirectActivity=new WiFiDirectActivity(this);
+
+        mVisible = true;
+        mControlsView = findViewById(R.id.fullscreen_content_controls);
+        mContentView = findViewById(R.id.fullscreen_content);
+
+        date=(TextView)findViewById(R.id.date);
+        massage=(TextView)findViewById(R.id.massage);
+        info=(TextView)findViewById(R.id.information);
+        number=(TextView)findViewById(R.id.number);
+        mTimer = new Timer();
+        mMyTimerTask = new MyTimerTask();
+        imageArrow=(ImageView)findViewById(R.id.imageArrow);
+        fire=(ImageView)findViewById(R.id.fire);
+        ring=(ImageView)findViewById(R.id.ring);
+
+        drawableUp=getResources().getDrawable(R.drawable.up);
+        drawableDown=getResources().getDrawable(R.drawable.down);
+        drawableRing=getResources().getDrawable(R.drawable.ring);
+
+        frameLayout=(FrameLayout)findViewById(R.id.mainLayout);
+
+        String infoSt="Производитель : РФ \n" +
+                "default text";
+        info.setText(infoSt);
+
+
+        /*StringBuilder sb=new StringBuilder(massage.getText());
+        for(int i=0;i<100;i++)
+            sb.append("  ");
+        sb.append(massage.getText());
+        for(int i=0;i<100;i++)
+            sb.append("  ");
+        //massage.setText(sb.toString());*/
+
+        massage.setSelected(true);
+
+        musicPlayer = new MediaPlayer();
+        soundPlayer  = new QueuePlayer(new MediaPlayer());
+        specialSoundPlayer = new QueuePlayer(new MediaPlayer());
+
+        fragVideo= new FragmentVideo();
+        fragText=new FragmentText();
+        fragImage=new FragmentImage();
+
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager
+                .beginTransaction();
+
+        //TODO wtf 2 add
+        fragmentTransaction.add(R.id.fragment,fragImage);
+//        fragmentTransaction.add(R.id.fragment, fragText);
+
+        fragmentTransaction.commit();
+    }
 
     private boolean isContainSdCard(){
         File root=Environment.getExternalStorageDirectory().getParentFile();
@@ -149,6 +207,7 @@ public class FullscreenActivity extends AppCompatActivity {
         fragmentTransaction.commit();
         fragText.onUpdate(0,5);//without SD card
     }
+
     private void StartAsync(){
         if(!isAsyn) {
             main = new Main();
@@ -157,6 +216,7 @@ public class FullscreenActivity extends AppCompatActivity {
             isAsyn = true;
         }
     }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -180,6 +240,26 @@ public class FullscreenActivity extends AppCompatActivity {
         if(wiFiDirectActivity!=null)
             wiFiDirectActivity.cancel(false);
         isAsyn=false;
+    }
+
+    private boolean isRebooting=false;
+    private void TotalReboot(final long sleepTime){
+        if(!isRebooting){
+            isRebooting=true;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    onPause();
+                    try {
+                        Thread.sleep(sleepTime);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    onResume();
+                    isRebooting=false;
+                }
+            }).start();
+        }
     }
 
     private void PlayMusic(String fileName){
@@ -260,63 +340,7 @@ public class FullscreenActivity extends AppCompatActivity {
             decorView.setSystemUiVisibility(uiOptions);
         }
     }
-    private void Initialaze() {
-//        main=new Main();
-//        wiFiDirectActivity=new WiFiDirectActivity(this);
 
-        mVisible = true;
-        mControlsView = findViewById(R.id.fullscreen_content_controls);
-        mContentView = findViewById(R.id.fullscreen_content);
-
-        date=(TextView)findViewById(R.id.date);
-        massage=(TextView)findViewById(R.id.massage);
-        info=(TextView)findViewById(R.id.information);
-        number=(TextView)findViewById(R.id.number);
-        mTimer = new Timer();
-        mMyTimerTask = new MyTimerTask();
-        imageArrow=(ImageView)findViewById(R.id.imageArrow);
-        fire=(ImageView)findViewById(R.id.fire);
-        ring=(ImageView)findViewById(R.id.ring);
-
-        drawableUp=getResources().getDrawable(R.drawable.up);
-        drawableDown=getResources().getDrawable(R.drawable.down);
-        drawableRing=getResources().getDrawable(R.drawable.ring);
-
-        frameLayout=(FrameLayout)findViewById(R.id.mainLayout);
-
-        String infoSt="Производитель : РФ \n" +
-                "default text";
-        info.setText(infoSt);
-
-
-        /*StringBuilder sb=new StringBuilder(massage.getText());
-        for(int i=0;i<100;i++)
-            sb.append("  ");
-        sb.append(massage.getText());
-        for(int i=0;i<100;i++)
-            sb.append("  ");
-        //massage.setText(sb.toString());*/
-
-        massage.setSelected(true);
-
-        musicPlayer = new MediaPlayer();
-        soundPlayer  = new QueuePlayer(new MediaPlayer());
-        specialSoundPlayer = new QueuePlayer(new MediaPlayer());
-
-        fragVideo= new FragmentVideo();
-        fragText=new FragmentText();
-        fragImage=new FragmentImage();
-
-        FragmentManager fragmentManager = getFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager
-                .beginTransaction();
-
-        //TODO wtf 2 add
-        fragmentTransaction.add(R.id.fragment,fragImage);
-//        fragmentTransaction.add(R.id.fragment, fragText);
-
-        fragmentTransaction.commit();
-    }
 
     private void SetSetting() {
         pathSDcard=setting.pathSDcard;
@@ -443,6 +467,8 @@ public class FullscreenActivity extends AppCompatActivity {
         int musicSeek=0;
         boolean isOpen=false;
         boolean isMusicPlayed=false;
+        private DisconnectCounter disconnectCounter=new DisconnectCounter(10);
+
         public Main(){
             super();
         }
@@ -575,6 +601,14 @@ public class FullscreenActivity extends AppCompatActivity {
                     Media(b[3]);
                     MucisPalyer(b[7]);
                     NextBackGraund(b[8]);
+
+                    disconnectCounter.reSet();
+                }else{
+                    if(disconnectCounter.isDisconnected()) {
+                        Toast.makeText(context, "Reboot", Toast.LENGTH_SHORT).show();
+                        TotalReboot(1000);
+                        disconnectCounter.reSet();
+                    }
                 }
             }
             else
