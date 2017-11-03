@@ -34,6 +34,7 @@ import com.divan.liftapp.Fragments.FragmentText;
 import com.divan.liftapp.Fragments.FragmentVideo;
 import com.divan.liftapp.Fragments.MyFragment;
 import com.divan.liftapp.Utils.DisconnectCounter;
+import com.divan.liftapp.Utils.LogToFile;
 import com.divan.liftapp.Wifi.WiFiDirectActivity;
 
 import com.example.universalliftappsetting.Setting;
@@ -468,6 +469,7 @@ public class FullscreenActivity extends AppCompatActivity {
         boolean isOpen=false;
         boolean isMusicPlayed=false;
         private DisconnectCounter disconnectCounter=new DisconnectCounter(10);
+        LogToFile logToFile;
 
         public Main(){
             super();
@@ -509,6 +511,12 @@ public class FullscreenActivity extends AppCompatActivity {
                 musicPlayer.pause();
                 // musicPlayer.start();
             }
+
+            try{
+                logToFile=new LogToFile(PathToLiftApp+"log.txt");
+            }catch (Exception e){
+                Toast.makeText(context,e.toString(),Toast.LENGTH_LONG).show();
+            }
         }
         public void setFiles(){
             synchronized (massage) {
@@ -536,25 +544,31 @@ public class FullscreenActivity extends AppCompatActivity {
             byte[] buf = new byte[setting.sizeOfBuffer.value];//work while size=64
 
             while(true){
-                if (isCancelled()) {
-                    ftDriver.end();
-                    return null;
-                }
-                System.gc();
-                //isOpen=ftDriver.isConnection();
-                //isOpen=ftDriver.begin(FTDriver.BAUD9600);// work while it commented (2d branch)
-                if(isOpen) {
-                    ftDriver.readInMy(buf);// work while read(buf)
+                try {
+                    if (isCancelled()) {
+                        ftDriver.end();
+                        return null;
+                    }
+                    System.gc();
                     //isOpen=ftDriver.isConnection();
-                }
-                else//comment it (2d branch)
-                {
-                    isOpen=ftDriver.begin(NumberedSetting.BAUDRATE[setting.indexBAUDRATE.value%NumberedSetting.BAUDRATE.length],setting.sizeOfBuffer.value);
-                }
-                publishProgress(buf);
-                try{
+                    //isOpen=ftDriver.begin(FTDriver.BAUD9600);// work while it commented (2d branch)
+                    if (isOpen) {
+                        ftDriver.readInMy(buf);// work while read(buf)
+                        //isOpen=ftDriver.isConnection();
+                    } else//comment it (2d branch)
+                    {
+                        isOpen = ftDriver.begin(NumberedSetting.BAUDRATE[setting.indexBAUDRATE.value % NumberedSetting.BAUDRATE.length], setting.sizeOfBuffer.value);
+                    }
+                    publishProgress(buf);
+
                     Thread.sleep(BAUDRATE);
-                }catch (InterruptedException e){}
+                }catch (Exception e){
+                    try {
+                        logToFile.Log(e.toString());
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
+                    }
+                }
             }
         }
         private Void testProcess(){
@@ -587,37 +601,43 @@ public class FullscreenActivity extends AppCompatActivity {
         @Override
         protected void onProgressUpdate(byte[]... values) {
             super.onProgressUpdate(values);
-            byte [] b=values[0];
-            if(isOpen) {
-                if(b[0]==50) {
-                    SpecialThings(b[PosSpecialThings]);
-                    // Status(b[0]);
-                    Flours(b[1]);
-                    Images(b[2]);
-                    //viewMassage(b);
-                    NamedSound(b[4]);
-                    Sounds(b[5]);
-                    SpecialSound(b[6]);
-                    Media(b[3]);
-                    MucisPalyer(b[7]);
-                    NextBackGraund(b[8]);
+            try {
+                byte[] b = values[0];
+                if (isOpen) {
+                    if (b[0] == 50) {
+                        SpecialThings(b[PosSpecialThings]);
+                        // Status(b[0]);
+                        Flours(b[1]);
+                        Images(b[2]);
+                        //viewMassage(b);
+                        NamedSound(b[4]);
+                        Sounds(b[5]);
+                        SpecialSound(b[6]);
+                        Media(b[3]);
+                        MucisPalyer(b[7]);
+                        NextBackGraund(b[8]);
 
-                    disconnectCounter.reSet();
-                }else{
-                    if(disconnectCounter.isDisconnected()) {
-                        Toast.makeText(context, "Reboot", Toast.LENGTH_SHORT).show();
-                        TotalReboot(1000);
                         disconnectCounter.reSet();
+                    } else {
+                        if (disconnectCounter.isDisconnected()) {
+                            Toast.makeText(context, "Reboot", Toast.LENGTH_SHORT).show();
+                            TotalReboot(1000);
+                            disconnectCounter.reSet();
+                        }
                     }
+                } else {
+                    number.setText("-");
+                    Images((byte) 7);
+                    Media((byte) 8);
+                }
+                FullScreencall();
+            }catch (Exception e){
+                try {
+                    logToFile.Log(e.toString());
+                } catch (Exception e1) {
+                    e1.printStackTrace();
                 }
             }
-            else
-            {
-                number.setText("-");
-                Images((byte)7);
-                Media((byte)8);
-            }
-            FullScreencall();
         }
 
         void Status(byte b){
