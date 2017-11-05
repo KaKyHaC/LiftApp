@@ -1,4 +1,4 @@
-package com.divan.liftapp;
+package com.divan.liftapp.Utils;
 
 import android.widget.ArrayAdapter;
 import android.widget.TextView;

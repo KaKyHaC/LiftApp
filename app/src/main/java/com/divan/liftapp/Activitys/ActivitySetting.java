@@ -1,4 +1,4 @@
-package com.divan.liftapp;
+package com.divan.liftapp.Activitys;
 
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -19,6 +19,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.divan.liftapp.Activitys.FullscreenActivity;
+import com.divan.liftapp.FTDriver;
+import com.divan.liftapp.R;
 import com.example.universalliftappsetting.settingmenu.SpecialSetting;
 import com.example.universalliftappsetting.Setting;
 
@@ -26,14 +29,13 @@ import com.example.universalliftappsetting.Setting;
 import java.io.File;
 import java.util.Vector;
 
-import static com.divan.liftapp.FullscreenActivity.BAUDRATE;
-import static com.divan.liftapp.FullscreenActivity.PosSetStation;
+import static com.divan.liftapp.Activitys.FullscreenActivity.BAUDRATE;
+import static com.divan.liftapp.Activitys.FullscreenActivity.PosSetStation;
 import static com.example.universalliftappsetting.settingmenu.SpecialSetting.stationNames;
 
 import com.example.universalliftappsetting.settingmenu.DateSetting;
 import com.example.universalliftappsetting.settingmenu.NumberedSetting;
 import com.example.universalliftappsetting.settingmenu.SettingItem;
-import com.example.universalliftappsetting.settingmenu.SpecialSetting;
 
 public class ActivitySetting extends AppCompatActivity implements SpecialSetting.SpecialActivity {
     public static final int UiSetting= View.SYSTEM_UI_FLAG_FULLSCREEN|View.SYSTEM_UI_FLAG_HIDE_NAVIGATION| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;

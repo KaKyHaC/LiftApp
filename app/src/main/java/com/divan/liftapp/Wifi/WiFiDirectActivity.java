@@ -16,11 +16,9 @@
 
 package com.divan.liftapp.Wifi;
 
-import android.bluetooth.BluetoothClass;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
-import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
@@ -29,15 +27,10 @@ import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.net.wifi.p2p.WifiP2pManager.ChannelListener;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.widget.Toast;
 
-import com.divan.liftapp.FullscreenActivity;
-import com.divan.liftapp.R;
+import com.divan.liftapp.Activitys.FullscreenActivity;
 import com.divan.liftapp.Wifi.DeviceList.DeviceActionListener;
 
-import java.lang.reflect.Method;
 import java.util.List;
 
 /**

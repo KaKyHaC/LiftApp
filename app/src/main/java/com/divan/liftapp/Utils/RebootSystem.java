@@ -1,10 +1,8 @@
 package com.divan.liftapp.Utils;
 
-import android.app.Activity;
-import android.app.Application;
-import android.content.Context;
+import android.content.Intent;
 
-import com.divan.liftapp.FullscreenActivity;
+import com.divan.liftapp.Activitys.FullscreenActivity;
 
 /**
  * Created by Dima on 05.11.2017.
@@ -18,8 +16,13 @@ public class RebootSystem {
         this.app = app;
     }
 
-    public void start(){
+    public void startLaunchService(){
+        if(!isRebooting) {
+            isRebooting = true;
 
+            app.startService(new Intent(app, LaunchLiftAppService.class));
+            app.finish();
+        }
     }
     public void startAsyncPauseResume(final long delay){
         if(!isRebooting) {

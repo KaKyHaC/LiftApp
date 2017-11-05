@@ -22,11 +22,9 @@ import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.divan.liftapp.FullscreenActivity;
-import com.divan.liftapp.R;
+import com.divan.liftapp.Activitys.FullscreenActivity;
 import com.example.universalliftappsetting.FileTransaction;
 import com.example.universalliftappsetting.Setting;
 

@@ -9,8 +9,8 @@ import android.widget.TextView;
 import com.divan.liftapp.R;
 import com.example.universalliftappsetting.Setting;
 
-import static com.divan.liftapp.FullscreenActivity.SettingFolder;
-import static com.divan.liftapp.FullscreenActivity.settingFile;
+import static com.divan.liftapp.Activitys.FullscreenActivity.SettingFolder;
+import static com.divan.liftapp.Activitys.FullscreenActivity.settingFile;
 
 
 public class FragmentText extends MyFragment {

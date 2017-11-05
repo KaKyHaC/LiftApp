@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/im1"
     android:id="@+id/mainLayout"
-    tools:context="com.divan.liftapp.FullscreenActivity">
+    tools:context="com.divan.liftapp.Activitys.FullscreenActivity">
 
 
     <!-- The primary full-screen view. This can be replaced with whatever view

@@ -1,4 +1,4 @@
-package com.divan.liftapp;
+package com.divan.liftapp.Activitys;
 
 import android.content.Context;
 import android.content.pm.ActivityInfo;
@@ -9,6 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import com.divan.liftapp.Activitys.FullscreenActivity;
+import com.divan.liftapp.FTDriver;
+import com.divan.liftapp.R;
 import com.example.universalliftappsetting.Setting;
 import com.example.universalliftappsetting.settingmenu.NumberedSetting;
 
@@ -18,10 +21,10 @@ import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static com.divan.liftapp.FullscreenActivity.BAUDRATE;
-import static com.divan.liftapp.FullscreenActivity.SIZEOFMASSAGE;
-import static com.divan.liftapp.FullscreenActivity.UiSetting;
-import static com.divan.liftapp.FullscreenActivity.ValNormal;
+import static com.divan.liftapp.Activitys.FullscreenActivity.BAUDRATE;
+import static com.divan.liftapp.Activitys.FullscreenActivity.SIZEOFMASSAGE;
+import static com.divan.liftapp.Activitys.FullscreenActivity.UiSetting;
+import static com.divan.liftapp.Activitys.FullscreenActivity.ValNormal;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
