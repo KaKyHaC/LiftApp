@@ -34,6 +34,7 @@ import com.divan.liftapp.Fragments.FragmentText;
 import com.divan.liftapp.Fragments.FragmentVideo;
 import com.divan.liftapp.Fragments.MyFragment;
 import com.divan.liftapp.Utils.DisconnectCounter;
+import com.divan.liftapp.Utils.LaunchLiftAppService;
 import com.divan.liftapp.Utils.LogToFile;
 import com.divan.liftapp.Wifi.WiFiDirectActivity;
 
@@ -124,8 +125,9 @@ public class FullscreenActivity extends AppCompatActivity {
         ((FrameLayout)findViewById(R.id.fragment)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context,ActivitySetting.class);
-                startActivity(intent);
+                TotalReboot(1);
+//                Intent intent = new Intent(context,ActivitySetting.class);
+//                startActivity(intent);
             }
         });
     }
@@ -219,7 +221,7 @@ public class FullscreenActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         getWindow().getDecorView().setSystemUiVisibility(UiSetting);
         if(!isContainSdCard())
@@ -232,7 +234,7 @@ public class FullscreenActivity extends AppCompatActivity {
         StartAsync();
     }
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
         if(musicPlayer!=null)
             musicPlayer.pause();
@@ -247,19 +249,9 @@ public class FullscreenActivity extends AppCompatActivity {
     private void TotalReboot(final long sleepTime){
         if(!isRebooting){
             isRebooting=true;
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    onPause();
-                    try{
-                        Thread.sleep(sleepTime);
-                    }catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    onResume();
-                    isRebooting=false;
-                }
-            }).start();
+//
+            startService(new Intent(this, LaunchLiftAppService.class));
+            finish();
         }
     }
 

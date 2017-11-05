@@ -9,14 +9,19 @@ public class LaunchLiftAppService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        try {
-            Thread.sleep(sleepTime);
-            Intent intent1=new Intent();
-            intent1.setAction("android.intent.action.LiftApp");
-            intent1.addCategory(Intent.CATEGORY_DEFAULT);
-            intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent1);
-        }catch (Exception e){}
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(sleepTime);
+                    Intent intent1=new Intent();
+                    intent1.setAction("android.intent.action.LiftApp");
+                    intent1.addCategory(Intent.CATEGORY_DEFAULT);
+                    intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent1);
+                }catch (Exception e){}
+            }
+        }).start();
         return super.onStartCommand(intent, flags, startId);
     }
 
