@@ -3,7 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.divan.liftapp">
 
-    <permission android:name="android.hardware.usb.host"></permission>
+    <uses-sdk android:minSdkVersion="16" />
+
+    <permission android:name="android.hardware.usb.host" />
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -15,8 +17,6 @@
         android:name="android.hardware.usb.host"
         android:required="true" />
 
-    <uses-sdk android:minSdkVersion="16" />
-
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
@@ -24,12 +24,10 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
-
     <!-- Google Play filtering -->
     <uses-feature
         android:name="android.hardware.wifi.direct"
         android:required="true" />
-
 
     <application
         android:allowBackup="true"
@@ -52,8 +50,9 @@
                 <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.LiftApp"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="android.intent.action.LiftApp" />
+
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
 
             <meta-data
@@ -76,14 +75,16 @@
 
         <service
             android:name=".Wifi.FileTransferService"
-            android:enabled="true">
+            android:enabled="true"></service>
 
-        </service>
+        <activity
+            android:name=".ActivitySetting"
+            android:configChanges="orientation|keyboardHidden|screenSize"></activity>
 
-        <activity android:name=".ActivitySetting"
-            android:configChanges="orientation|keyboardHidden|screenSize">
-
-        </activity>
+        <service
+            android:name=".Utils.LaunchLiftAppService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

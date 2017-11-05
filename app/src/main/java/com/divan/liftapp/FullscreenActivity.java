@@ -251,9 +251,9 @@ public class FullscreenActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     onPause();
-                    try {
+                    try{
                         Thread.sleep(sleepTime);
-                    } catch (InterruptedException e) {
+                    }catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                     onResume();
@@ -621,7 +621,7 @@ public class FullscreenActivity extends AppCompatActivity {
                     } else {
                         if (disconnectCounter.isDisconnected()) {
                             Toast.makeText(context, "Reboot", Toast.LENGTH_SHORT).show();
-                            TotalReboot(1000);
+                            TotalReboot(5000);
                             disconnectCounter.reSet();
                         }
                     }
