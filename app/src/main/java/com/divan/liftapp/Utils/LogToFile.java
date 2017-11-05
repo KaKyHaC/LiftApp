@@ -14,7 +14,6 @@ public class LogToFile {
 
     public LogToFile(String pathToFile) throws Exception {
         File f=new File(pathToFile);
-        f.mkdir();
         log=f;
     }
 

@@ -566,7 +566,7 @@ public class FullscreenActivity extends AppCompatActivity {
                     try {
                         logToFile.Log(e.toString());
                     } catch (Exception e1) {
-                        e1.printStackTrace();
+//                        e1.printStackTrace();
                     }
                 }
             }
@@ -635,7 +635,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 try {
                     logToFile.Log(e.toString());
                 } catch (Exception e1) {
-                    e1.printStackTrace();
+//                    e1.printStackTrace();
                 }
             }
         }
