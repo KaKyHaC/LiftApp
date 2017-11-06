@@ -24,6 +24,8 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
+    <uses-permission android:name="android.permission.DEVICE_POWER"/>
+    <uses-permission android:name="android.permission.REBOOT"/>
     <!-- Google Play filtering -->
     <uses-feature
         android:name="android.hardware.wifi.direct"
@@ -82,7 +84,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize"></activity>
 
         <service
-            android:name=".Utils.LaunchLiftAppService"
+            android:name=".Utils.Services.LaunchLiftAppService"
             android:enabled="true"
             android:exported="true"></service>
     </application>

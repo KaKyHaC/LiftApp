@@ -1,4 +1,4 @@
-package com.divan.liftapp.Utils;
+package com.divan.liftapp.Utils.Services;
 
 import android.app.Service;
 import android.content.Intent;
