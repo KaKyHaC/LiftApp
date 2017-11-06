@@ -119,7 +119,7 @@ public class FullscreenActivity extends MyFullscreeanActivity {
         int musicSeek=0;
         boolean isOpen=false;
         boolean isMusicPlayed=false;
-        private DisconnectCounter disconnectCounter=new DisconnectCounter(10);
+        private DisconnectCounter disconnectCounter;
         LogToFile logToFile;
 
         public Main(){
@@ -168,6 +168,8 @@ public class FullscreenActivity extends MyFullscreeanActivity {
             }catch (Exception e){
                 Toast.makeText(context,e.toString(),Toast.LENGTH_LONG).show();
             }
+
+            disconnectCounter=new DisconnectCounter(setting.countToReboot.value);
         }
         public void setFiles(){
             synchronized (massage) {

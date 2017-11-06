@@ -112,10 +112,11 @@ public class ActivitySetting extends AppCompatActivity implements SpecialSetting
         //add 25.09.2017
         settingItems.add(setting.capacityMass);
         settingItems.add(setting.capacityPeople);
+        //
+        settingItems.add(setting.countToReboot);
 
 
-
-        settingItems.add(new SpecialSetting(SpecialSetting.TypeSpecialItem.STATION,this,STATION));
+//        settingItems.add(new SpecialSetting(SpecialSetting.TypeSpecialItem.STATION,this,STATION));
         settingItems.add(new SpecialSetting(SpecialSetting.TypeSpecialItem.DEFAULT,this,DEFAULT));
 //        settingItems.add(new SpecialSetting(SpecialSetting.TypeSpecialItem.INSTRUCTION,this,"Инструкция"));
         settingItems.add(new SpecialSetting(SpecialSetting.TypeSpecialItem.EXIT,this,EXIT));
