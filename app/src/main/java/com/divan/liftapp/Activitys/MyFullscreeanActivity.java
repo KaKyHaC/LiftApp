@@ -54,8 +54,7 @@ abstract public class MyFullscreeanActivity extends AppCompatActivity {
             |View.SYSTEM_UI_FLAG_LOW_PROFILE
             | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
             | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
-    public static final int SIZEOFMASSAGE=64;
-    public static final int BAUDRATE=100,PosSpecialThings=9,ValAlert=2,ValNormal=2,PosSetStation=12;
+
     public static final  String SettingFolder="LiftApp",settingFile="setting.txt",GONG="gong.wav";
     public static String pathSDcard= Environment.getExternalStorageDirectory().getAbsolutePath();
 

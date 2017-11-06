@@ -43,6 +43,8 @@ import java.util.concurrent.TimeUnit;
 public class FullscreenActivity extends MyFullscreeanActivity {
     FullscreenActivity.Main main;
     WiFiDirectActivity wiFiDirectActivity;
+    public static final int SIZEOFMASSAGE=64;
+    public static final int BAUDRATE=100,PosSpecialThings=9,ValAlert=2,ValNormal=2,PosSetStation=12;
 
     boolean isAsyn=false;
 
