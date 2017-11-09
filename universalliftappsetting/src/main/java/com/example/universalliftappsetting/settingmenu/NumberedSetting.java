@@ -99,5 +99,6 @@ public class NumberedSetting extends SettingItem {
     @Override
     public void setValue(String value) {
         this.value=Integer.parseInt(value);
+        bufValue=this.value;
     }
 }
