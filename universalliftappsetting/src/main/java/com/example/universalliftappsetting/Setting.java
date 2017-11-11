@@ -42,6 +42,7 @@ public class Setting {
 
     public NumberedSetting capacityPeople,capacityMass;
     public NumberedSetting countToReboot;
+    public NumberedSetting typeOfReboot;
 
 
     public void InitDefault(){
@@ -92,6 +93,7 @@ public class Setting {
         capacityMass=new NumberedSetting(40,"Грузоподъемность ,кг", NumberedSetting.NumberedType.Capacity);
 
         countToReboot=new NumberedSetting(10,"Количество пустых пакетов до перезапуска");
+        typeOfReboot=new NumberedSetting(0,"Тип перезапуска");
 
         DateSetting.deltaTime=new Long(0);
 
@@ -164,6 +166,7 @@ public class Setting {
             writeItem(capacityPeople,bw);
 
             writeItem(countToReboot,bw);
+            writeItem(typeOfReboot,bw);
 
         }catch (IOException e){}
     }
@@ -222,6 +225,7 @@ public class Setting {
         SetItemValue(capacityPeople,strings);
 
         SetItemValue(countToReboot,strings);
+        SetItemValue(typeOfReboot,strings);
     }
 
     private Vector<String> readAllFromFile(File file){

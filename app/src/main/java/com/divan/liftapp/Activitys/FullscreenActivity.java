@@ -90,7 +90,12 @@ public class FullscreenActivity extends MyFullscreeanActivity {
         }
     }
     public void TotalReboot(final long sleepTime){
-        new RebootSystem(this).startReboot();
+        RebootSystem rebootSystem=new RebootSystem(this);
+        switch (setting.typeOfReboot.value%3){
+            case 0:rebootSystem.startLaunchService();break;
+            case 1:rebootSystem.startAsyncPauseResume(sleepTime);break;
+            case 2:rebootSystem.startReboot();break;
+        }
     }
 
     public void SetSettingFromWiFi(){
@@ -453,6 +458,9 @@ public class FullscreenActivity extends MyFullscreeanActivity {
                 RunWiFiTask();
             }else if(b==9){
                 StopWiFiTask();
+            }else if(b==10){
+                Toast.makeText(context,"Reboot from Controller",Toast.LENGTH_SHORT).show();
+                TotalReboot(1000);
             }
            /* if(b==8){
                 InputConnection ic = getCurrentInputConnection();
