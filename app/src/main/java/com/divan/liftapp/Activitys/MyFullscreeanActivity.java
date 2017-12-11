@@ -197,7 +197,7 @@ abstract public class MyFullscreeanActivity extends AppCompatActivity {
         if(!isContainSdCard())
         {
             setTextFragmentAsWithoutSD();
-            return;
+//            return;
         }
         setting.StartRead();
         SetSetting();
